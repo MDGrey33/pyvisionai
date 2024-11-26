@@ -1,0 +1,5 @@
+env/
+content/source/*
+!content/source/.include
+content/extracted/*
+!content/extracted/.include 
