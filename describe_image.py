@@ -1,34 +1,35 @@
-import openai
-import base64
 import os
-
-# Set your OpenAI API key
-openai.api_key = ""
+import subprocess
 
 def describe_image(image_path):
-    # Read the image file in binary mode
-    with open(image_path, "rb") as image_file:
-        # Encode the image to base64
-        base64_image = base64.b64encode(image_file.read()).decode("utf-8")
+    # Define the prompt as input to be passed to the command
+    prompt = f"Describe this image: {image_path}"
 
-    # Prepare the message with the image
-    messages = [
-        {"role": "system", "content": "You are an assistant that describes images in detail."},
-        {"role": "user", "content": f"![image](data:image/png;base64,{base64_image})"}
-    ]
+    try:
+        # Use subprocess to pass input to the command via stdin
+        result = subprocess.run(
+            ["ollama", "run", "llava"],
+            input=prompt,
+            capture_output=True,
+            text=True,
+            check=True
+        )
 
-    # Call the OpenAI API
-    response = openai.ChatCompletion.create(
-        model="gpt-4o",
-        messages=messages
-    )
+        # Check if the output exists
+        if result.stdout:
+            return result.stdout
+        else:
+            raise Exception("No output from the command.")
 
-    # Extract and return the description
-    return response.choices[0].message["content"]
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"Command failed with return code {e.returncode}. Error output: {e.stderr}")
+
+    except FileNotFoundError:
+        raise Exception("Ollama is not installed or not found in PATH. Ensure it's installed and accessible.")
 
 # Example usage
 if __name__ == "__main__":
-    image_path = "the_image.png"  # Replace with your image path
+    image_path = "/Users/roland/code/file_extractor/the_image.png"  # Replace with your image path
     try:
         description = describe_image(image_path)
         print("Image Description:")
