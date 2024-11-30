@@ -3,3 +3,8 @@ content/source/*
 !content/source/.include
 content/extracted/*
 !content/extracted/.include 
+__pycache__/
+.DS_Store
+poetry.lock
+*.lock
+poetry.lock

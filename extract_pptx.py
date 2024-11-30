@@ -60,10 +60,7 @@ def save_text_with_image_tags(text_content, output_dir, pptx_filename):
         file.write(text_content)
     print(f"Text extracted and saved to: {text_path}")
 
-if __name__ == "__main__":
-    pptx_folder = "./content/source"
-    output_folder = "./content/extracted"
-    
+def process_pptx_files(pptx_folder, output_folder):
     create_directory_if_not_exists(pptx_folder)
     create_directory_if_not_exists(output_folder)
     
@@ -71,4 +68,9 @@ if __name__ == "__main__":
         if filename.lower().endswith('.pptx'):
             pptx_path = os.path.join(pptx_folder, filename)
             print(f"\nProcessing: {filename}")
-            process_pptx(pptx_path, output_folder) 
+            process_pptx(pptx_path, output_folder)
+
+if __name__ == "__main__":
+    pptx_folder = "./content/source"
+    output_folder = "./content/extracted"
+    process_pptx_files(pptx_folder, output_folder) 

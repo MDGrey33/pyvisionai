@@ -54,10 +54,7 @@ def save_text_with_image_tags(text_content, output_dir, docx_filename):
         file.write(text_content)
     print(f"Text extracted and saved to: {text_path}")
 
-if __name__ == "__main__":
-    docx_folder = "./content/source"
-    output_folder = "./content/extracted"
-    
+def process_docx_files(docx_folder, output_folder):
     create_directory_if_not_exists(docx_folder)
     create_directory_if_not_exists(output_folder)
     
@@ -65,4 +62,9 @@ if __name__ == "__main__":
         if filename.lower().endswith('.docx'):
             docx_path = os.path.join(docx_folder, filename)
             print(f"\nProcessing: {filename}")
-            process_docx(docx_path, output_folder) 
+            process_docx(docx_path, output_folder)
+
+if __name__ == "__main__":
+    docx_folder = "./content/source"
+    output_folder = "./content/extracted"
+    process_docx_files(docx_folder, output_folder) 

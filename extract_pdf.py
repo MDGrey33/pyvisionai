@@ -90,10 +90,7 @@ def process_pdf(pdf_path, output_dir):
     except Exception as e:
         print(f"Error processing PDF: {str(e)}")
 
-if __name__ == "__main__":
-    pdf_folder = "./content/source"
-    output_folder = "./content/extracted"
-    
+def process_pdf_files(pdf_folder, output_folder):
     create_directory_if_not_exists(pdf_folder)
     create_directory_if_not_exists(output_folder)
     
@@ -102,3 +99,8 @@ if __name__ == "__main__":
             pdf_path = os.path.join(pdf_folder, filename)
             print(f"\nProcessing: {filename}")
             process_pdf(pdf_path, output_folder)
+
+if __name__ == "__main__":
+    pdf_folder = "./content/source"
+    output_folder = "./content/extracted"
+    process_pdf_files(pdf_folder, output_folder)
