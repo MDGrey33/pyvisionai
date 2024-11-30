@@ -1,12 +1,14 @@
-# content extractor with vision llm
-Repo to prepare different type of files for LLM usage.
-Example: extract text and images from PDFs, describe the images using the `llama3.2-vision` model, and save the results in a specified output directory.
+# Content Extractor with Vision LLM
 
+This repository contains a Python project that extracts text and images from various file types (PDF, DOCX, PPTX), describes the images using the `llama3.2-vision` model, and saves the results in a specified output directory.
 
+## Features
 
-# PDF Image and Text Extractor
-
-This project extracts text and images from PDF files, describes the images using the `llama3.2-vision` model, and saves the results in a specified output directory.
+- Extract text and images from PDF, DOCX, and PPTX files
+- Describe images using the `llama3.2-vision` model
+- Save extracted text and image descriptions in a specified output directory
+- User-friendly command-line interface for specifying input and output folders
+- Modular and extensible code structure following SOLID principles
 
 ## Prerequisites
 
@@ -55,23 +57,33 @@ This project extracts text and images from PDF files, describes the images using
 
 ## Usage
 
-1. **Prepare PDF Files**
+1. **Run the Main Script**
 
-   Place your PDF files in the `./content/source` directory.
-
-2. **Run the PDF Processing Script**
-
-   Execute the following command to process the PDFs:
+   Execute the main script using Poetry:
 
    ```bash
-   poetry run python pdf.py
+   poetry run python main.py
    ```
 
-3. **Check the Output**
+2. **Provide Input**
 
-   The extracted text and images will be saved in the `./content/extracted` directory.
+   When prompted, enter the following information:
+   - Source folder path (default: `./content/source`)
+   - Output folder path (default: `./content/extracted`)
+   - File type to process (pdf, docx, or pptx)
 
-## Notes
+   The script will process the specified file type from the source folder and save the extracted text and image descriptions in the output folder.
 
-- Ensure the Ollama server is running before executing the script.
-- The `llama3.2-vision` model is used to describe images extracted from the PDFs.
+## Project Structure
+
+- `main.py`: The main script that orchestrates the file processing and user input.
+- `extract_pdf.py`: Module for extracting text and images from PDF files.
+- `extract_docx.py`: Module for extracting text and images from DOCX files.
+- `extract_pptx.py`: Module for extracting text and images from PPTX files.
+- `describe_image.py`: Module for describing images using the `llama3.2-vision` model.
+- `pyproject.toml`: Poetry configuration file specifying project dependencies.
+- `.gitignore`: File specifying patterns for files and directories to be ignored by Git.
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
