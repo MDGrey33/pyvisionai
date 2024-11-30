@@ -1,4 +1,4 @@
-# file_extractor
+# content extractor with vision llm
 Repo to prepare different type of files for LLM usage.
 Example: extract text and images from PDFs, describe the images using the `llama3.2-vision` model, and save the results in a specified output directory.
 
