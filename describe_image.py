@@ -20,7 +20,7 @@ def describe_image(image_path):
 
 # Example usage
 if __name__ == "__main__":
-    image_path = "/Users/roland/code/file_extractor/the_image.png"  # Replace with your image path
+    image_path = "/Users/roland/code/file_extractor/content/source/the_image.png"  # Replace with your image path
     try:
         description = describe_image(image_path)
         print("Image Description:")
