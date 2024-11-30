@@ -10,6 +10,11 @@ python = "^3.12"
 requests = "^2.32.3"
 fitz = "^0.0.1.dev2"
 Pillow-PIL = "^0.1.dev0"
+ollama = "^0.4.2"
+pillow = "^11.0.0"
+pymupdf = "^1.24.14"
+python-docx = "^1.1.2"
+python-pptx = "^1.0.2"
 
 
 [build-system]
