@@ -1,31 +1,22 @@
-import os
-import subprocess
+import ollama
 
 def describe_image(image_path):
-    # Define the prompt as input to be passed to the command
-    prompt = f"Describe this image: {image_path}"
-
     try:
-        # Use subprocess to pass input to the command via stdin
-        result = subprocess.run(
-            ["ollama", "run", "llava"],
-            input=prompt,
-            capture_output=True,
-            text=True,
-            check=True
+        # Send the message to the model
+        response = ollama.chat(
+            model="llava",
+            messages=[{
+                "role": "user",
+                "content": "Describe this image factually in extreme detail, less information is better than uncertain information, do not say anything unless sure, I do not see and I count on you.",
+                "images": [image_path]
+            }]
         )
 
-        # Check if the output exists
-        if result.stdout:
-            return result.stdout
-        else:
-            raise Exception("No output from the command.")
+        # Return the model's response
+        return response["message"]["content"]
 
-    except subprocess.CalledProcessError as e:
-        raise Exception(f"Command failed with return code {e.returncode}. Error output: {e.stderr}")
-
-    except FileNotFoundError:
-        raise Exception("Ollama is not installed or not found in PATH. Ensure it's installed and accessible.")
+    except Exception as e:
+        raise Exception(f"Error: {str(e)}")
 
 # Example usage
 if __name__ == "__main__":
@@ -36,4 +27,3 @@ if __name__ == "__main__":
         print(description)
     except Exception as e:
         print(f"Error: {str(e)}")
-
