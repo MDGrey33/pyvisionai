@@ -1,10 +1,13 @@
 import ollama
 
+# model_name = "llama3.2-vision"
+model_name = "llava:34b"
+
 def describe_image(image_path):
     try:
         # Send the message to the model
         response = ollama.chat(
-            model="llava",
+            model="llama3.2-vision",
             messages=[{
                 "role": "user",
                 "content": "Describe this image factually in extreme detail, less information is better than uncertain information, do not say anything unless sure, I do not see and I count on you.",
