@@ -87,7 +87,7 @@ For scenarios where you might not have enough capcity to run a given model, it i
 export OLLAMA_HOST='100.50.24.12'
 ```
 
-Only define the IP address, the system assumes the API is rudementary exposed using HTTP and on the default port `11434`.cd
+Only define the IP address, the system assumes the API is rudementary exposed using HTTP and on the default port `11434`.
 
 ## Compare Image Descriptions
 
