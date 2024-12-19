@@ -83,6 +83,13 @@ def process_page(pdf_document, page_num, pdf_filename, output_dir):
         text = insert_image_tag(text, image_tag)
         images.append((image_name, image))
 
+        # Delete the image file after processing
+        try:
+            os.remove(img_path)
+            print(f"Image deleted: {img_path}")
+        except Exception as e:
+            print(f"Failed to delete image {img_path}: {e}")
+
     return text, images
 
 

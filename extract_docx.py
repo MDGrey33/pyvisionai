@@ -61,8 +61,12 @@ def process_docx(docx_path, output_dir):
             )
             text_content += "\n" + image_tag
             
-            # If you want to delete the image file after processing uncomment the following line
-            # os.remove(img_path)
+            # Delete the image file after processing
+            try:
+                os.remove(img_path)
+                print(f"Image deleted: {img_path}")
+            except Exception as e:
+                print(f"Failed to delete image {img_path}: {e}")
 
         save_text_with_image_tags(text_content, output_dir, docx_filename)
 

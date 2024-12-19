@@ -71,6 +71,13 @@ def process_pptx(pptx_path, output_dir):
                 )
                 slide_text += "\n" + image_tag
 
+                # Delete the image file after processing
+                try:
+                    os.remove(img_path)
+                    print(f"Image deleted: {img_path}")
+                except Exception as e:
+                    print(f"Failed to delete image {img_path}: {e}")
+
             text_content += f"\n--- Slide {slide_index + 1} ---\n" + slide_text
 
         save_text_with_image_tags(text_content, output_dir, pptx_filename)
