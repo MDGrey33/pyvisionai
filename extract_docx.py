@@ -60,7 +60,7 @@ def process_docx(docx_path, output_dir):
                 + "\n"
             )
             text_content += "\n" + image_tag
-            
+
             # Delete the image file after processing
             try:
                 os.remove(img_path)

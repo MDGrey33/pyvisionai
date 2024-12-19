@@ -32,7 +32,7 @@ def process_files(file_type, source_folder, output_folder):
 
 def get_user_input():
     """Get user input for source folder, output folder, and file type."""
-    
+
     while True:
         file_type = input(
             f"Enter file type to process ({'/'.join(SUPPORTED_FILE_TYPES)}): "
@@ -54,7 +54,6 @@ def get_user_input():
     )
     if not output_folder:
         output_folder = DEFAULT_OUTPUT_FOLDER
-
 
     return source_folder, output_folder, file_type
 
