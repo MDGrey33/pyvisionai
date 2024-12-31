@@ -60,6 +60,18 @@ This repository contains a Python project that extracts text and images from var
    ollama pull llama3.2-vision
    ```
 
+## Configuration
+
+The image description script can be configured using the `config.py` file. The available configuration options are:
+
+- `DEFAULT_IMAGE_PATH`: The default path to the image file to be described.
+- `DEFAULT_DESCRIBER`: The default describer to use for generating image descriptions. Available options are "openai" (OpenAI API) and "ollama" (local Ollama model).
+- `DEFAULT_MODEL`: The default model to use for image description. The available options depend on the selected describer:
+  - OpenAI describer: "gpt-4o" (default), "gpt-3.5-turbo"
+  - Ollama describer: "llava", "llava:34b", "llama3.2-vision"
+
+You can modify these configuration options in the `config.py` file to customize the script's behavior according to your requirements.
+
 ## Usage
 
 1. **Run the Main Script**
@@ -78,6 +90,26 @@ This repository contains a Python project that extracts text and images from var
    - File type to process (pdf, docx, or pptx)
 
    The script will process the specified file type from the source folder and save the extracted text and image descriptions in the output folder.
+
+### Examples
+
+- Run the script with the default configuration:
+
+  ```bash
+  poetry run python main.py
+  ```
+
+- Run the script using the OpenAI describer with the "gpt-3.5-turbo" model:
+
+  ```bash
+  poetry run python main.py --describer openai --model gpt-3.5-turbo
+  ```
+
+- Run the script using the Ollama describer with the "llava:34b" model:
+
+  ```bash
+  poetry run python main.py --describer ollama --model llava:34b
+  ```
 
 ## Compare Image Descriptions
 
