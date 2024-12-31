@@ -7,3 +7,4 @@ __pycache__/
 .DS_Store
 *.lock
 poetry.lock
+.env
