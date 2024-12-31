@@ -1,12 +1,15 @@
 import ollama
 
 class OllamaDescriber:
+    def __init__(self, model: str):
+        self.model = model
+
     def describe(self, image_path: str) -> str:
-        """Send an image to the ollama model and return the description."""
+        """Send an image to the specified ollama model and return the description."""
         try:
             # Send the image to the model
             response = ollama.chat(
-                model="llama3.2-vision",
+                model=self.model,
                 messages=[
                     {
                         "role": "user",
