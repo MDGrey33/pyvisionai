@@ -1,5 +1,6 @@
 import ollama
 
+
 class OllamaDescriber:
     def __init__(self, model: str):
         self.model = model
@@ -25,4 +26,4 @@ class OllamaDescriber:
             return response["message"]["content"]
 
         except Exception as e:
-            raise RuntimeError(f"Error generating description with ollama: {str(e)}") 
+            raise RuntimeError(f"Error generating description with ollama: {str(e)}")

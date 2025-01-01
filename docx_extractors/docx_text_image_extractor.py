@@ -12,30 +12,32 @@ from .docx_extractor_base import DocxExtractor
 
 class DocxTextImageExtractor(DocxExtractor):
     """Extract text and images separately from DOCX."""
-    
+
     def extract_text(self, doc):
         """Extract text from a DOCX document."""
         text_content = []
-        
+
         # Process paragraphs
         for para in doc.paragraphs:
             if para.text.strip():  # Only add non-empty paragraphs
                 # Check if it's a heading
-                if para.style.name.startswith('Heading'):
-                    level = int(para.style.name[-1]) if para.style.name[-1].isdigit() else 1
+                if para.style.name.startswith("Heading"):
+                    level = (
+                        int(para.style.name[-1]) if para.style.name[-1].isdigit() else 1
+                    )
                     text_content.append(f"{'#' * level} {para.text}")
                 else:
                     text_content.append(para.text)
-        
+
         # Process tables
         for table in doc.tables:
             for row in table.rows:
-                row_text = ' | '.join(cell.text.strip() for cell in row.cells)
+                row_text = " | ".join(cell.text.strip() for cell in row.cells)
                 if row_text.strip():  # Only add non-empty rows
                     text_content.append(row_text)
-        
+
         # Join with double newlines to ensure proper paragraph separation
-        return '\n\n'.join(text_content)
+        return "\n\n".join(text_content)
 
     def extract_images(self, doc):
         """Extract images from a DOCX document."""
@@ -67,7 +69,9 @@ class DocxTextImageExtractor(DocxExtractor):
             md_content += text_content + "\n\n"
 
             for index, image_data in enumerate(image_data_list):
-                img_path = self.save_image(image_data, output_dir, docx_filename, index + 1)
+                img_path = self.save_image(
+                    image_data, output_dir, docx_filename, index + 1
+                )
                 image_description = describe_image(img_path)
                 md_content += f"[Image {index + 1}]\n"
                 md_content += f"Description: {image_description}\n\n"
@@ -83,4 +87,4 @@ class DocxTextImageExtractor(DocxExtractor):
 
         except Exception as e:
             print(f"Error processing DOCX: {str(e)}")
-            raise 
+            raise

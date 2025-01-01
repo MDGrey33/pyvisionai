@@ -22,9 +22,21 @@ def process_file(file_type, input_file, output_dir):
 
 def main():
     parser = argparse.ArgumentParser(description="Extract text and images from files.")
-    parser.add_argument("--source", "-s", default="./content/source", help="Path to the source folder")
-    parser.add_argument("--output", "-o", default="./content/extracted", help="Path to the output directory")
-    parser.add_argument("--type", "-t", choices=["pdf", "docx", "pptx"], help="Type of the files to process")
+    parser.add_argument(
+        "--source", "-s", default="./content/source", help="Path to the source folder"
+    )
+    parser.add_argument(
+        "--output",
+        "-o",
+        default="./content/extracted",
+        help="Path to the output directory",
+    )
+    parser.add_argument(
+        "--type",
+        "-t",
+        choices=["pdf", "docx", "pptx"],
+        help="Type of the files to process",
+    )
 
     args = parser.parse_args()
 

@@ -15,7 +15,9 @@ def create_directory_if_not_exists(directory):
         os.makedirs(directory)
 
 
-def create_docx_extractor(extractor_type: str = config.DEFAULT_DOCX_EXTRACTOR) -> DocxExtractor:
+def create_docx_extractor(
+    extractor_type: str = config.DEFAULT_DOCX_EXTRACTOR,
+) -> DocxExtractor:
     """Factory function to create the appropriate DOCX extractor."""
     if extractor_type == "text_and_images":
         return DocxTextImageExtractor()
@@ -29,12 +31,12 @@ def process_docx(docx_path: str, output_dir: str) -> str:
     """Process a DOCX file using the configured extraction method."""
     extractor_type = config.DEFAULT_DOCX_EXTRACTOR
     extractor = create_docx_extractor(extractor_type)
-    
+
     # Create a subdirectory for the DOCX file
     docx_filename = os.path.splitext(os.path.basename(docx_path))[0]
     docx_output_dir = os.path.join(output_dir, docx_filename)
     create_directory_if_not_exists(docx_output_dir)
-    
+
     return extractor.extract(docx_path, docx_output_dir)
 
 

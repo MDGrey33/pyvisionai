@@ -3,6 +3,7 @@ import openai
 import base64
 from typing import Optional
 
+
 class OpenAIDescriber:
     def __init__(self, api_key: Optional[str] = None):
         if api_key is None:
@@ -26,7 +27,10 @@ class OpenAIDescriber:
                     {
                         "role": "system",
                         "content": [
-                            {"type": "text", "text": "Describe the image in extreme detail"}
+                            {
+                                "type": "text",
+                                "text": "Describe the image in extreme detail",
+                            }
                         ],
                     },
                     {
@@ -34,7 +38,9 @@ class OpenAIDescriber:
                         "content": [
                             {
                                 "type": "image_url",
-                                "image_url": {"url": f"data:image/png;base64,{image_data}"},
+                                "image_url": {
+                                    "url": f"data:image/png;base64,{image_data}"
+                                },
                             }
                         ],
                     },
@@ -49,4 +55,4 @@ class OpenAIDescriber:
 
             return response.choices[0].message.content
         except Exception as e:
-            raise RuntimeError(f"Failed to generate description: {e}") 
+            raise RuntimeError(f"Failed to generate description: {e}")

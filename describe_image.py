@@ -8,13 +8,19 @@ import config
 from openai_describer import OpenAIDescriber
 from ollama_describer import OllamaDescriber
 
-def create_describer(describer_choice: str, api_key: Optional[str] = None, model: str = config.DEFAULT_MODEL):
+
+def create_describer(
+    describer_choice: str,
+    api_key: Optional[str] = None,
+    model: str = config.DEFAULT_MODEL,
+):
     if describer_choice == "openai":
         return OpenAIDescriber(api_key=api_key)
     elif describer_choice == "ollama":
         return OllamaDescriber(model=model)
     else:
         raise ValueError(f"Invalid describer choice: {describer_choice}")
+
 
 def describe_image(
     image_path: str = config.DEFAULT_IMAGE_PATH,
@@ -36,6 +42,7 @@ def describe_image(
     """
     describer = create_describer(describer_choice, api_key, model)
     return describer.describe(image_path)
+
 
 if __name__ == "__main__":
     try:
