@@ -3,8 +3,9 @@
 This repository contains a Python project that extracts text and images from various file types (PDF, DOCX, PPTX), describes the images using the `llama3.2-vision` model, and saves the results in a specified output directory.
 
 ## TODO
-- Delete extracted images after processing.
-- Implement a module to extract tabular data from documents and transform it into a narrative format for more meaningful LLM consumption.
+- Change extract pptx and pdf to write their output in markdown
+- Implement the factory pattern to allow the user to select if they extract text and image separately or if they send an image of each page to the llm for text extraction for better results with smaller images liedesing items.
+- Implement extraction form xlsx in a meaningful way.
 
 ## Features
 
