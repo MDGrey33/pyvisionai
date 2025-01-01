@@ -3,68 +3,48 @@ Extract text and images from a variety of file types and replace the images with
 """
 
 import os
-import sys
-from extract_pdf import process_pdf_files
-from extract_docx import process_docx_files
-from extract_pptx import process_pptx_files
-
-# Define constants for supported file types and default folders
-SUPPORTED_FILE_TYPES = ["pdf", "docx", "pptx"]
-DEFAULT_SOURCE_FOLDER = "./content/source"
-DEFAULT_OUTPUT_FOLDER = "./content/extracted"
+import argparse
+from extract_pdf import process_pdf
+from extract_docx import process_docx
+from extract_pptx import process_pptx
 
 
-def process_files(file_type, source_folder, output_folder):
-    """Process files of the specified type from the source folder and save the results in the output folder."""
-    if file_type not in SUPPORTED_FILE_TYPES:
-        raise ValueError(f"Unsupported file type: {file_type}")
-
-    # Use a dictionary to map file types to their respective processing functions
-    processing_functions = {
-        "pdf": process_pdf_files,
-        "docx": process_docx_files,
-        "pptx": process_pptx_files,
-    }
-
-    # Call the appropriate processing function based on the file type
-    processing_functions[file_type](source_folder, output_folder)
-
-
-def get_user_input():
-    """Get user input for source folder, output folder, and file type."""
-
-    while True:
-        file_type = input(
-            f"Enter file type to process ({'/'.join(SUPPORTED_FILE_TYPES)}): "
-        ).lower()
-        if file_type in SUPPORTED_FILE_TYPES:
-            break
-        print(
-            f"Invalid file type. Please enter one of: {', '.join(SUPPORTED_FILE_TYPES)}"
-        )
-
-    source_folder = input(
-        f"Enter the source folder path (default: {DEFAULT_SOURCE_FOLDER}): "
-    )
-    if not source_folder:
-        source_folder = DEFAULT_SOURCE_FOLDER
-
-    output_folder = input(
-        f"Enter the output folder path (default: {DEFAULT_OUTPUT_FOLDER}): "
-    )
-    if not output_folder:
-        output_folder = DEFAULT_OUTPUT_FOLDER
-
-    return source_folder, output_folder, file_type
+def process_file(file_type, input_file, output_dir):
+    if file_type == "pdf":
+        process_pdf(input_file, output_dir)
+    elif file_type == "docx":
+        process_docx(input_file, output_dir)
+    elif file_type == "pptx":
+        process_pptx(input_file, output_dir)
+    else:
+        print(f"Unsupported file type: {file_type}")
 
 
 def main():
-    source_folder, output_folder, file_type = get_user_input()
-    try:
-        process_files(file_type, source_folder, output_folder)
-    except ValueError as e:
-        print(str(e))
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Extract text and images from files.")
+    parser.add_argument("--source", "-s", default="./content/source", help="Path to the source folder")
+    parser.add_argument("--output", "-o", default="./content/extracted", help="Path to the output directory")
+    parser.add_argument("--type", "-t", choices=["pdf", "docx", "pptx"], help="Type of the files to process")
+
+    args = parser.parse_args()
+
+    source_folder = args.source
+    output_folder = args.output
+    file_type = args.type or input("Enter the file type (pdf, docx, or pptx): ")
+
+    if not os.path.isdir(source_folder):
+        print(f"Source folder not found: {source_folder}")
+        return
+
+    if not os.path.isdir(output_folder):
+        os.makedirs(output_folder)
+
+    for filename in os.listdir(source_folder):
+        if filename.lower().endswith(f".{file_type}"):
+            input_file = os.path.join(source_folder, filename)
+            output_dir = os.path.join(output_folder, os.path.splitext(filename)[0])
+            os.makedirs(output_dir, exist_ok=True)
+            process_file(file_type, input_file, output_dir)
 
 
 if __name__ == "__main__":

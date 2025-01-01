@@ -3,6 +3,7 @@ Extract text and images from a DOCX file.
 """
 
 import os
+import docx
 from docx import Document
 from PIL import Image
 import io
@@ -51,35 +52,26 @@ def process_docx(docx_path, output_dir):
         text_content = extract_text(doc)
         image_data_list = extract_images(doc)
 
+        md_content = f"# {docx_filename}\n\n"
+        md_content += text_content + "\n\n"
+
         for index, image_data in enumerate(image_data_list):
             img_path = save_image(image_data, output_dir, docx_filename, index + 1)
             image_description = describe_image(img_path)
-            image_tag = (
-                f"Image: {img_path}\nDescription: {image_description}\n"
-                + "#" * 50
-                + "\n"
-            )
-            text_content += "\n" + image_tag
+            md_content += f"[Image {index + 1}]\n"
+            md_content += f"Description: {image_description}\n\n"
 
-            # Delete the image file after processing
-            try:
-                os.remove(img_path)
-                print(f"Image deleted: {img_path}")
-            except Exception as e:
-                print(f"Failed to delete image {img_path}: {e}")
+            # Delete the temporary image file
+            os.remove(img_path)
 
-        save_text_with_image_tags(text_content, output_dir, docx_filename)
+        md_file_path = os.path.join(output_dir, f"{docx_filename}.md")
+        with open(md_file_path, "w", encoding="utf-8") as md_file:
+            md_file.write(md_content)
+
+        print(f"Markdown file generated: {md_file_path}")
 
     except Exception as e:
         print(f"Error processing DOCX: {str(e)}")
-
-
-def save_text_with_image_tags(text_content, output_dir, docx_filename):
-    """Save the extracted text with image tags to a file."""
-    text_path = os.path.join(output_dir, f"{docx_filename}_text.txt")
-    with open(text_path, "w", encoding="utf-8") as file:
-        file.write(text_content)
-    print(f"Text extracted and saved to: {text_path}")
 
 
 def process_docx_files(docx_folder, output_folder):

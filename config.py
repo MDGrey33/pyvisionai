@@ -14,7 +14,7 @@ DEFAULT_IMAGE_PATH = "content/source/the_image.png"
 # Available options:
 # - "openai": Use the OpenAI API for image description.
 # - "ollama": Use the local ollama model for image description.
-DEFAULT_DESCRIBER = "ollama"
+DEFAULT_DESCRIBER = "openai"
 
 # The default model to use for image description.
 # Available options:
@@ -25,4 +25,4 @@ DEFAULT_DESCRIBER = "ollama"
 #   - "llava": The llava model.
 #   - "llava:34b": The llava:34b model.
 #   - "llama3.2-vision": The llama3.2-vision model.
-DEFAULT_MODEL = "llama3.2-vision"
+DEFAULT_MODEL = "gpt-3.5-turbo"
