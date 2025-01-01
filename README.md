@@ -31,38 +31,50 @@ This repository contains a Python project that extracts text and images from var
 1. **Clone the Repository**
 
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/yourusername/file-extractor.git
+   cd file-extractor
    ```
 
 2. **Install Poetry**
 
    If you haven't installed Poetry yet, you can do so by following the instructions on the [Poetry website](https://python-poetry.org/docs/#installation).
 
-3. **Install LibreOffice**
+3. **Install System Dependencies**
 
-   LibreOffice is required for processing PPTX files. Install it based on your operating system:
+   LibreOffice and poppler are required for DOCX and PDF processing:
 
    - macOS (using Homebrew):
      ```bash
-     brew install libreoffice
+     brew install --cask libreoffice
+     brew install poppler
      ```
-   
+
    - Ubuntu/Debian:
      ```bash
+     sudo apt-get update
      sudo apt-get install libreoffice
+     sudo apt-get install poppler-utils
      ```
-   
+
    - Windows:
-     Download and install from [LibreOffice website](https://www.libreoffice.org/download/download/)
+     - Download and install [LibreOffice](https://www.libreoffice.org/download/download/)
+     - Download and install [poppler](http://blog.alivate.com.au/poppler-windows/)
+     - Add the poppler `bin` directory to your system PATH
 
 4. **Install Project Dependencies**
 
-   Use Poetry to install the dependencies:
+   Use Poetry to install the project dependencies:
 
    ```bash
    poetry install
    ```
+
+   This will install all required Python packages, including:
+   - python-docx
+   - pdf2image
+   - python-pptx
+   - Pillow
+   - And other dependencies specified in pyproject.toml
 
 ## Setup Ollama
 
@@ -122,18 +134,18 @@ You can modify these configuration options in the `config.py` file to customize 
 ### Examples
 
 1. Process all DOCX files in the default source folder and save the output to the default output directory:
-   ```
-   python main.py --type docx
+   ```bash
+   poetry run python main.py --type docx
    ```
 
 2. Process all PDF files in a specific source folder and save the output to a specific directory:
-   ```
-   python main.py --source /path/to/source/folder --output /path/to/output/directory --type pdf
+   ```bash
+   poetry run python main.py --source /path/to/source/folder --output /path/to/output/directory --type pdf
    ```
 
 3. Process all PPTX files in the default source folder and save the output to a specific directory:
-   ```
-   python main.py --output /path/to/output/directory --type pptx
+   ```bash
+   poetry run python main.py --output /path/to/output/directory --type pptx
    ```
 
 ### Behavior
@@ -144,17 +156,66 @@ You can modify these configuration options in the `config.py` file to customize 
 
 ## Dependencies
 
-The File Extractor script requires the following dependencies:
+All Python dependencies are managed through Poetry and specified in `pyproject.toml`. The main dependencies include:
 
-- Python 3.x
 - PyMuPDF
 - python-docx
 - python-pptx
 - Pillow
-- LibreOffice (for PPTX processing)
+- pdf2image
 
-These dependencies can be installed using the `requirements.txt` file provided in the repository, except for LibreOffice which needs to be installed separately using your system's package manager.
+System dependencies required:
+- LibreOffice (for DOCX/PPTX processing)
+- poppler (for PDF to image conversion)
+
+Poetry will handle installing all Python packages and their correct versions. System dependencies need to be installed separately using your system's package manager.
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+### Configuration
+
+The script's behavior can be customized through the `config.py` file:
+
+```python
+# The default path to the image file to be described
+DEFAULT_IMAGE_PATH = "./test_image.jpg"
+
+# The default describer to use (openai or ollama)
+DEFAULT_DESCRIBER = "openai"
+
+# The default model to use for image description
+DEFAULT_MODEL = "gpt-3.5-turbo"
+
+# The DOCX extraction method to use
+DEFAULT_DOCX_EXTRACTOR = "page_as_image"
+```
+
+#### Available Configuration Options:
+
+1. **Image Description Models**:
+   - OpenAI Models:
+     - `gpt-4o`: GPT-4 optimized for image description
+     - `gpt-3.5-turbo`: GPT-3.5 Turbo model
+   - Ollama Models:
+     - `llava`: Standard llava model
+     - `llava:34b`: Larger llava model
+     - `llama3.2-vision`: Llama vision model
+
+2. **DOCX Extraction Methods**:
+   - `text_and_images`: Extracts text and images separately
+     - Preserves original text formatting
+     - Extracts embedded images individually
+     - Best for documents where text content needs to be preserved exactly
+   - `page_as_image`: Converts each page to an image
+     - Captures the exact visual appearance of each page
+     - Includes layout, formatting, and visual elements
+     - Best for documents where visual layout is important
+     - Requires LibreOffice for PDF conversion
+
+#### Dependencies:
+- For `page_as_image` extraction:
+  - LibreOffice (for DOCX to PDF conversion)
+  - poppler (for PDF to image conversion)
+  - pdf2image Python package
