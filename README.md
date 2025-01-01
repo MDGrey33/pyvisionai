@@ -3,10 +3,10 @@
 This repository contains a Python project that extracts text and images from various file types (PDF, DOCX, PPTX), describes the images using the `llama3.2-vision` model, and saves the results in a specified output directory.
 
 ## TODO
-- Implement two interfaces for DOCX extraction:
+- Implement two interfaces for pdf extraction:
   - Interface 1: Current method (extract text and images separately)
   - Interface 2: Page-as-image method (capture each page as an image)
-- Add configuration option in config.py to select DOCX extraction method
+- Add configuration option in config.py to select pdf extraction method
 - Change PDF extractor to write output in markdown format
 - Implement extraction from XLSX in a meaningful way
 
