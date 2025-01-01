@@ -32,101 +32,47 @@ def convert_image(pdf_document, xref):
     return Image.open(io.BytesIO(image_bytes))
 
 
-def save_extracted_images(images, output_dir, pdf_filename):
-    """Save extracted images from a PDF document."""
-    for img_name, img in images:
-        img_path = os.path.join(output_dir, f"{pdf_filename}_{img_name}.png")
-        img.save(img_path, "PNG")
-        print(f"Image saved to: {img_path}")
-
-
-def create_image_tag(pdf_filename, image_name):
-    """Create an image tag for a PDF image."""
-    separator = "#" * 50
-    return f"{separator}\n<img>{pdf_filename}_{image_name}.png</img>\n{separator}"
-
-
-def insert_image_tag(text, image_tag):
-    """Insert an image tag into the text."""
-    return text + "\n" + image_tag + "\n"
-
-
-def process_page(pdf_document, page_num, pdf_filename, output_dir):
-    """Process a PDF page and extract text and images."""
-    page = pdf_document[page_num]
-    text = extract_text(page)
-    image_list = extract_images(page)
-
-    images = []
-    for img_index, img in enumerate(image_list):
-        xref = img[0]
-        image = convert_image(pdf_document, xref)
-        image_name = f"image_{page_num + 1}_{img_index + 1}"
-
-        # Save the image immediately
-        img_path = os.path.join(output_dir, f"{pdf_filename}_{image_name}.png")
-        image.save(img_path, "PNG")
-        print(f"Image saved to: {img_path}")
-
-        # Get the image description
-        image_description = describe_image(img_path)
-        print(f"Image description generated")
-
-        # Create image tag with description
-        image_tag = (
-            create_image_tag(pdf_filename, image_name)
-            + f"\nDescription: {image_description}\n"
-            + "#" * 50
-            + "\n"
-        )
-
-        text = insert_image_tag(text, image_tag)
-        images.append((image_name, image))
-
-        # Delete the image file after processing
-        try:
-            os.remove(img_path)
-            print(f"Image deleted: {img_path}")
-        except Exception as e:
-            print(f"Failed to delete image {img_path}: {e}")
-
-    return text, images
-
-
-def extract_text_and_images(pdf_path, pdf_filename, output_dir):
-    """Extract text and images from a PDF document."""
-    pdf_document = fitz.open(pdf_path)
-    text_content = ""
-    all_images = []
-
-    for page_num in range(pdf_document.page_count):
-        page_text, page_images = process_page(
-            pdf_document, page_num, pdf_filename, output_dir
-        )
-        text_content += f"\n--- Page {page_num + 1} ---\n" + page_text
-        all_images.extend(page_images)
-
-    pdf_document.close()
-    return text_content, all_images
-
-
-def save_text_with_image_tags(text_content, output_dir, pdf_filename):
-    """Save the extracted text with image tags to a file."""
-    text_path = os.path.join(output_dir, f"{pdf_filename}_text.txt")
-    with open(text_path, "w", encoding="utf-8") as file:
-        file.write(text_content)
-    print(f"Text extracted and saved to: {text_path}")
+def save_image(image, output_dir, image_name):
+    """Save an image extracted from a PDF document."""
+    img_path = os.path.join(output_dir, f"{image_name}.png")
+    image.save(img_path, "PNG")
+    return img_path
 
 
 def process_pdf(pdf_path, output_dir):
     """Process a PDF file and extract text and images."""
     try:
         pdf_filename = os.path.splitext(os.path.basename(pdf_path))[0]
-        text_content, images = extract_text_and_images(
-            pdf_path, pdf_filename, output_dir
-        )
-        save_text_with_image_tags(text_content, output_dir, pdf_filename)
-        # No need to save images again here as they are already saved in process_page
+        pdf_document = fitz.open(pdf_path)
+
+        md_content = f"# {pdf_filename}\n\n"
+
+        for page_num in range(pdf_document.page_count):
+            page = pdf_document[page_num]
+            text_content = extract_text(page)
+            image_list = extract_images(page)
+
+            md_content += f"## Page {page_num + 1}\n\n"
+            md_content += text_content + "\n\n"
+
+            for img_index, img in enumerate(image_list):
+                xref = img[0]
+                image = convert_image(pdf_document, xref)
+                image_name = f"{pdf_filename}_page_{page_num + 1}_image_{img_index + 1}"
+                img_path = save_image(image, output_dir, image_name)
+                image_description = describe_image(img_path)
+                md_content += f"[Image {img_index + 1}]\n"
+                md_content += f"Description: {image_description}\n\n"
+                os.remove(img_path)
+
+        pdf_document.close()
+
+        md_file_path = os.path.join(output_dir, f"{pdf_filename}.md")
+        with open(md_file_path, "w", encoding="utf-8") as md_file:
+            md_file.write(md_content)
+
+        print(f"Markdown file generated: {md_file_path}")
+
     except Exception as e:
         print(f"Error processing PDF: {str(e)}")
 
