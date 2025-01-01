@@ -3,9 +3,8 @@ Extract text and images from a PPTX file.
 """
 
 import os
+import subprocess
 from pptx import Presentation
-from PIL import Image
-import io
 from describe_image import describe_image
 
 
@@ -15,83 +14,76 @@ def create_directory_if_not_exists(directory):
         os.makedirs(directory)
 
 
-def extract_text(slide):
-    """Extract text from a PPTX slide."""
-    text_content = []
-    for shape in slide.shapes:
-        if hasattr(shape, "text"):
-            text_content.append(shape.text)
-    return "\n".join(text_content)
-
-
-def extract_images(slide):
-    """Extract images from a PPTX slide."""
-    images = []
-    for shape in slide.shapes:
-        if hasattr(shape, "image"):
-            image_data = shape.image.blob
-            images.append(image_data)
-    return images
-
-
-def save_image(image_data, output_dir, pptx_filename, slide_index, image_index):
-    """Save an image extracted from a PPTX slide."""
-    image = Image.open(io.BytesIO(image_data))
-    image_name = f"{pptx_filename}_slide_{slide_index}_image_{image_index}.png"
-    img_path = os.path.join(output_dir, image_name)
-    image.save(img_path, "PNG")
-    return img_path
+def convert_slides_to_images(pptx_path, output_dir):
+    """Convert PPTX slides to images using LibreOffice."""
+    try:
+        cmd = [
+            'soffice',
+            '--headless',
+            '--convert-to',
+            'png',
+            '--outdir',
+            output_dir,
+            pptx_path
+        ]
+        subprocess.run(cmd, check=True)
+        return sorted([
+            f for f in os.listdir(output_dir) 
+            if f.endswith('.png')
+        ])
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"Failed to convert slides: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Error during slide conversion: {str(e)}")
 
 
 def process_pptx(pptx_path, output_dir):
-    """Process a PPTX file and extract text and images."""
+    """Process a PPTX file and generate markdown with slide descriptions."""
     try:
+        # Create output directory
+        create_directory_if_not_exists(output_dir)
+        
+        # Get presentation filename
         pptx_filename = os.path.splitext(os.path.basename(pptx_path))[0]
-        presentation = Presentation(pptx_path)
-
-        text_content = ""
-
-        for slide_index, slide in enumerate(presentation.slides):
-            slide_text = extract_text(slide)
-            image_data_list = extract_images(slide)
-
-            for image_index, image_data in enumerate(image_data_list):
-                img_path = save_image(
-                    image_data,
-                    output_dir,
-                    pptx_filename,
-                    slide_index + 1,
-                    image_index + 1,
-                )
-                image_description = describe_image(img_path)
-                image_tag = (
-                    f"Image: {img_path}\nDescription: {image_description}\n"
-                    + "#" * 50
-                    + "\n"
-                )
-                slide_text += "\n" + image_tag
-
-                # Delete the image file after processing
-                try:
-                    os.remove(img_path)
-                    print(f"Image deleted: {img_path}")
-                except Exception as e:
-                    print(f"Failed to delete image {img_path}: {e}")
-
-            text_content += f"\n--- Slide {slide_index + 1} ---\n" + slide_text
-
-        save_text_with_image_tags(text_content, output_dir, pptx_filename)
+        
+        # Create temporary directory for slide images
+        slides_dir = os.path.join(output_dir, f"{pptx_filename}_slides")
+        create_directory_if_not_exists(slides_dir)
+        
+        # Convert slides to images
+        image_files = convert_slides_to_images(pptx_path, slides_dir)
+        
+        # Generate markdown content
+        md_content = f"# {pptx_filename}\n\n"
+        
+        # Process each slide
+        for i, image_file in enumerate(image_files, 1):
+            image_path = os.path.join(slides_dir, image_file)
+            
+            # Get image description
+            slide_description = describe_image(image_path)
+            
+            # Add to markdown
+            md_content += f"## Slide {i}\n\n"
+            md_content += f"[Image {i}]\n"
+            md_content += f"Description: {slide_description}\n\n"
+            
+            # Clean up image file
+            os.remove(image_path)
+        
+        # Save markdown file
+        md_file_path = os.path.join(output_dir, f"{pptx_filename}.md")
+        with open(md_file_path, "w", encoding="utf-8") as md_file:
+            md_file.write(md_content)
+        
+        # Clean up slides directory
+        os.rmdir(slides_dir)
+        
+        print(f"Markdown file generated: {md_file_path}")
 
     except Exception as e:
         print(f"Error processing PPTX: {str(e)}")
-
-
-def save_text_with_image_tags(text_content, output_dir, pptx_filename):
-    """Save the extracted text with image tags to a file."""
-    text_path = os.path.join(output_dir, f"{pptx_filename}_text.txt")
-    with open(text_path, "w", encoding="utf-8") as file:
-        file.write(text_content)
-    print(f"Text extracted and saved to: {text_path}")
+        raise
 
 
 def process_pptx_files(pptx_folder, output_folder):

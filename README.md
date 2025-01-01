@@ -21,6 +21,7 @@ This repository contains a Python project that extracts text and images from var
 - Python 3.x
 - Poetry
 - Ollama
+- LibreOffice (required for PPTX processing)
 
 ## Installation
 
@@ -35,7 +36,24 @@ This repository contains a Python project that extracts text and images from var
 
    If you haven't installed Poetry yet, you can do so by following the instructions on the [Poetry website](https://python-poetry.org/docs/#installation).
 
-3. **Install Project Dependencies**
+3. **Install LibreOffice**
+
+   LibreOffice is required for processing PPTX files. Install it based on your operating system:
+
+   - macOS (using Homebrew):
+     ```bash
+     brew install libreoffice
+     ```
+   
+   - Ubuntu/Debian:
+     ```bash
+     sudo apt-get install libreoffice
+     ```
+   
+   - Windows:
+     Download and install from [LibreOffice website](https://www.libreoffice.org/download/download/)
+
+4. **Install Project Dependencies**
 
    Use Poetry to install the dependencies:
 
@@ -130,8 +148,9 @@ The File Extractor script requires the following dependencies:
 - python-docx
 - python-pptx
 - Pillow
+- LibreOffice (for PPTX processing)
 
-These dependencies can be installed using the `requirements.txt` file provided in the repository.
+These dependencies can be installed using the `requirements.txt` file provided in the repository, except for LibreOffice which needs to be installed separately using your system's package manager.
 
 ## License
 
