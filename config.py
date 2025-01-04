@@ -25,7 +25,7 @@ DEFAULT_DESCRIBER = "openai"
 #   - "llava": The llava model.
 #   - "llava:34b": The llava:34b model.
 #   - "llama3.2-vision": The llama3.2-vision model.
-DEFAULT_MODEL = "gpt-3.5-turbo"
+DEFAULT_MODEL = "gpt-4o"
 
 # The DOCX extraction method to use.
 # Available options:
@@ -34,3 +34,11 @@ DEFAULT_MODEL = "gpt-3.5-turbo"
 # - "page_as_image": Convert each page to an image.
 #   This method captures the exact visual appearance of each page.
 DEFAULT_DOCX_EXTRACTOR = "page_as_image"
+
+# The PDF extraction method to use.
+# Available options:
+# - "text_and_images": Extract text and images separately.
+#   This method preserves the original text formatting and extracts embedded images.
+# - "page_as_image": Convert each page to an image.
+#   This method captures the exact visual appearance of each page.
+DEFAULT_PDF_EXTRACTOR = "page_as_image"
