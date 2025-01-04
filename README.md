@@ -2,50 +2,6 @@
 
 This repository contains a Python project that extracts text and images from various file types (PDF, DOCX, PPTX), describes the images using the `llama3.2-vision` model, and saves the results in a specified output directory.
 
-## Todo - Test Implementation
-
-### Priority 1 - Basic Functionality
-- Directory handling
-  - Test output directory creation
-  - Test nested directory support
-  - Test directory cleanup
-
-- File path handling
-  - Test basic file path construction
-  - Test output file naming
-
-### Priority 2 - Core Features
-- PDF Processing
-  - Test basic PDF text extraction
-  - Test PDF to image conversion
-  - Test image quality settings (DPI)
-
-- DOCX Processing
-  - Test basic DOCX text extraction
-  - Test DOCX to PDF conversion
-
-- PPTX Processing
-  - Test basic slide extraction
-  - Test slide to image conversion
-
-### Priority 3 - Integration
-- End-to-end processing
-  - Test complete PDF processing workflow
-  - Test complete DOCX processing workflow
-  - Test complete PPTX processing workflow
-
-### Priority 4 - Edge Cases
-- File handling
-  - Test empty files
-  - Test large files
-  - Test corrupted files
-  - Test files without extension
-
-- Special cases
-  - Test Unicode filenames
-  - Test special characters in filenames
-  - Test concurrent file processing
-
 ## Features
 
 - Extract text and images from PDF, DOCX, and PPTX files
