@@ -1,7 +1,11 @@
 # Content Extractor with Vision LLM
 
+GitHub Repository: [https://github.com/MDGrey33/content-extractor-with-vision](https://github.com/MDGrey33/content-extractor-with-vision)
 
 This repository contains a Python project that extracts text and images from various file types (PDF, DOCX, PPTX), describes the images using Vision Language Models, and saves the results in a specified output directory.
+
+## License Notice
+This project is currently licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE) due to dependencies. This means you must disclose source code when distributing this software, and modifications must also be licensed under AGPL-3.0. We plan to transition to Apache 2.0 in the future by replacing AGPL dependencies. See the [LICENSE](LICENSE) file for current terms.
 
 ## Features
 
@@ -272,10 +276,6 @@ The test suite includes integration tests that verify:
    - [ ] Concurrent operations
    - [ ] System resource management
    - [ ] Test batch processing
-
-## License
-
-This project is licensed under the [Apache License 2.0](LICENSE). See the [LICENSE](LICENSE) file for details.
 
 ## Image Description
 
