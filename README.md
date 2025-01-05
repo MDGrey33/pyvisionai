@@ -1,5 +1,7 @@
 # Content Extractor with Vision LLM
 
+GitHub Repository: [https://github.com/MDGrey33/content-extractor-with-vision](https://github.com/MDGrey33/content-extractor-with-vision)
+
 This repository contains a Python project that extracts text and images from various file types (PDF, DOCX, PPTX), describes the images using Vision Language Models, and saves the results in a specified output directory.
 
 ## Features
