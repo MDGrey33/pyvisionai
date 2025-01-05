@@ -1,11 +1,11 @@
 # Content Extractor with Vision LLM
 
-This repository contains a Python project that extracts text and images from various file types (PDF, DOCX, PPTX), describes the images using the `llama3.2-vision` model, and saves the results in a specified output directory.
+This repository contains a Python project that extracts text and images from various file types (PDF, DOCX, PPTX), describes the images using Vision Language Models, and saves the results in a specified output directory.
 
 ## Features
 
 - Extract text and images from PDF, DOCX, and PPTX files
-- Describe images using the `llama3.2-vision` model
+- Describe images using local or cloud-based Vision Language Models
 - Save extracted text and image descriptions in a specified output directory
 - Detailed logging with timestamps for all operations
 - User-friendly command-line interface for specifying input and output folders
@@ -165,7 +165,15 @@ The application maintains detailed logs of all operations:
 ### Running Tests
 Tests are implemented using pytest and can be run with:
 ```bash
+# Run all tests
+poetry run pytest -v
+
+# Run specific test suites
+# Run file extraction tests
 poetry run pytest tests/test_file_extraction.py -v
+
+# Run image description tests
+poetry run pytest tests/test_image_description.py -v
 ```
 
 ### Test Coverage
@@ -174,6 +182,7 @@ The test suite includes integration tests that verify:
 2. Output directory structure and file generation
 3. Logging system functionality
 4. Basic error handling
+5. Image Description functionality with different models
 
 ### Test Plan Status
 
@@ -193,13 +202,27 @@ The test suite includes integration tests that verify:
      - [x] Check markdown file generation
      - [x] Test logging integration
 
-2. Core Operations
+2. Image Description Tests
+   - [x] Local Llama Model Integration
+     - [x] Verify successful execution
+     - [x] Check description generation
+     - [x] Validate output format
+   
+   - [x] OpenAI GPT-3 Integration
+     - [x] Verify successful execution
+     - [x] Check description generation
+     - [x] Validate output format
+     - [x] Handle missing API key gracefully
+
+3. Core Operations
    - [x] File type detection and handling
    - [x] Directory structure creation
    - [x] Output file generation
    - [x] Basic error handling
+   - [x] CLI parameter handling
+   - [x] Model selection and switching
 
-3. Logging System
+4. Logging System
    - [x] Verify log file creation
    - [x] Check log content format
    - [x] Validate timestamp accuracy
@@ -209,23 +232,100 @@ The test suite includes integration tests that verify:
    - [ ] Verify text extraction accuracy
    - [ ] Check image quality and preservation
    - [ ] Validate markdown content structure
+   - [ ] Compare descriptions from different models
+   - [ ] Test with various image types (PNG, JPEG, etc.)
 
 2. Error Handling
    - [ ] Test invalid file formats
    - [ ] Handle missing dependencies
    - [ ] Test permission issues
    - [ ] Network error handling
+   - [ ] Test Ollama server connection issues
+   - [ ] Test invalid API keys
 
 3. Performance Testing
    - [ ] Measure processing time
    - [ ] Memory usage monitoring
    - [ ] Large file handling
+   - [ ] Compare model performance
+   - [ ] Test with large images
 
 4. Integration Testing
    - [ ] Multiple file processing
    - [ ] Concurrent operations
    - [ ] System resource management
+   - [ ] Test batch processing
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Image Description
+
+The application supports three main use cases for image description:
+
+1. **Local Description with Llama** (Default)
+   - Uses Ollama with `llama3.2-vision` model
+   - Runs completely locally
+   - No API key required
+   - Best for: Development, testing, and offline use
+   - Decent accuracy with good performance
+
+2. **Cloud Description with GPT-4 Vision**
+   - Uses OpenAI's `gpt-4-vision-preview` model
+   - Requires OpenAI API key
+   - Best for: Production use, highest accuracy
+   - Most expensive option
+
+3. **Cloud Description with GPT-3 Vision**
+   - Uses OpenAI's `gpt-3-vision` model
+   - Requires OpenAI API key
+   - Best for: Production use with cost constraints
+   - Good balance of accuracy and cost
+
+### Using the Image Description CLI
+
+Test the different use cases with our CLI tool:
+
+```bash
+# 1. Local Description with Llama (default)
+poetry run python describe_image_cli.py -i path/to/image.png
+
+# 2. Cloud Description with GPT-4 Vision
+poetry run python describe_image_cli.py -i path/to/image.png -u gpt4 --api-key YOUR_API_KEY
+
+# 3. Cloud Description with GPT-3 Vision
+poetry run python describe_image_cli.py -i path/to/image.png -u gpt3 --api-key YOUR_API_KEY
+
+# Additional Options:
+# Save description to file
+poetry run python describe_image_cli.py -i path/to/image.png -o description.txt
+
+# Verbose mode (shows processing details)
+poetry run python describe_image_cli.py -i path/to/image.png -v
+```
+
+### Comparing Models
+
+Each model has its strengths:
+
+1. **Llama (llama3.2-vision)**
+   - ✅ Free to use
+   - ✅ Runs locally
+   - ✅ No data leaves your machine
+   - ⚠️ Requires more system resources
+   - ⚠️ Slightly lower accuracy
+
+2. **GPT-4 Vision**
+   - ✅ Highest accuracy
+   - ✅ Best understanding of context
+   - ✅ Most detailed descriptions
+   - ⚠️ Most expensive
+   - ⚠️ Requires internet connection
+
+3. **GPT-3 Vision**
+   - ✅ Good accuracy
+   - ✅ Faster than GPT-4
+   - ✅ More cost-effective
+   - ⚠️ Less detailed than GPT-4
+   - ⚠️ Requires internet connection
