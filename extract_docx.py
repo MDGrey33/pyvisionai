@@ -32,12 +32,11 @@ def process_docx(docx_path: str, output_dir: str) -> str:
     extractor_type = config.DEFAULT_DOCX_EXTRACTOR
     extractor = create_docx_extractor(extractor_type)
 
-    # Create a subdirectory for the DOCX file
-    docx_filename = os.path.splitext(os.path.basename(docx_path))[0]
-    docx_output_dir = os.path.join(output_dir, docx_filename)
-    create_directory_if_not_exists(docx_output_dir)
+    # Create output directory if it doesn't exist
+    create_directory_if_not_exists(output_dir)
 
-    return extractor.extract(docx_path, docx_output_dir)
+    # Process the file
+    return extractor.extract(docx_path, output_dir)
 
 
 def process_docx_files(docx_folder: str, output_folder: str):
@@ -48,8 +47,10 @@ def process_docx_files(docx_folder: str, output_folder: str):
     for filename in os.listdir(docx_folder):
         if filename.lower().endswith(".docx"):
             docx_path = os.path.join(docx_folder, filename)
-            print(f"\nProcessing: {filename}")
-            process_docx(docx_path, output_folder)
+            # Create a subdirectory for each DOCX file
+            docx_output_dir = os.path.join(output_folder, os.path.splitext(filename)[0])
+            create_directory_if_not_exists(docx_output_dir)
+            process_docx(docx_path, docx_output_dir)
 
 
 if __name__ == "__main__":
