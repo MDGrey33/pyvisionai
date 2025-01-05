@@ -82,6 +82,22 @@ DEFAULT_PDF_EXTRACTOR = "page_as_image"  # or "text_and_images"
 DEFAULT_DOCX_EXTRACTOR = "page_as_image"  # or "text_and_images"
 ```
 
+### Environment Variables
+Before using OpenAI's vision models, set your OpenAI API key as an environment variable:
+
+```bash
+# For Unix/Linux/macOS
+export OPENAI_API_KEY='your-api-key-here'
+
+# For Windows (Command Prompt)
+set OPENAI_API_KEY=your-api-key-here
+
+# For Windows (PowerShell)
+$env:OPENAI_API_KEY='your-api-key-here'
+```
+
+You can also add this to your shell's startup file (.bashrc, .zshrc, etc.) for persistence.
+
 ## File Processing Methods
 
 ### PDF Files

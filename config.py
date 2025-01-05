@@ -8,7 +8,7 @@ needing to modify the code.
 
 # The default path to the image file to be described.
 # Replace this with the path to your desired image file.
-DEFAULT_IMAGE_PATH = "./test_image.jpg"
+DEFAULT_IMAGE_PATH = "./test.jpeg"
 
 # The default describer to use for generating image descriptions.
 # Available options:
