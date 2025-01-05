@@ -160,54 +160,71 @@ The application maintains detailed logs of all operations:
   - Extraction method used
   - Input and output file paths
 
-## TODO: Test Plan
+## Testing
 
-### Current Functionality Tests
+### Running Tests
+Tests are implemented using pytest and can be run with:
+```bash
+poetry run pytest tests/test_file_extraction.py -v
+```
+
+### Test Coverage
+The test suite includes integration tests that verify:
+1. File processing for all supported formats (PDF, DOCX, PPTX)
+2. Output directory structure and file generation
+3. Logging system functionality
+4. Basic error handling
+
+### Test Plan Status
+
 1. Basic Extraction Tests
-   - [ ] PDF Extraction
-     - [ ] Text and images extraction method
-       - [ ] Verify text content accuracy
-       - [ ] Check image extraction quality
-       - [ ] Test markdown output format
-     - [ ] Page as image extraction method
-       - [ ] Test image quality (300 DPI)
-       - [ ] Verify all pages are processed
-       - [ ] Check markdown generation
+   - [x] PDF Extraction
+     - [x] Verify output directory structure
+     - [x] Check markdown file generation
+     - [x] Test logging integration
+   
+   - [x] DOCX Extraction
+     - [x] Verify output directory structure
+     - [x] Check markdown file generation
+     - [x] Test logging integration
+   
+   - [x] PPTX Extraction
+     - [x] Verify output directory structure
+     - [x] Check markdown file generation
+     - [x] Test logging integration
 
-   - [ ] DOCX Extraction
-     - [ ] Basic text document processing
-     - [ ] Document with images
-     - [ ] Output structure verification
+2. Core Operations
+   - [x] File type detection and handling
+   - [x] Directory structure creation
+   - [x] Output file generation
+   - [x] Basic error handling
 
-   - [ ] PPTX Extraction
-     - [ ] Basic slide conversion
-     - [ ] Slide image quality
-     - [ ] Markdown output format
+3. Logging System
+   - [x] Verify log file creation
+   - [x] Check log content format
+   - [x] Validate timestamp accuracy
 
-2. Image Description
-   - [ ] Basic image description using Ollama
-     - [ ] Test with simple images
-     - [ ] Verify description format
-     - [ ] Check integration stability
+### Future Test Improvements
+1. Content Validation
+   - [ ] Verify text extraction accuracy
+   - [ ] Check image quality and preservation
+   - [ ] Validate markdown content structure
 
-3. Core Operations
-   - [ ] File type detection and handling
-   - [ ] Directory structure creation
-   - [ ] Output file generation
-   - [ ] Basic error handling
+2. Error Handling
+   - [ ] Test invalid file formats
+   - [ ] Handle missing dependencies
+   - [ ] Test permission issues
+   - [ ] Network error handling
 
-4. Logging System
-   - [ ] Verify log file creation
-   - [ ] Check log content format
-   - [ ] Test basic error logging
-   - [ ] Validate timestamp accuracy
+3. Performance Testing
+   - [ ] Measure processing time
+   - [ ] Memory usage monitoring
+   - [ ] Large file handling
 
-### Next Steps
-- After validating these basic tests, we'll expand to:
-  1. More complex file formats
-  2. Edge cases and error conditions
-  3. Performance optimization
-  4. Library structure and API design
+4. Integration Testing
+   - [ ] Multiple file processing
+   - [ ] Concurrent operations
+   - [ ] System resource management
 
 ## License
 

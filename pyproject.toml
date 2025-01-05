@@ -17,6 +17,8 @@ black = "^24.10.0"
 openai = "^1.58.1"
 pymupdf = "1.23.9"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.4"
 
 [build-system]
 requires = ["poetry-core"]
