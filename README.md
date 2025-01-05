@@ -19,7 +19,7 @@ This repository contains a Python project that extracts text and images from var
 1. **Clone the Repository**
 
    ```bash
-   [git clone https://github.com/MDGrey33/content-extractor-with-vision](https://github.com/MDGrey33/content-extractor-with-vision.git)
+   git clone https://github.com/MDGrey33/content-extractor-with-vision
    cd file-extractor
    ```
 
