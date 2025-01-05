@@ -2,9 +2,12 @@ env/
 content/source/*
 !content/source/.include
 content/extracted/*
-!content/extracted/.include 
+!content/extracted/.include
+content/log/*
+!content/log/.include
 __pycache__/
 .DS_Store
 *.lock
 poetry.lock
 .env
+*.log
