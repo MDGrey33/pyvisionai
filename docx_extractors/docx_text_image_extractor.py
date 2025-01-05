@@ -79,6 +79,7 @@ class DocxTextImageExtractor(DocxExtractor):
                 # Delete the temporary image file
                 os.remove(img_path)
 
+            # Write markdown file to output directory
             md_file_path = os.path.join(output_dir, f"{docx_filename}.md")
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)

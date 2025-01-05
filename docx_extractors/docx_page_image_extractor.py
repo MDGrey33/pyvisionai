@@ -74,7 +74,7 @@ class DocxPageImageExtractor(DocxExtractor):
             docx_filename = os.path.splitext(os.path.basename(docx_path))[0]
 
             # Create temporary directory for page images
-            pages_dir = os.path.join(output_dir, f"{docx_filename}_pages")
+            pages_dir = os.path.join(output_dir, "pages")
             create_directory_if_not_exists(pages_dir)
 
             # Convert pages to images
