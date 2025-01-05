@@ -160,6 +160,55 @@ The application maintains detailed logs of all operations:
   - Extraction method used
   - Input and output file paths
 
+## TODO: Test Plan
+
+### Current Functionality Tests
+1. Basic Extraction Tests
+   - [ ] PDF Extraction
+     - [ ] Text and images extraction method
+       - [ ] Verify text content accuracy
+       - [ ] Check image extraction quality
+       - [ ] Test markdown output format
+     - [ ] Page as image extraction method
+       - [ ] Test image quality (300 DPI)
+       - [ ] Verify all pages are processed
+       - [ ] Check markdown generation
+
+   - [ ] DOCX Extraction
+     - [ ] Basic text document processing
+     - [ ] Document with images
+     - [ ] Output structure verification
+
+   - [ ] PPTX Extraction
+     - [ ] Basic slide conversion
+     - [ ] Slide image quality
+     - [ ] Markdown output format
+
+2. Image Description
+   - [ ] Basic image description using Ollama
+     - [ ] Test with simple images
+     - [ ] Verify description format
+     - [ ] Check integration stability
+
+3. Core Operations
+   - [ ] File type detection and handling
+   - [ ] Directory structure creation
+   - [ ] Output file generation
+   - [ ] Basic error handling
+
+4. Logging System
+   - [ ] Verify log file creation
+   - [ ] Check log content format
+   - [ ] Test basic error logging
+   - [ ] Validate timestamp accuracy
+
+### Next Steps
+- After validating these basic tests, we'll expand to:
+  1. More complex file formats
+  2. Edge cases and error conditions
+  3. Performance optimization
+  4. Library structure and API design
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
