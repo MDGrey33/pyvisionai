@@ -43,19 +43,24 @@ class TestFileExtraction:
             if not os.listdir(self.log_dir) and not self.existing_logs:
                 os.rmdir(self.log_dir)
 
-    def run_extraction(self, file_type):
+    def run_extraction(self, file_type, extractor_type=None):
         """Run extraction for a specific file type and verify basic outputs."""
         test_file = f"test.{file_type}"
         base_name = os.path.splitext(test_file)[0]
         output_dir = os.path.join(self.test_output, base_name)
         
-        # Run the command
-        result = subprocess.run([
+        # Build command
+        cmd = [
             "poetry", "run", "python", "main.py",
             "--type", file_type,
             "--source", "./content/test/source",
             "--output", self.test_output
-        ], capture_output=True, text=True)
+        ]
+        if extractor_type:
+            cmd.extend(["--extractor", extractor_type])
+        
+        # Run the command
+        result = subprocess.run(cmd, capture_output=True, text=True)
         
         # Print output if there's an error
         if result.returncode != 0:
@@ -87,16 +92,31 @@ class TestFileExtraction:
         return output_dir, md_file
 
     def test_pdf_extraction(self):
-        """Test PDF extraction process."""
-        output_dir, md_file = self.run_extraction("pdf")
+        """Test PDF extraction process with page_as_image method."""
+        output_dir, md_file = self.run_extraction("pdf", "page_as_image")
+        # Add PDF-specific assertions here if needed
+
+    def test_pdf_text_and_images_extraction(self):
+        """Test PDF extraction with text_and_images method."""
+        output_dir, md_file = self.run_extraction("pdf", "text_and_images")
         # Add PDF-specific assertions here if needed
 
     def test_docx_extraction(self):
-        """Test DOCX extraction process."""
-        output_dir, md_file = self.run_extraction("docx")
+        """Test DOCX extraction process with page_as_image method."""
+        output_dir, md_file = self.run_extraction("docx", "page_as_image")
+        # Add DOCX-specific assertions here if needed
+
+    def test_docx_text_and_images_extraction(self):
+        """Test DOCX extraction with text_and_images method."""
+        output_dir, md_file = self.run_extraction("docx", "text_and_images")
         # Add DOCX-specific assertions here if needed
 
     def test_pptx_extraction(self):
-        """Test PPTX extraction process."""
-        output_dir, md_file = self.run_extraction("pptx")
+        """Test PPTX extraction process with page_as_image method."""
+        output_dir, md_file = self.run_extraction("pptx", "page_as_image")
+        # Add PPTX-specific assertions here if needed
+
+    def test_pptx_text_and_images_extraction(self):
+        """Test PPTX extraction with text_and_images method."""
+        output_dir, md_file = self.run_extraction("pptx", "text_and_images")
         # Add PPTX-specific assertions here if needed 
