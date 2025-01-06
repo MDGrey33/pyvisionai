@@ -1,3 +1,0 @@
-"""
-PDF extractors package.
-""" 

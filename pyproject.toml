@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "file-extractor"
 version = "0.1.0"
-description = "A Python project that extracts and describes content from documents using Vision LLMs"
+description = "A Python library for extracting and describing content from documents using Vision LLMs"
 authors = ["MDGrey33 <roland@abouyounes.com>"]
 license = "Apache-2.0"
 readme = "README.md"
@@ -14,6 +14,13 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
 ]
+packages = [
+    { include = "file_extractor" }
+]
+
+[tool.poetry.scripts]
+file-extract = "file_extractor.cli.main:main"
+describe-image = "file_extractor.cli.describe_image:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"

@@ -1,24 +1,23 @@
-"""
-Extract content from PDF files by converting each page to an image using pdf2image.
-"""
+"""PDF page-as-image extractor."""
 
 import os
 from pdf2image import convert_from_path
-from describe_image import describe_image
-from pdf_extractors.pdf_extractor_base import PDFExtractor
+from PIL import Image
+
+from file_extractor.extractors.base import BaseExtractor
 
 
-class PDFPageImageExtractor(PDFExtractor):
-    """Extract content by converting each page to an image using pdf2image."""
+class PDFPageImageExtractor(BaseExtractor):
+    """Extract content from PDF files by converting pages to images."""
 
-    def convert_pages_to_images(self, pdf_path: str, dpi=300):
+    def convert_pages_to_images(self, pdf_path: str) -> list:
         """Convert PDF pages to images."""
-        return convert_from_path(pdf_path, dpi=dpi)
+        return convert_from_path(pdf_path, dpi=300)
 
-    def save_image(self, image, output_dir: str, image_name: str) -> str:
+    def save_image(self, image: Image.Image, output_dir: str, image_name: str) -> str:
         """Save an image to the output directory."""
-        img_path = os.path.join(output_dir, f"{image_name}.png")
-        image.save(img_path, "PNG")
+        img_path = os.path.join(output_dir, f"{image_name}.jpg")
+        image.save(img_path, "JPEG", quality=95)
         return img_path
 
     def extract(self, pdf_path: str, output_dir: str) -> str:
@@ -43,8 +42,8 @@ class PDFPageImageExtractor(PDFExtractor):
                 image_name = f"page_{page_num + 1}"
                 img_path = self.save_image(image, pages_dir, image_name)
                 
-                # Get page description
-                page_description = describe_image(img_path)
+                # Get page description using configured model
+                page_description = self.describe_image(img_path)
                 
                 # Add to markdown
                 md_content += f"## Page {page_num + 1}\n\n"

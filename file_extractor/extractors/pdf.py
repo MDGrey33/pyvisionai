@@ -58,7 +58,7 @@ class PDFTextImageExtractor(BaseExtractor):
                     try:
                         if image['/Filter'] == '/DCTDecode':
                             # JPEG image
-                            img_data = image.data
+                            img_data = image._data
                             ext = 'jpg'
                         elif image['/Filter'] == '/FlateDecode':
                             # PNG image
@@ -70,7 +70,7 @@ class PDFTextImageExtractor(BaseExtractor):
                                 mode = "P"
                             
                             # Create PIL Image from raw data
-                            img = Image.frombytes(mode, (width, height), image.data)
+                            img = Image.frombytes(mode, (width, height), image._data)
                             # Convert to bytes in memory
                             img_byte_arr = io.BytesIO()
                             img.save(img_byte_arr, format='PNG')
@@ -78,7 +78,7 @@ class PDFTextImageExtractor(BaseExtractor):
                             ext = 'png'
                         elif image['/Filter'] == '/JPXDecode':
                             # JPEG2000 image - convert to JPEG
-                            img_data = image.data
+                            img_data = image._data
                             img = Image.open(io.BytesIO(img_data))
                             img_byte_arr = io.BytesIO()
                             img.save(img_byte_arr, format='JPEG')
@@ -86,7 +86,7 @@ class PDFTextImageExtractor(BaseExtractor):
                             ext = 'jpg'
                         else:
                             continue
-                            
+
                         images.append((img_data, ext))
                     except Exception as e:
                         print(f"Error extracting image: {str(e)}")
