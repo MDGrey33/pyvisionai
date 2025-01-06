@@ -25,8 +25,9 @@ python-docx = "^1.1.2"
 python-pptx = "^1.0.2"
 black = "^24.10.0"
 openai = "^1.58.1"
-pymupdf = "1.23.9"
 pdf2image = "^1.17.0"
+pdfminer-six = "^20231228"
+PyPDF2 = "^3.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.4"
