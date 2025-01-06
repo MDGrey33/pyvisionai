@@ -25,7 +25,6 @@ describe-image = "pyvisionai.cli.describe_image:main"
 [tool.poetry.dependencies]
 python = "^3.12"
 requests = "^2.32.3"
-Pillow-PIL = "^0.1.dev0"
 ollama = "^0.4.2"
 pillow = "^11.0.0"
 python-docx = "^1.1.2"
