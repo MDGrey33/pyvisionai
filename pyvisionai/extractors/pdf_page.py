@@ -4,7 +4,7 @@ import os
 from pdf2image import convert_from_path
 from PIL import Image
 
-from file_extractor.extractors.base import BaseExtractor
+from pyvisionai.extractors.base import BaseExtractor
 
 
 class PDFPageImageExtractor(BaseExtractor):

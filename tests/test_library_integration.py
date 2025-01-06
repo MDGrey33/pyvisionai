@@ -1,11 +1,13 @@
-"""Integration tests for the library API."""
+"""
+Library integration tests.
+"""
 
 import os
 import pytest
-from file_extractor import (
+from pyvisionai import (
     create_extractor,
-    describe_image_openai,
     describe_image_ollama,
+    describe_image_openai
 )
 
 

@@ -5,7 +5,7 @@ from docx import Document
 from PIL import Image
 import io
 
-from file_extractor.extractors.base import BaseExtractor
+from pyvisionai.extractors.base import BaseExtractor
 
 
 class DocxTextImageExtractor(BaseExtractor):

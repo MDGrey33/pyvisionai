@@ -1,16 +1,16 @@
-"""Logging configuration for the file-extractor package."""
+"""Logging configuration for the pyvisionai package."""
 
 import os
 import logging
 from datetime import datetime
 
 
-def setup_logger(name: str = "file_extractor") -> logging.Logger:
+def setup_logger(name: str = "pyvisionai") -> logging.Logger:
     """
     Set up a logger with file and console handlers.
 
     Args:
-        name: Name for the logger (default: file_extractor)
+        name: Name for the logger (default: pyvisionai)
 
     Returns:
         logging.Logger: Configured logger instance

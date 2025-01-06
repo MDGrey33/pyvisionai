@@ -2,12 +2,12 @@
 
 from typing import Dict, Type, Optional
 
-from file_extractor.extractors.base import BaseExtractor
-from file_extractor.extractors.pdf import PDFTextImageExtractor
-from file_extractor.extractors.pdf_page import PDFPageImageExtractor
-from file_extractor.extractors.docx import DocxTextImageExtractor
-from file_extractor.extractors.pptx import PptxTextImageExtractor
-from file_extractor.utils.config import DEFAULT_IMAGE_MODEL
+from pyvisionai.extractors.base import BaseExtractor
+from pyvisionai.extractors.pdf import PDFTextImageExtractor
+from pyvisionai.extractors.pdf_page import PDFPageImageExtractor
+from pyvisionai.extractors.docx import DocxTextImageExtractor
+from pyvisionai.extractors.pptx import PptxTextImageExtractor
+from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL
 
 
 # Map of file types to their extractors

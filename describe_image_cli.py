@@ -1,1 +1,0 @@
-file_extractor/cli/describe_image.py

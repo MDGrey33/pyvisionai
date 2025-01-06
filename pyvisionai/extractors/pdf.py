@@ -16,8 +16,8 @@ from PyPDF2 import PdfReader
 from PIL import Image
 import io
 
-from file_extractor.describers.ollama import describe_image_ollama as describe_image
-from file_extractor.extractors.base import BaseExtractor
+from pyvisionai.describers.ollama import describe_image_ollama as describe_image
+from pyvisionai.extractors.base import BaseExtractor
 
 
 class PDFTextImageExtractor(BaseExtractor):

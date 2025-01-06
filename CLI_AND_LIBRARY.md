@@ -22,10 +22,10 @@
 2. **Install the Package**
    ```bash
    # Using pip
-   pip install file-extractor
+   pip install pyvisionai
 
    # Using poetry
-   poetry add file-extractor
+   poetry add pyvisionai
    ```
 
 3. **Configure Environment Variables**
@@ -39,121 +39,63 @@
    mkdir -p content/source content/extracted content/log
    ```
 
-## Command Line Tools
+## Command Line Interface
 
-After installing the package, you'll have access to two CLI commands:
-
-### 1. Image Description CLI (`describe-image`)
-
-The `describe-image` command allows you to describe images using different vision models.
+### Extract Content from Files
 
 ```bash
-# Basic Usage
-describe-image -i path/to/image.jpg [options]
+# Process a single file (using default page-as-image method)
+file-extract -t pdf -s path/to/file.pdf -o output_dir
+file-extract -t docx -s path/to/file.docx -o output_dir
+file-extract -t pptx -s path/to/file.pptx -o output_dir
 
-# Options:
--i, --image      Path to the image file (required)
--u, --use-case   Model to use for description:
-                 - gpt4: OpenAI GPT-4 Vision (default)
-                 - gpt3: OpenAI GPT-3 Vision
-                 - llama: Local Llama model (requires Ollama setup)
--k, --api-key    OpenAI API key (required for gpt3/gpt4)
--v, --verbose    Print additional information
+# Process with specific extractor
+file-extract -t pdf -s input.pdf -o output_dir -e text_and_images
 
-# Examples:
-# Using default GPT-4 Vision
-describe-image -i content/test/source/test.jpeg -v
-
-# Using GPT-3 Vision
-describe-image -i content/test/source/test.jpeg -u gpt3 -v
-
-# Using local Llama model (requires Ollama setup)
-describe-image -i content/test/source/test.jpeg -u llama -v
+# Process all files in a directory
+file-extract -t pdf -s input_dir -o output_dir
 ```
 
-### 2. File Extraction CLI (`file-extract`)
-
-The `file-extract` command extracts content from various file types (PDF, DOCX, PPTX).
+### Describe Images
 
 ```bash
-# Basic Usage
-file-extract -t file_type [options]
+# Using GPT-4 Vision (default, recommended)
+describe-image -i path/to/image.jpg
 
-# Options:
--t, --type       Type of file to process (required):
-                 - pdf
-                 - docx
-                 - pptx
--s, --source     Source file or directory (default: ./content/source)
--o, --output     Output directory (default: ./content/extracted)
--e, --extractor  Extraction method:
-                 - page_as_image: Convert each page to image (default, recommended)
-                 - text_and_images: Extract text and images separately
+# Using local Llama model
+describe-image -i path/to/image.jpg -u llama
 
-# Examples:
-# Process a single PDF file (using default page-as-image method)
-file-extract -t pdf -s path/to/file.pdf -o output_dir
-
-# Process all DOCX files in a directory with specific extractor
-file-extract -t docx -s input_dir -o output_dir -e text_and_images
-
-# Process PPTX with default settings
-file-extract -t pptx -s path/to/file.pptx
+# Additional options
+describe-image -i image.jpg -v  # Verbose output
 ```
 
 ## Library Usage
 
-### Image Description
-
 ```python
-from file_extractor import describe_image_openai, describe_image_ollama
+from pyvisionai import create_extractor, describe_image_openai, describe_image_ollama
 
+# 1. Extract content from files
+extractor = create_extractor("pdf")  # or "docx" or "pptx"
+output_path = extractor.extract("input.pdf", "output_dir")
+
+# With specific extraction method
+extractor = create_extractor("pdf", extractor_type="text_and_images")
+output_path = extractor.extract("input.pdf", "output_dir")
+
+# 2. Describe images
 # Using GPT-4 Vision (default, recommended)
 description = describe_image_openai(
-    image_path="path/to/image.jpg",
-    model="gpt-4o",  # default
+    "image.jpg",
+    model="gpt-4o-mini",  # default
     api_key="your-api-key",  # optional if set in environment
     max_tokens=300  # default
 )
 
-# Using local Llama model (requires Ollama setup)
+# Using local Llama model
 description = describe_image_ollama(
-    image_path="path/to/image.jpg",
+    "image.jpg",
     model="llama3.2-vision"  # default
 )
-```
-
-### File Extraction
-
-```python
-from file_extractor import create_extractor
-
-# Create an extractor (using default page-as-image method)
-pdf_extractor = create_extractor("pdf")  # page_as_image is default
-
-# Or specify a different extraction method
-pdf_extractor = create_extractor(
-    file_type="pdf",
-    extractor_type="text_and_images"
-)
-
-# Process a file
-output_path = pdf_extractor.extract(
-    input_file="path/to/file.pdf",
-    output_dir="path/to/output"
-)
-```
-
-## Environment Variables
-
-The library uses the following environment variables:
-
-```bash
-# OpenAI API Key (required for default GPT-4 Vision)
-export OPENAI_API_KEY='your-api-key'
-
-# Ollama Host (optional, only if using Llama model)
-export OLLAMA_HOST='http://localhost:11434'
 ```
 
 ## Output Format
@@ -161,17 +103,10 @@ export OLLAMA_HOST='http://localhost:11434'
 All extractors generate:
 1. A markdown file containing:
    - Document title
-   - Page content (text or image descriptions)
+   - Page/slide content (text or image descriptions)
    - Page/slide numbers
-
-2. Directory structure:
-```
-content/
-├── extracted/
-│   └── document_name/
-│       └── document_name.md
-├── source/
-│   └── (your source files)
-└── log/
-    └── file_extractor_YYYYMMDD_HHMMSS.log
-``` 
+2. Clean directory structure:
+   ```
+   output_dir/
+   └── pyvisionai_YYYYMMDD_HHMMSS.log
+   ``` 

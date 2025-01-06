@@ -4,9 +4,9 @@ import os
 import argparse
 from typing import Optional
 
-from file_extractor.core.factory import create_extractor
-from file_extractor.utils.logger import logger
-from file_extractor.utils.config import (
+from pyvisionai.core.factory import create_extractor
+from pyvisionai.utils.logger import logger
+from pyvisionai.utils.config import (
     DEFAULT_PDF_EXTRACTOR,
     CONTENT_DIR,
     SOURCE_DIR,

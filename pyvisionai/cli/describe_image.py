@@ -4,8 +4,8 @@ import os
 import argparse
 from typing import Optional
 
-from file_extractor.describers import describe_image_ollama, describe_image_openai
-from file_extractor.utils.logger import logger
+from pyvisionai.describers import describe_image_ollama, describe_image_openai
+from pyvisionai.utils.logger import logger
 
 
 # Available models for each service

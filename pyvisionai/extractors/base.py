@@ -3,8 +3,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from file_extractor.describers import describe_image_ollama, describe_image_openai
-from file_extractor.utils.config import DEFAULT_IMAGE_MODEL
+from pyvisionai.describers import describe_image_ollama, describe_image_openai
+from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL
 
 
 class BaseExtractor(ABC):

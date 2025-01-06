@@ -17,17 +17,6 @@ Extract and describe content from documents using Vision Language Models.
 - Multiple extraction methods for different use cases
 - Detailed logging with timestamps for all operations
 
-## Recommended Settings
-
-### Image Description Models
-- **GPT-4 Vision** (Default): Best quality descriptions, recommended for production use
-- **GPT-3.5 Vision**: Good balance of quality and speed
-- **Llama (Local)**: Fast, no API costs, good for development/testing
-
-### Extraction Methods
-- **Page as Image** (Default): Best for complex layouts, consistent results
-- **Text and Images**: Better for simple layouts, preserves original text
-
 ## Installation
 
 1. **Install System Dependencies**
@@ -50,10 +39,10 @@ Extract and describe content from documents using Vision Language Models.
 2. **Install the Package**
    ```bash
    # Using pip
-   pip install file-extractor
+   pip install pyvisionai
 
    # Using poetry
-   poetry add file-extractor
+   poetry add pyvisionai
    ```
 
 3. **Create Working Directories** (optional)
@@ -112,7 +101,7 @@ Extract and describe content from documents using Vision Language Models.
 ### Library Usage
 
 ```python
-from file_extractor import create_extractor, describe_image_openai, describe_image_ollama
+from pyvisionai import create_extractor, describe_image_openai, describe_image_ollama
 
 # 1. Extract content from files
 extractor = create_extractor("pdf")  # or "docx" or "pptx"
@@ -138,101 +127,11 @@ description = describe_image_ollama(
 )
 ```
 
-## Parameters
-
-### File Extraction CLI Parameters
-| Parameter | Short | Description | Default | Required |
-|-----------|-------|-------------|----------|----------|
-| `--type`, `-t` | `-t` | File type to process (pdf, docx, pptx) | - | Yes |
-| `--source`, `-s` | `-s` | Source file or directory path | `./content/source` | No |
-| `--output`, `-o` | `-o` | Output directory path | `./content/extracted` | No |
-| `--extractor`, `-e` | `-e` | Extraction method (text_and_images, page_as_image) | `page_as_image` | No |
-
-### Image Description CLI Parameters
-| Parameter | Short | Description | Default | Required |
-|-----------|-------|-------------|----------|----------|
-| `--image`, `-i` | `-i` | Path to the image file | - | Yes |
-| `--model`, `-u` | `-u` | Model to use (gpt4, llama) | `gpt4` | No |
-| `--api-key`, `-k` | `-k` | OpenAI API key | From env | No* |
-| `--verbose`, `-v` | `-v` | Print verbose output | `False` | No |
-
-*Required when using GPT-4 and not set in environment
-
-### Library Function Parameters
-
-#### `create_extractor(file_type, extractor_type="page_as_image")`
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|----------|
-| `file_type` | str | Type of file to process (pdf, docx, pptx) | - |
-| `extractor_type` | str | Extraction method (text_and_images, page_as_image) | `page_as_image` |
-
-#### `describe_image_ollama(image_path, model="llama3.2-vision")`
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|----------|
-| `image_path` | str | Path to the image file | - |
-| `model` | str | Ollama model to use | `llama3.2-vision` |
-
-#### `describe_image_openai(image_path, model="gpt-4o-mini", api_key=None, max_tokens=300)`
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|----------|
-| `image_path` | str | Path to the image file | - |
-| `model` | str | OpenAI model to use | `gpt-4o-mini` |
-| `api_key` | str | OpenAI API key | From env |
-| `max_tokens` | int | Maximum tokens in response | 300 |
-
-## Extraction Methods
-
-### PDF Files
-1. **Page as Image** (default):
-   - Converts each page to a high-resolution image
-   - Best for complex layouts or when text extraction is unreliable
-   - Provides consistent results across different PDF types
-
-2. **Text and Images**:
-   - Extracts text and embedded images separately
-   - Preserves original text content and formatting
-   - Best for PDFs with simple layouts
-
-### DOCX Files
-1. **Page as Image** (default):
-   - Converts each page to an image
-   - Captures exact visual appearance
-   - Best for documents with complex formatting
-
-2. **Text and Images**:
-   - Extracts text and embedded images separately
-   - Preserves original text formatting
-   - Best for simple documents
-
-### PPTX Files
-1. **Page as Image** (default):
-   - Converts each slide to an image
-   - Captures exact visual appearance
-   - Best for presentations with animations or complex layouts
-
-2. **Text and Images**:
-   - Extracts text and embedded images separately
-   - Preserves original text formatting
-   - Best for simple presentations
-
-## Output Format
-
-All extractors generate:
-1. A markdown file containing:
-   - Document title
-   - Page/slide content (text or image descriptions)
-   - Page/slide numbers
-2. Clean directory structure:
-   ```
-   output_dir/
-   └── document_name.md
-   ```
-
 ## Logging
 
 The application maintains detailed logs of all operations:
 - Logs are stored in `content/log/` with timestamp-based filenames
-- Each run creates a new log file: `file_extractor_YYYYMMDD_HHMMSS.log`
+- Each run creates a new log file: `pyvisionai_YYYYMMDD_HHMMSS.log`
 - Logs include:
   - Timestamp for each operation
   - Processing steps and their status

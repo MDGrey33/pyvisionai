@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "file-extractor"
+name = "pyvisionai"
 version = "0.1.0"
 description = "A Python library for extracting and describing content from documents using Vision LLMs"
 authors = ["MDGrey33 <roland@abouyounes.com>"]
@@ -15,12 +15,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 packages = [
-    { include = "file_extractor" }
+    { include = "pyvisionai" }
 ]
 
 [tool.poetry.scripts]
-file-extract = "file_extractor.cli.main:main"
-describe-image = "file_extractor.cli.describe_image:main"
+file-extract = "pyvisionai.cli.main:main"
+describe-image = "pyvisionai.cli.describe_image:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"

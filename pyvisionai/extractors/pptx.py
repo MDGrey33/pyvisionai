@@ -5,7 +5,7 @@ from pptx import Presentation
 from PIL import Image
 import io
 
-from file_extractor.extractors.base import BaseExtractor
+from pyvisionai.extractors.base import BaseExtractor
 
 
 class PptxTextImageExtractor(BaseExtractor):
