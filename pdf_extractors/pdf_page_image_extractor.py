@@ -1,30 +1,21 @@
 """
-Extract content from PDF files by converting each page to an image.
+Extract content from PDF files by converting each page to an image using pdf2image.
 """
 
 import os
-import fitz  # PyMuPDF
-from PIL import Image
+from pdf2image import convert_from_path
 from describe_image import describe_image
 from pdf_extractors.pdf_extractor_base import PDFExtractor
 
 
-def create_directory_if_not_exists(directory):
-    """Create a directory if it doesn't exist."""
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-
 class PDFPageImageExtractor(PDFExtractor):
-    """Extract content by converting each page to an image."""
+    """Extract content by converting each page to an image using pdf2image."""
 
-    def convert_page_to_image(self, page, dpi=300):
-        """Convert a PDF page to an image."""
-        pix = page.get_pixmap(matrix=fitz.Matrix(dpi/72, dpi/72))
-        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-        return img
+    def convert_pages_to_images(self, pdf_path: str, dpi=300):
+        """Convert PDF pages to images."""
+        return convert_from_path(pdf_path, dpi=dpi)
 
-    def save_image(self, image, output_dir, image_name):
+    def save_image(self, image, output_dir: str, image_name: str) -> str:
         """Save an image to the output directory."""
         img_path = os.path.join(output_dir, f"{image_name}.png")
         image.save(img_path, "PNG")
@@ -34,25 +25,23 @@ class PDFPageImageExtractor(PDFExtractor):
         """Process PDF file by converting each page to an image."""
         try:
             pdf_filename = os.path.splitext(os.path.basename(pdf_path))[0]
-            pdf_document = fitz.open(pdf_path)
 
             # Create temporary directory for page images
             pages_dir = os.path.join(output_dir, f"{pdf_filename}_pages")
-            create_directory_if_not_exists(pages_dir)
+            if not os.path.exists(pages_dir):
+                os.makedirs(pages_dir)
+
+            # Convert PDF pages to images
+            images = self.convert_pages_to_images(pdf_path)
 
             # Generate markdown content
             md_content = f"# {pdf_filename}\n\n"
 
             # Process each page
-            for page_num in range(pdf_document.page_count):
-                page = pdf_document[page_num]
-                
-                # Convert page to image
-                page_image = self.convert_page_to_image(page)
-                
+            for page_num, image in enumerate(images):
                 # Save page image
                 image_name = f"page_{page_num + 1}"
-                img_path = self.save_image(page_image, pages_dir, image_name)
+                img_path = self.save_image(image, pages_dir, image_name)
                 
                 # Get page description
                 page_description = describe_image(img_path)
@@ -64,8 +53,6 @@ class PDFPageImageExtractor(PDFExtractor):
                 
                 # Clean up image file
                 os.remove(img_path)
-
-            pdf_document.close()
 
             # Save markdown file
             md_file_path = os.path.join(output_dir, f"{pdf_filename}.md")
