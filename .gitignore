@@ -5,6 +5,10 @@ content/extracted/*
 !content/extracted/.include
 content/log/*
 !content/log/.include
+# Keep test files
+!content/test/
+!content/test/source/
+!content/test/source/*
 __pycache__/
 .DS_Store
 *.lock
