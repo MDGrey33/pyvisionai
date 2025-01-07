@@ -20,11 +20,13 @@ def test_pdf_extraction(test_dirs):
     """Test PDF extraction using page-as-image method."""
     source_dir, output_dir = test_dirs
     pdf_path = os.path.join(source_dir, "test.pdf")
+    expected_output = os.path.join(output_dir, "test_pdf.md")
 
     # Create PDF extractor with default method (page-as-image)
     extractor = create_extractor("pdf")
     output_path = extractor.extract(pdf_path, output_dir)
 
+    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -37,11 +39,13 @@ def test_docx_extraction(test_dirs):
     """Test DOCX extraction."""
     source_dir, output_dir = test_dirs
     docx_path = os.path.join(source_dir, "test.docx")
+    expected_output = os.path.join(output_dir, "test_docx.md")
 
     # Create DOCX extractor
     extractor = create_extractor("docx")
     output_path = extractor.extract(docx_path, output_dir)
 
+    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -53,11 +57,13 @@ def test_pptx_extraction(test_dirs):
     """Test PPTX extraction."""
     source_dir, output_dir = test_dirs
     pptx_path = os.path.join(source_dir, "test.pptx")
+    expected_output = os.path.join(output_dir, "test_pptx.md")
 
     # Create PPTX extractor
     extractor = create_extractor("pptx")
     output_path = extractor.extract(pptx_path, output_dir)
 
+    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -100,11 +106,13 @@ def test_pdf_text_extraction(test_dirs):
     """Test PDF extraction using text-and-images method."""
     source_dir, output_dir = test_dirs
     pdf_path = os.path.join(source_dir, "test.pdf")
+    expected_output = os.path.join(output_dir, "test_pdf.md")
 
     # Create PDF extractor with text-and-images method
     extractor = create_extractor("pdf", extractor_type="text_and_images")
     output_path = extractor.extract(pdf_path, output_dir)
 
+    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -117,11 +125,13 @@ def test_docx_text_extraction(test_dirs):
     """Test DOCX extraction using text-and-images method."""
     source_dir, output_dir = test_dirs
     docx_path = os.path.join(source_dir, "test.docx")
+    expected_output = os.path.join(output_dir, "test_docx.md")
 
     # Create DOCX extractor with text-and-images method
     extractor = create_extractor("docx", extractor_type="text_and_images")
     output_path = extractor.extract(docx_path, output_dir)
 
+    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()

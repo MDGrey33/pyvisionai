@@ -70,7 +70,7 @@ class DocxTextImageExtractor(BaseExtractor):
                             os.remove(img_path)
 
             # Save markdown file
-            md_file_path = os.path.join(output_dir, f"{docx_filename}.md")
+            md_file_path = os.path.join(output_dir, f"{docx_filename}_docx.md")
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 

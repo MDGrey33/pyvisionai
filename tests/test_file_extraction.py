@@ -49,7 +49,8 @@ class TestFileExtraction:
     def run_extraction(self, file_type, extractor_type=None):
         """Run extraction for a specific file type and verify basic outputs."""
         test_file = f"test.{file_type}"
-        base_name = os.path.splitext(test_file)[0]
+        # Change the expected output filename to include the file type
+        expected_output_filename = f"test_{file_type}.md"
         output_dir = self.test_output
 
         # Build command
@@ -93,7 +94,7 @@ class TestFileExtraction:
         assert os.path.exists(
             output_dir
         ), f"Output directory should exist at {output_dir}"
-        md_file = os.path.join(output_dir, f"{base_name}.md")
+        md_file = os.path.join(output_dir, expected_output_filename)
         assert os.path.exists(md_file), f"Markdown file should be created at {md_file}"
 
         # Verify markdown content

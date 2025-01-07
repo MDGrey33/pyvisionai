@@ -146,7 +146,7 @@ class PDFTextImageExtractor(BaseExtractor):
                     os.remove(img_path)
 
             # Save markdown file
-            md_file_path = os.path.join(output_dir, f"{pdf_filename}.md")
+            md_file_path = os.path.join(output_dir, f"{pdf_filename}_pdf.md")
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 

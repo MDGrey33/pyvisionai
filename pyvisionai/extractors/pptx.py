@@ -72,7 +72,7 @@ class PptxTextImageExtractor(BaseExtractor):
                             continue
 
             # Save markdown file
-            md_file_path = os.path.join(output_dir, f"{pptx_filename}.md")
+            md_file_path = os.path.join(output_dir, f"{pptx_filename}_pptx.md")
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 
