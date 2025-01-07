@@ -5,6 +5,8 @@ Extract text and images separately from PDF files using pdfminer.six and PyPDF2.
 import os
 from io import StringIO
 from typing import List, Tuple
+import zlib
+import re
 
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
@@ -18,6 +20,23 @@ import io
 
 from pyvisionai.describers.ollama import describe_image_ollama as describe_image
 from pyvisionai.extractors.base import BaseExtractor
+
+
+def get_color_mode(color_space) -> str:
+    """Determine the color mode from the PDF color space."""
+    if isinstance(color_space, str):
+        if color_space == "/DeviceRGB":
+            return "RGB"
+        elif color_space == "/DeviceCMYK":
+            return "CMYK"
+        elif color_space == "/DeviceGray":
+            return "L"
+    elif isinstance(color_space, list):
+        # Handle ICC and other color spaces
+        if color_space[0] == "/ICCBased":
+            # Most ICC profiles are RGB or CMYK
+            return "RGB"  # We'll convert to RGB as a safe default
+    return "RGB"  # Default to RGB if unsure
 
 
 class PDFTextImageExtractor(BaseExtractor):
@@ -52,41 +71,87 @@ class PDFTextImageExtractor(BaseExtractor):
         if "/Resources" in page and "/XObject" in page["/Resources"]:
             xObject = page["/Resources"]["/XObject"].get_object()
 
-            for obj in xObject:
-                if xObject[obj]["/Subtype"] == "/Image":
-                    image = xObject[obj]
-
-                    # Try to extract image data
+            for obj_name in xObject:
+                obj = xObject[obj_name].get_object()
+                if obj["/Subtype"] == "/Image":
                     try:
-                        if image["/Filter"] == "/DCTDecode":
+                        # Get raw data
+                        data = obj.get_data()
+                        
+                        # Extract image data based on filter type
+                        if obj["/Filter"] == "/DCTDecode":
                             # JPEG image
-                            img_data = image._data
+                            img_data = data
                             ext = "jpg"
-                        elif image["/Filter"] == "/FlateDecode":
+                        elif obj["/Filter"] == "/FlateDecode":
                             # PNG image
-                            width = image["/Width"]
-                            height = image["/Height"]
-                            if image["/ColorSpace"] == "/DeviceRGB":
-                                mode = "RGB"
-                            else:
-                                mode = "P"
-
+                            width = obj["/Width"]
+                            height = obj["/Height"]
+                            
+                            # Get color mode
+                            mode = get_color_mode(obj.get("/ColorSpace", "/DeviceRGB"))
+                            
+                            # Calculate expected data size
+                            channels = len(mode)  # RGB=3, CMYK=4, L=1
+                            bits_per_component = obj.get("/BitsPerComponent", 8)
+                            expected_size = width * height * channels * (bits_per_component // 8)
+                            
+                            # Try to decompress data if needed
+                            try:
+                                img_data = zlib.decompress(data)
+                            except:
+                                img_data = data
+                            
+                            # Verify data size
+                            if len(img_data) != expected_size:
+                                print(f"Warning: Data size mismatch. Got {len(img_data)}, expected {expected_size}")
+                                continue
+                            
                             # Create PIL Image from raw data
-                            img = Image.frombytes(mode, (width, height), image._data)
-                            # Convert to bytes in memory
-                            img_byte_arr = io.BytesIO()
-                            img.save(img_byte_arr, format="PNG")
-                            img_data = img_byte_arr.getvalue()
-                            ext = "png"
-                        elif image["/Filter"] == "/JPXDecode":
-                            # JPEG2000 image - convert to JPEG
-                            img_data = image._data
-                            img = Image.open(io.BytesIO(img_data))
-                            img_byte_arr = io.BytesIO()
-                            img.save(img_byte_arr, format="JPEG")
-                            img_data = img_byte_arr.getvalue()
-                            ext = "jpg"
+                            try:
+                                img = Image.frombytes(mode, (width, height), img_data)
+                                
+                                # Convert to RGB if needed
+                                if mode != "RGB":
+                                    img = img.convert("RGB")
+                                
+                                # Save as PNG
+                                img_byte_arr = io.BytesIO()
+                                img.save(img_byte_arr, format="PNG")
+                                img_data = img_byte_arr.getvalue()
+                                ext = "png"
+                            except Exception as e:
+                                print(f"Error creating image: {str(e)}")
+                                continue
+                        elif obj["/Filter"] == "/JPXDecode":
+                            # JPEG2000
+                            img_data = data
+                            ext = "jp2"
                         else:
+                            print(f"Unsupported filter: {obj['/Filter']}")
+                            continue
+
+                        # Verify image data
+                        try:
+                            img = Image.open(io.BytesIO(img_data))
+                            if img.mode != "RGB":
+                                img = img.convert("RGB")
+                            
+                            # Check for black image
+                            pixels = list(img.getdata())
+                            black_pixels = sum(1 for p in pixels if p == (0, 0, 0))
+                            black_percentage = (black_pixels / len(pixels)) * 100
+                            if black_percentage > 90:
+                                print(f"Warning: Image is {black_percentage:.1f}% black")
+                                continue
+                            
+                            # Convert back to bytes
+                            img_byte_arr = io.BytesIO()
+                            img.save(img_byte_arr, format=ext.upper())
+                            img_data = img_byte_arr.getvalue()
+                            
+                        except Exception as e:
+                            print(f"Error verifying image: {str(e)}")
                             continue
 
                         images.append((img_data, ext))
