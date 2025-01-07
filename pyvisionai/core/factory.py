@@ -8,6 +8,7 @@ from pyvisionai.extractors.pdf_page import PDFPageImageExtractor
 from pyvisionai.extractors.docx import DocxTextImageExtractor
 from pyvisionai.extractors.docx_page import DocxPageImageExtractor
 from pyvisionai.extractors.pptx import PptxTextImageExtractor
+from pyvisionai.extractors.pptx_page import PptxPageImageExtractor
 from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL
 
 
@@ -22,8 +23,8 @@ EXTRACTORS: Dict[str, Dict[str, Type[BaseExtractor]]] = {
         "page_as_image": DocxPageImageExtractor,  # Use new page-as-image extractor
     },
     "pptx": {
-        "text_and_images": PptxTextImageExtractor,
-        "page_as_image": PptxTextImageExtractor,  # Same extractor for both methods
+        "text_and_images": PptxTextImageExtractor,  # Keep for now, will remove after testing
+        "page_as_image": PptxPageImageExtractor,  # Use new page-as-image extractor
     },
 }
 
@@ -50,7 +51,6 @@ def create_extractor(
     """
     if file_type not in EXTRACTORS:
         raise ValueError(f"Unsupported file type: {file_type}")
-
     if extractor_type not in EXTRACTORS[file_type]:
         raise ValueError(f"Unsupported extractor type: {extractor_type}")
 
