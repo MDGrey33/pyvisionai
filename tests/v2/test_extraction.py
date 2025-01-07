@@ -86,7 +86,7 @@ def setup_test_env():
         ("pdf", "text_and_images"),
         ("docx", "page_as_image"),
         ("docx", "text_and_images"),
-        ("pptx", "text_and_images"),
+        ("pptx", "page_as_image"),
     ],
 )
 def test_file_extraction_lib(file_type, method, setup_test_env):
@@ -129,15 +129,31 @@ def test_file_extraction_lib(file_type, method, setup_test_env):
     assert os.path.exists(output_path)
     with open(output_path, "r") as f:
         content = f.read()
+        # Basic content checks
         assert len(content) > 0
         assert "Description:" in content
         assert "# test" in content
-
+        
         # File type specific assertions
         if file_type == "pdf":
             assert "Page 1" in content
+            # Verify specific content
+            assert "Exploring Nature" in content, "Expected document title not found in PDF"
+            # Verify image descriptions
+            assert "[Image" in content and "forest" in content.lower(), "Expected forest description not found in PDF"
         elif file_type == "pptx":
             assert "Slide 1" in content
+            # Verify specific content
+            assert "Solid Base Consult" in content, "Expected company name not found in PPTX"
+            # Verify image descriptions if present
+            if "[Image" in content:
+                assert any(term in content.lower() for term in ["tablet", "person"]), "Expected image content not found in PPTX"
+        elif file_type == "docx":
+            # Verify specific content
+            assert "Exploring Nature" in content, "Expected document title not found in DOCX"
+            # Verify image descriptions if present
+            if "[Image" in content:
+                assert "forest" in content.lower(), "Expected forest description not found in DOCX"
 
 
 @pytest.mark.parametrize(
@@ -147,7 +163,7 @@ def test_file_extraction_lib(file_type, method, setup_test_env):
         ("pdf", "text_and_images"),
         ("docx", "page_as_image"),
         ("docx", "text_and_images"),
-        ("pptx", "text_and_images"),
+        ("pptx", "page_as_image"),
     ],
 )
 def test_file_extraction_cli(file_type, method, setup_test_env):
@@ -194,30 +210,49 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
     assert os.path.exists(output_path)
     with open(output_path, "r") as f:
         content = f.read()
+        # Basic content checks
         assert len(content) > 0
         assert "Description:" in content
         assert "# test" in content
-
+        
         # File type specific assertions
         if file_type == "pdf":
             assert "Page 1" in content
+            # Verify specific content
+            assert "Exploring Nature" in content, "Expected document title not found in PDF"
+            # Verify image descriptions
+            assert "[Image" in content and "forest" in content.lower(), "Expected forest description not found in PDF"
         elif file_type == "pptx":
             assert "Slide 1" in content
+            # Verify specific content
+            assert "Solid Base Consult" in content, "Expected company name not found in PPTX"
+            # Verify image descriptions if present
+            if "[Image" in content:
+                assert any(term in content.lower() for term in ["tablet", "person"]), "Expected image content not found in PPTX"
+        elif file_type == "docx":
+            # Verify specific content
+            assert "Exploring Nature" in content, "Expected document title not found in DOCX"
+            # Verify image descriptions if present
+            if "[Image" in content:
+                assert "forest" in content.lower(), "Expected forest description not found in DOCX"
 
 
 # OpenAI Vision tests
 def test_image_description_lib_gpt4(setup_test_env):
     """Test image description using GPT-4 through library API."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
-
+    
     # Skip if no API key is provided
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         pytest.skip("Skipping GPT-4 test - No API key provided")
-
+    
     # Use GPT-4 Vision
     description = describe_image_openai(image_path, model="gpt-4o-mini")
+    # Basic length check
     assert description and len(description) > 100, "Description seems too short"
+    # Content verification
+    assert any(term in description.lower() for term in ["forest", "tree"]), "Expected forest scene description not found"
 
 
 def test_image_description_cli_gpt4(setup_test_env):
@@ -245,16 +280,21 @@ def test_image_description_cli_gpt4(setup_test_env):
     # Verify output
     assert result.returncode == 0, f"CLI command failed with: {result.stderr}"
     assert len(result.stdout) > 100, "Description seems too short"
+    # Content verification
+    assert any(term in result.stdout.lower() for term in ["forest", "tree"]), "Expected forest scene description not found"
 
 
 # Local Vision tests
 def test_image_description_lib_llama(setup_test_env):
     """Test image description using Llama through library API."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
-
+    
     # Use Llama model
     description = describe_image_ollama(image_path, model="llama3.2-vision")
+    # Basic length check
     assert description and len(description) > 100, "Description seems too short"
+    # Content verification
+    assert any(term in description.lower() for term in ["forest", "tree"]), "Expected forest scene description not found"
 
 
 def test_image_description_cli_llama(setup_test_env):
@@ -275,6 +315,8 @@ def test_image_description_cli_llama(setup_test_env):
     # Verify output
     assert result.returncode == 0, f"CLI command failed with: {result.stderr}"
     assert len(result.stdout) > 100, "Description seems too short"
+    # Content verification
+    assert any(term in result.stdout.lower() for term in ["forest", "tree"]), "Expected forest scene description not found"
 
 
 # Benchmark test
