@@ -31,7 +31,7 @@ def create_extractor(
     file_type: str,
     extractor_type: str = "page_as_image",
     model: str = DEFAULT_IMAGE_MODEL,
-    api_key: Optional[str] = None
+    api_key: Optional[str] = None,
 ) -> BaseExtractor:
     """
     Create an extractor instance based on file type and extraction method.
@@ -57,4 +57,4 @@ def create_extractor(
     extractor = extractor_class()
     extractor.model = model
     extractor.api_key = api_key
-    return extractor 
+    return extractor

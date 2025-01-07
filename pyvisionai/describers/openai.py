@@ -11,7 +11,7 @@ def describe_image_openai(
     image_path: str,
     model: str = "gpt-4o-mini",
     api_key: Optional[str] = None,
-    max_tokens: int = 300
+    max_tokens: int = 300,
 ) -> str:
     """
     Describe an image using OpenAI's GPT-4 Vision model.
@@ -40,20 +40,17 @@ def describe_image_openai(
                 {
                     "role": "user",
                     "content": [
-                        {
-                            "type": "text",
-                            "text": "Describe this image in detail."
-                        },
+                        {"type": "text", "text": "Describe this image in detail."},
                         {
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{image_data}"
-                            }
-                        }
-                    ]
+                            },
+                        },
+                    ],
                 }
             ],
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
         )
 
         # Extract description
@@ -66,4 +63,4 @@ def describe_image_openai(
 
     except Exception as e:
         logger.error(f"Error describing image with OpenAI: {str(e)}")
-        raise 
+        raise

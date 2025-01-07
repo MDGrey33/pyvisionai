@@ -41,15 +41,15 @@ class PDFPageImageExtractor(BaseExtractor):
                 # Save page image
                 image_name = f"page_{page_num + 1}"
                 img_path = self.save_image(image, pages_dir, image_name)
-                
+
                 # Get page description using configured model
                 page_description = self.describe_image(img_path)
-                
+
                 # Add to markdown
                 md_content += f"## Page {page_num + 1}\n\n"
                 md_content += f"[Image {page_num + 1}]\n"
                 md_content += f"Description: {page_description}\n\n"
-                
+
                 # Clean up image file
                 os.remove(img_path)
 
@@ -65,4 +65,4 @@ class PDFPageImageExtractor(BaseExtractor):
 
         except Exception as e:
             print(f"Error processing PDF: {str(e)}")
-            raise 
+            raise

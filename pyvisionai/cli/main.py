@@ -18,7 +18,7 @@ def process_file(
     file_type: str,
     input_file: str,
     output_dir: str,
-    extractor_type: Optional[str] = None
+    extractor_type: Optional[str] = None,
 ) -> str:
     """
     Process a single file using the appropriate extractor.
@@ -49,7 +49,7 @@ def process_directory(
     file_type: str,
     input_dir: str,
     output_dir: str,
-    extractor_type: Optional[str] = None
+    extractor_type: Optional[str] = None,
 ) -> None:
     """
     Process all files of a given type in a directory.
@@ -82,26 +82,24 @@ def main():
         description="Extract content from various file types."
     )
     parser.add_argument(
-        "-t", "--type",
+        "-t",
+        "--type",
         choices=["pdf", "docx", "pptx"],
         required=True,
-        help="Type of file to process"
+        help="Type of file to process",
     )
     parser.add_argument(
-        "-s", "--source",
-        default=SOURCE_DIR,
-        help="Source file or directory"
+        "-s", "--source", default=SOURCE_DIR, help="Source file or directory"
     )
     parser.add_argument(
-        "-o", "--output",
-        default=EXTRACTED_DIR,
-        help="Output directory"
+        "-o", "--output", default=EXTRACTED_DIR, help="Output directory"
     )
     parser.add_argument(
-        "-e", "--extractor",
+        "-e",
+        "--extractor",
         choices=["text_and_images", "page_as_image"],
         default=DEFAULT_PDF_EXTRACTOR,
-        help="Type of extractor to use"
+        help="Type of extractor to use",
     )
 
     args = parser.parse_args()
@@ -121,4 +119,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

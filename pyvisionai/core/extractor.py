@@ -1,4 +1,5 @@
 """Base class for all content extractors."""
+
 from abc import ABC, abstractmethod
 
 
@@ -17,4 +18,4 @@ class BaseExtractor(ABC):
         Returns:
             str: Path to the generated markdown file
         """
-        pass 
+        pass

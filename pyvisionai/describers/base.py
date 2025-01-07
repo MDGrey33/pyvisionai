@@ -24,4 +24,4 @@ def describe_image(image_path: str, model: Optional[str] = None) -> str:
     elif model == "gpt4":
         return describe_image_openai(image_path)
     else:
-        raise ValueError(f"Unsupported model: {model}") 
+        raise ValueError(f"Unsupported model: {model}")

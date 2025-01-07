@@ -19,8 +19,8 @@ def setup_logger(name: str = "pyvisionai") -> logging.Logger:
     logger.setLevel(logging.INFO)
 
     # Create formatters
-    console_formatter = logging.Formatter('%(message)s')
-    file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    console_formatter = logging.Formatter("%(message)s")
+    file_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
     # Console handler
     console_handler = logging.StreamHandler()
@@ -35,7 +35,7 @@ def setup_logger(name: str = "pyvisionai") -> logging.Logger:
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = os.path.join(log_dir, f"extraction_{timestamp}.log")
-    
+
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(file_formatter)
@@ -45,4 +45,4 @@ def setup_logger(name: str = "pyvisionai") -> logging.Logger:
 
 
 # Create the default logger instance
-logger = setup_logger() 
+logger = setup_logger()

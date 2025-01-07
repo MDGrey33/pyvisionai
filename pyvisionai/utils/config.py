@@ -18,4 +18,4 @@ LOG_DIR = os.path.join(CONTENT_DIR, "log")
 
 # Create directories if they don't exist
 for directory in [CONTENT_DIR, SOURCE_DIR, EXTRACTED_DIR, LOG_DIR]:
-    os.makedirs(directory, exist_ok=True) 
+    os.makedirs(directory, exist_ok=True)

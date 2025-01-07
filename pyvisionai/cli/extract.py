@@ -21,7 +21,7 @@ def process_file(
     output_dir: str,
     extractor_type: Optional[str] = None,
     model: Optional[str] = None,
-    api_key: Optional[str] = None
+    api_key: Optional[str] = None,
 ) -> str:
     """
     Process a single file using the appropriate extractor.
@@ -62,7 +62,7 @@ def process_directory(
     output_dir: str,
     extractor_type: Optional[str] = None,
     model: Optional[str] = None,
-    api_key: Optional[str] = None
+    api_key: Optional[str] = None,
 ) -> None:
     """
     Process all files of a given type in a directory.
@@ -83,7 +83,9 @@ def process_directory(
         for filename in os.listdir(input_dir):
             if filename.lower().endswith(f".{file_type}"):
                 input_file = os.path.join(input_dir, filename)
-                process_file(file_type, input_file, output_dir, extractor_type, model, api_key)
+                process_file(
+                    file_type, input_file, output_dir, extractor_type, model, api_key
+                )
 
     except Exception as e:
         logger.error(f"Error processing directory: {str(e)}")
@@ -96,46 +98,56 @@ def main():
         description="Extract content from various file types."
     )
     parser.add_argument(
-        "-t", "--type",
+        "-t",
+        "--type",
         choices=["pdf", "docx", "pptx"],
         required=True,
-        help="Type of file to process"
+        help="Type of file to process",
     )
     parser.add_argument(
-        "-s", "--source",
-        default=SOURCE_DIR,
-        help="Source file or directory"
+        "-s", "--source", default=SOURCE_DIR, help="Source file or directory"
     )
     parser.add_argument(
-        "-o", "--output",
-        default=EXTRACTED_DIR,
-        help="Output directory"
+        "-o", "--output", default=EXTRACTED_DIR, help="Output directory"
     )
     parser.add_argument(
-        "-e", "--extractor",
+        "-e",
+        "--extractor",
         choices=["text_and_images", "page_as_image"],
         default=DEFAULT_PDF_EXTRACTOR,
-        help="Type of extractor to use"
+        help="Type of extractor to use",
     )
     parser.add_argument(
-        "-m", "--model",
+        "-m",
+        "--model",
         choices=["llama", "gpt4"],
         default=DEFAULT_IMAGE_MODEL,
-        help="Model to use for image descriptions"
+        help="Model to use for image descriptions",
     )
-    parser.add_argument(
-        "-k", "--api-key",
-        help="OpenAI API key (required for GPT-4)"
-    )
+    parser.add_argument("-k", "--api-key", help="OpenAI API key (required for GPT-4)")
 
     args = parser.parse_args()
 
     try:
         # Determine if source is a file or directory
         if os.path.isfile(args.source):
-            process_file(args.type, args.source, args.output, args.extractor, args.model, args.api_key)
+            process_file(
+                args.type,
+                args.source,
+                args.output,
+                args.extractor,
+                args.model,
+                args.api_key,
+            )
         elif os.path.isdir(args.source):
-            process_directory(args.type, args.source, args.output, args.extractor, args.model, args.api_key)
+            process_directory(
+                args.type,
+                args.source,
+                args.output,
+                args.extractor,
+                args.model,
+                args.api_key,
+            )
         else:
             raise FileNotFoundError(f"Source not found: {args.source}")
 
@@ -145,4 +157,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

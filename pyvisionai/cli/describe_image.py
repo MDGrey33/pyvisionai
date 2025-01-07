@@ -17,7 +17,7 @@ def describe_image_cli(
     image_path: str,
     model: str = "llama",
     api_key: Optional[str] = None,
-    verbose: bool = False
+    verbose: bool = False,
 ) -> str:
     """
     Describe an image using the specified model.
@@ -66,32 +66,29 @@ def describe_image_cli(
 
 def main():
     """Main entry point for the CLI."""
-    parser = argparse.ArgumentParser(description="Describe an image using various models.")
+    parser = argparse.ArgumentParser(
+        description="Describe an image using various models."
+    )
     parser.add_argument("-i", "--image", required=True, help="Path to the image file")
     parser.add_argument(
-        "-u", "--use-case",
+        "-u",
+        "--use-case",
         choices=["llama", "gpt3", "gpt4"],
         default="llama",
-        help="Model to use for description"
+        help="Model to use for description",
     )
     parser.add_argument(
-        "-k", "--api-key",
-        help="OpenAI API key (required for GPT models)"
+        "-k", "--api-key", help="OpenAI API key (required for GPT models)"
     )
     parser.add_argument(
-        "-v", "--verbose",
-        action="store_true",
-        help="Print verbose output"
+        "-v", "--verbose", action="store_true", help="Print verbose output"
     )
 
     args = parser.parse_args()
 
     try:
         description = describe_image_cli(
-            args.image,
-            args.use_case,
-            args.api_key,
-            args.verbose
+            args.image, args.use_case, args.api_key, args.verbose
         )
         print(description)
     except Exception as e:
@@ -100,4 +97,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

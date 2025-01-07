@@ -28,7 +28,9 @@ class BaseExtractor(ABC):
         if self.model == "llama":
             return describe_image_ollama(image_path)
         elif self.model == "gpt4":
-            return describe_image_openai(image_path, model="gpt-4o-mini", api_key=self.api_key)
+            return describe_image_openai(
+                image_path, model="gpt-4o-mini", api_key=self.api_key
+            )
         else:
             raise ValueError(f"Unsupported model: {self.model}")
 
@@ -44,4 +46,4 @@ class BaseExtractor(ABC):
         Returns:
             str: Path to the generated markdown file
         """
-        pass 
+        pass

@@ -29,7 +29,7 @@ def describe_image_ollama(image_path: str, model: str = "llama3.2-vision") -> st
             "model": model,
             "prompt": "Describe this image in detail.",
             "stream": False,
-            "images": [image_data]
+            "images": [image_data],
         }
 
         # Make request
@@ -47,4 +47,4 @@ def describe_image_ollama(image_path: str, model: str = "llama3.2-vision") -> st
 
     except Exception as e:
         logger.error(f"Error describing image with Ollama: {str(e)}")
-        raise 
+        raise

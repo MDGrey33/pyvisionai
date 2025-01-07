@@ -17,8 +17,8 @@ class PptxTextImageExtractor(BaseExtractor):
             # Convert image data to PIL Image
             image = Image.open(io.BytesIO(image_data))
             # Convert to RGB if necessary
-            if image.mode != 'RGB':
-                image = image.convert('RGB')
+            if image.mode != "RGB":
+                image = image.convert("RGB")
             # Save as JPEG (supported format)
             img_path = os.path.join(output_dir, f"{image_name}.jpg")
             image.save(img_path, "JPEG", quality=95)
@@ -51,18 +51,24 @@ class PptxTextImageExtractor(BaseExtractor):
                     if hasattr(shape, "image"):
                         try:
                             image_count += 1
-                            image_name = f"{pptx_filename}_slide_{slide_num}_image_{image_count}"
-                            img_path = self.save_image(shape.image.blob, output_dir, image_name)
-                            
+                            image_name = (
+                                f"{pptx_filename}_slide_{slide_num}_image_{image_count}"
+                            )
+                            img_path = self.save_image(
+                                shape.image.blob, output_dir, image_name
+                            )
+
                             # Get image description using configured model
                             image_description = self.describe_image(img_path)
                             md_content += f"[Image {image_count}]\n"
                             md_content += f"Description: {image_description}\n\n"
-                            
+
                             # Clean up image file
                             os.remove(img_path)
                         except Exception as e:
-                            print(f"Error processing image in slide {slide_num}: {str(e)}")
+                            print(
+                                f"Error processing image in slide {slide_num}: {str(e)}"
+                            )
                             continue
 
             # Save markdown file
@@ -74,4 +80,4 @@ class PptxTextImageExtractor(BaseExtractor):
 
         except Exception as e:
             print(f"Error processing PPTX: {str(e)}")
-            raise 
+            raise
