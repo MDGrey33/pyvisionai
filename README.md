@@ -152,3 +152,81 @@ export OLLAMA_HOST='http://localhost:11434'
 ## License
 
 This project is licensed under the [Apache License 2.0](LICENSE).
+
+## Command Parameters
+
+### `file-extract` Command
+```bash
+file-extract [-h] -t TYPE -s SOURCE -o OUTPUT [-e EXTRACTOR] [-m MODEL] [-k API_KEY] [-v]
+
+Required Arguments:
+  -t, --type TYPE         File type to process (pdf, docx, pptx)
+  -s, --source SOURCE     Source file or directory path
+  -o, --output OUTPUT     Output directory path
+
+Optional Arguments:
+  -h, --help             Show help message and exit
+  -e, --extractor TYPE   Extraction method:
+                         - page_as_image: Convert pages to images (default)
+                         - text_and_images: Extract text and images separately
+  -m, --model MODEL      Vision model for image description:
+                         - gpt4: GPT-4 Vision (default, recommended)
+                         - llama: Local Llama model
+  -k, --api-key KEY      OpenAI API key (can also be set via OPENAI_API_KEY env var)
+  -v, --verbose          Enable verbose logging
+```
+
+### `describe-image` Command
+```bash
+describe-image [-h] -i IMAGE [-m MODEL] [-k API_KEY] [-t MAX_TOKENS] [-v]
+
+Required Arguments:
+  -i, --image IMAGE      Path to image file
+
+Optional Arguments:
+  -h, --help            Show help message and exit
+  -m, --model MODEL     Vision model to use:
+                        - gpt4: GPT-4 Vision (default, recommended)
+                        - llama: Local Llama model
+  -k, --api-key KEY     OpenAI API key (can also be set via OPENAI_API_KEY env var)
+  -t, --max-tokens NUM  Maximum tokens for response (default: 300)
+  -v, --verbose         Enable verbose logging
+```
+
+## Examples
+
+### File Extraction Examples
+```bash
+# Basic usage with defaults (page_as_image method, GPT-4 Vision)
+file-extract -t pdf -s document.pdf -o output_dir
+
+# Specify extraction method
+file-extract -t docx -s document.docx -o output_dir -e text_and_images
+
+# Use local Llama model for image description
+file-extract -t pptx -s slides.pptx -o output_dir -m llama
+
+# Process all PDFs in a directory with verbose logging
+file-extract -t pdf -s input_dir -o output_dir -v
+
+# Use custom OpenAI API key
+file-extract -t pdf -s document.pdf -o output_dir -k "your-api-key"
+```
+
+### Image Description Examples
+```bash
+# Basic usage with defaults (GPT-4 Vision)
+describe-image -i photo.jpg
+
+# Use local Llama model
+describe-image -i photo.jpg -m llama
+
+# Customize token limit
+describe-image -i photo.jpg -t 500
+
+# Enable verbose logging
+describe-image -i photo.jpg -v
+
+# Use custom OpenAI API key
+describe-image -i photo.jpg -k "your-api-key"
+```
