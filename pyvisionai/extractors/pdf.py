@@ -77,7 +77,7 @@ class PDFTextImageExtractor(BaseExtractor):
                     try:
                         # Get raw data
                         data = obj.get_data()
-                        
+
                         # Extract image data based on filter type
                         if obj["/Filter"] == "/DCTDecode":
                             # JPEG image
@@ -87,34 +87,38 @@ class PDFTextImageExtractor(BaseExtractor):
                             # PNG image
                             width = obj["/Width"]
                             height = obj["/Height"]
-                            
+
                             # Get color mode
                             mode = get_color_mode(obj.get("/ColorSpace", "/DeviceRGB"))
-                            
+
                             # Calculate expected data size
                             channels = len(mode)  # RGB=3, CMYK=4, L=1
                             bits_per_component = obj.get("/BitsPerComponent", 8)
-                            expected_size = width * height * channels * (bits_per_component // 8)
-                            
+                            expected_size = (
+                                width * height * channels * (bits_per_component // 8)
+                            )
+
                             # Try to decompress data if needed
                             try:
                                 img_data = zlib.decompress(data)
                             except:
                                 img_data = data
-                            
+
                             # Verify data size
                             if len(img_data) != expected_size:
-                                print(f"Warning: Data size mismatch. Got {len(img_data)}, expected {expected_size}")
+                                print(
+                                    f"Warning: Data size mismatch. Got {len(img_data)}, expected {expected_size}"
+                                )
                                 continue
-                            
+
                             # Create PIL Image from raw data
                             try:
                                 img = Image.frombytes(mode, (width, height), img_data)
-                                
+
                                 # Convert to RGB if needed
                                 if mode != "RGB":
                                     img = img.convert("RGB")
-                                
+
                                 # Save as PNG
                                 img_byte_arr = io.BytesIO()
                                 img.save(img_byte_arr, format="PNG")
@@ -136,20 +140,22 @@ class PDFTextImageExtractor(BaseExtractor):
                             img = Image.open(io.BytesIO(img_data))
                             if img.mode != "RGB":
                                 img = img.convert("RGB")
-                            
+
                             # Check for black image
                             pixels = list(img.getdata())
                             black_pixels = sum(1 for p in pixels if p == (0, 0, 0))
                             black_percentage = (black_pixels / len(pixels)) * 100
                             if black_percentage > 90:
-                                print(f"Warning: Image is {black_percentage:.1f}% black")
+                                print(
+                                    f"Warning: Image is {black_percentage:.1f}% black"
+                                )
                                 continue
-                            
+
                             # Convert back to bytes
                             img_byte_arr = io.BytesIO()
                             img.save(img_byte_arr, format=ext.upper())
                             img_data = img_byte_arr.getvalue()
-                            
+
                         except Exception as e:
                             print(f"Error verifying image: {str(e)}")
                             continue

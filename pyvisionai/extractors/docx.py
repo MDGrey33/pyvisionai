@@ -16,6 +16,7 @@ from pyvisionai.extractors.base import BaseExtractor
 @dataclass
 class ImageTask:
     """Container for image processing task data."""
+
     image_data: bytes
     image_name: str
     output_dir: str
@@ -68,7 +69,9 @@ class DocxTextImageExtractor(BaseExtractor):
     def process_image_task(self, task: ImageTask) -> tuple[int, str]:
         """Process a single image task."""
         try:
-            img_path = self.save_image(task.image_data, task.output_dir, task.image_name)
+            img_path = self.save_image(
+                task.image_data, task.output_dir, task.image_name
+            )
             image_description = describe_image(img_path)
             os.remove(img_path)  # Clean up
             return task.index, image_description
@@ -99,7 +102,7 @@ class DocxTextImageExtractor(BaseExtractor):
                     image_data=img_data,
                     image_name=image_name,
                     output_dir=output_dir,
-                    index=img_index
+                    index=img_index,
                 )
                 image_tasks.append(task)
 
@@ -107,7 +110,7 @@ class DocxTextImageExtractor(BaseExtractor):
             if image_tasks:
                 # Store descriptions in order
                 descriptions = [""] * len(image_tasks)
-                
+
                 # Use ThreadPoolExecutor for parallel processing
                 with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                     # Submit all tasks
@@ -115,12 +118,12 @@ class DocxTextImageExtractor(BaseExtractor):
                         executor.submit(self.process_image_task, task): task
                         for task in image_tasks
                     }
-                    
+
                     # Collect results as they complete
                     for future in concurrent.futures.as_completed(future_to_task):
                         idx, description = future.result()
                         descriptions[idx] = description
-                
+
                 # Add descriptions to markdown in correct order
                 for img_index, description in enumerate(descriptions):
                     md_content += f"[Image {img_index + 1}]\n"

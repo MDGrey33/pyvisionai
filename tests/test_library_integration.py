@@ -26,7 +26,9 @@ def test_pdf_extraction(test_dirs):
     extractor = create_extractor("pdf")
     output_path = extractor.extract(pdf_path, output_dir)
 
-    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
+    assert (
+        output_path == expected_output
+    ), f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -45,7 +47,9 @@ def test_docx_extraction(test_dirs):
     extractor = create_extractor("docx")
     output_path = extractor.extract(docx_path, output_dir)
 
-    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
+    assert (
+        output_path == expected_output
+    ), f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -63,7 +67,9 @@ def test_pptx_extraction(test_dirs):
     extractor = create_extractor("pptx")
     output_path = extractor.extract(pptx_path, output_dir)
 
-    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
+    assert (
+        output_path == expected_output
+    ), f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -112,7 +118,9 @@ def test_pdf_text_extraction(test_dirs):
     extractor = create_extractor("pdf", extractor_type="text_and_images")
     output_path = extractor.extract(pdf_path, output_dir)
 
-    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
+    assert (
+        output_path == expected_output
+    ), f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -131,7 +139,9 @@ def test_docx_text_extraction(test_dirs):
     extractor = create_extractor("docx", extractor_type="text_and_images")
     output_path = extractor.extract(docx_path, output_dir)
 
-    assert output_path == expected_output, f"Expected {expected_output}, got {output_path}"
+    assert (
+        output_path == expected_output
+    ), f"Expected {expected_output}, got {output_path}"
     assert os.path.exists(output_path)
     with open(output_path, "r", encoding="utf-8") as f:
         content = f.read()

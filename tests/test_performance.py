@@ -22,22 +22,26 @@ def measure_extraction_time(file_type, extractor_type=None):
     source_dir = "./content/test/source"
     output_dir = "./content/test/output"
     test_file = os.path.join(source_dir, f"test.{file_type}")
-    
+
     # Create extractor
     start_time = time.time()
-    extractor = create_extractor(file_type, extractor_type=extractor_type or "text_and_images")
+    extractor = create_extractor(
+        file_type, extractor_type=extractor_type or "text_and_images"
+    )
     setup_time = time.time() - start_time
-    
+
     # Extract content
     start_time = time.time()
     output_path = extractor.extract(test_file, output_dir)
     extraction_time = time.time() - start_time
-    
+
     return {
-        'setup_time': setup_time,
-        'extraction_time': extraction_time,
-        'total_time': setup_time + extraction_time,
-        'output_size': os.path.getsize(output_path) if os.path.exists(output_path) else 0
+        "setup_time": setup_time,
+        "extraction_time": extraction_time,
+        "total_time": setup_time + extraction_time,
+        "output_size": (
+            os.path.getsize(output_path) if os.path.exists(output_path) else 0
+        ),
     }
 
 
@@ -50,7 +54,7 @@ def test_pdf_performance():
     print(f"Extraction time: {results_page['extraction_time']:.2f}s")
     print(f"Total time: {results_page['total_time']:.2f}s")
     print(f"Output size: {results_page['output_size']/1024:.2f}KB")
-    
+
     # Test text-and-images method
     results_text = measure_extraction_time("pdf", "text_and_images")
     print(f"\nPDF (text-and-images) Performance:")
@@ -69,7 +73,7 @@ def test_docx_performance():
     print(f"Extraction time: {results_page['extraction_time']:.2f}s")
     print(f"Total time: {results_page['total_time']:.2f}s")
     print(f"Output size: {results_page['output_size']/1024:.2f}KB")
-    
+
     # Test text-and-images method
     results_text = measure_extraction_time("docx", "text_and_images")
     print(f"\nDOCX (text-and-images) Performance:")
@@ -86,4 +90,4 @@ def test_pptx_performance():
     print(f"Setup time: {results['setup_time']:.2f}s")
     print(f"Extraction time: {results['extraction_time']:.2f}s")
     print(f"Total time: {results['total_time']:.2f}s")
-    print(f"Output size: {results['output_size']/1024:.2f}KB") 
+    print(f"Output size: {results['output_size']/1024:.2f}KB")

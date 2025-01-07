@@ -17,15 +17,15 @@ class DocxPageImageExtractor(BaseExtractor):
         try:
             # Create a temporary directory for the PDF
             temp_dir = tempfile.mkdtemp()
-            
+
             # Get absolute paths
             abs_docx_path = os.path.abspath(docx_path)
             abs_temp_dir = os.path.abspath(temp_dir)
-            
+
             # The output PDF will have the same name as the input DOCX
             docx_filename = os.path.splitext(os.path.basename(docx_path))[0]
             pdf_path = os.path.join(abs_temp_dir, f"{docx_filename}.pdf")
-            
+
             # Convert DOCX to PDF using LibreOffice
             cmd = [
                 "soffice",
@@ -34,15 +34,15 @@ class DocxPageImageExtractor(BaseExtractor):
                 "pdf",
                 "--outdir",
                 abs_temp_dir,
-                abs_docx_path
+                abs_docx_path,
             ]
-            
+
             # Run the command and capture output
             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-            
+
             # Wait a moment for the file to be written
             time.sleep(1)
-            
+
             # Verify the PDF was created
             if not os.path.exists(pdf_path):
                 raise FileNotFoundError(
@@ -50,7 +50,7 @@ class DocxPageImageExtractor(BaseExtractor):
                     f"STDOUT: {result.stdout}\n"
                     f"STDERR: {result.stderr}"
                 )
-            
+
             return pdf_path
 
         except subprocess.CalledProcessError as e:
@@ -65,6 +65,7 @@ class DocxPageImageExtractor(BaseExtractor):
     def convert_pages_to_images(self, pdf_path: str) -> list:
         """Convert PDF pages to images using pdf2image."""
         from pdf2image import convert_from_path
+
         return convert_from_path(pdf_path, dpi=300)
 
     def save_image(self, image: Image.Image, output_dir: str, image_name: str) -> str:
@@ -123,4 +124,4 @@ class DocxPageImageExtractor(BaseExtractor):
 
         except Exception as e:
             print(f"Error processing DOCX: {str(e)}")
-            raise 
+            raise

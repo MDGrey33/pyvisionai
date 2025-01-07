@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyvisionai"
-version = "0.1.1"
+version = "0.2.0"
 description = "A Python library for extracting and describing content from documents using Vision LLMs"
 authors = ["MDGrey33 <roland@abouyounes.com>"]
 license = "Apache-2.0"
@@ -37,6 +37,7 @@ PyPDF2 = "^3.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.4"
+gitpython = "^3.1.42"
 
 [build-system]
 requires = ["poetry-core"]
