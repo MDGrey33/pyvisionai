@@ -40,7 +40,10 @@ def describe_image_openai(
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "Describe this image in detail."},
+                        {
+                            "type": "text",
+                            "text": "Describe this image in detail. Preserve as much of the precise original text, format, images and style as possible.",
+                        },
                         {
                             "type": "image_url",
                             "image_url": {

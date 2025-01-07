@@ -27,7 +27,7 @@ def describe_image_ollama(image_path: str, model: str = "llama3.2-vision") -> st
         url = "http://localhost:11434/api/generate"
         payload = {
             "model": model,
-            "prompt": "Describe this image in detail.",
+            "prompt": "Describe this image in detail. Preserve as much of the precise original text, format, images and style as possible.",
             "stream": False,
             "images": [image_data],
         }
