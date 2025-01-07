@@ -51,7 +51,7 @@ class TestFileExtraction:
         
         # Build command
         cmd = [
-            "poetry", "run", "file-extract",
+            "file-extract",
             "--type", file_type,
             "--source", "./content/test/source",
             "--output", output_dir

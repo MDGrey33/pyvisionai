@@ -9,6 +9,8 @@ content/log/*
 !content/test/
 !content/test/source/
 !content/test/source/*
+content/test/output/*
+!content/test/output/.include
 __pycache__/
 .DS_Store
 *.lock

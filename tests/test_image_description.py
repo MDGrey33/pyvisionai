@@ -12,7 +12,7 @@ def test_cli_image_description_llama():
     
     # Run the CLI command with Llama model
     cmd = [
-        "poetry", "run", "describe-image",
+        "describe-image",
         "-i", test_image,
         "-u", "llama",  # Use llama use case which uses llama3.2-vision
         "-v"
@@ -42,7 +42,7 @@ def test_cli_image_description_gpt4():
     
     # Run the CLI command with GPT-4 model
     cmd = [
-        "poetry", "run", "describe-image",
+        "describe-image",
         "-i", test_image,
         "-u", "gpt4",  # Use gpt4 use case which uses gpt-4-vision
         "-k", api_key,
