@@ -230,3 +230,15 @@ class PDFTextImageExtractor(BaseExtractor):
     def test_black_formatting(self, some_arg: str, another_arg: int = 42) -> str:
         """Test function with bad formatting."""
         return f"{some_arg} {another_arg}"
+
+    def really_bad_formatting(
+        self,
+        param1: str,
+        param2: int = 42,
+        param3: bool = False
+    ):
+        """This function is intentionally formatted badly."""
+        if param3:
+            return f"{param1} {param2}"
+        else:
+            return f"{param2} {param1}"
