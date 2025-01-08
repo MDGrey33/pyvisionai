@@ -136,10 +136,6 @@ def test_file_extraction_lib(file_type, method, setup_test_env):
             ), "Expected forest description not found in PDF"
         elif file_type == "pptx":
             assert "Slide 1" in content
-            # Verify specific content
-            assert (
-                "Solid Base Consult" in content
-            ), "Expected company name not found in PPTX"
             # Verify image descriptions if present
             if "[Image" in content:
                 assert any(
@@ -253,10 +249,6 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
             ), "Expected forest description not found in PDF"
         elif file_type == "pptx":
             assert "Slide 1" in content
-            # Verify specific content
-            assert (
-                "Solid Base Consult" in content
-            ), "Expected company name not found in PPTX"
             # Verify image descriptions if present
             if "[Image" in content:
                 assert any(

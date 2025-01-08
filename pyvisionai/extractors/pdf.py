@@ -1,5 +1,5 @@
 """
-Extract text and images separately from PDF files using pdfminer.six and PyPDF2.
+Extract text and images separately from PDF files using pdfminer.six and pypdf.
 """
 
 import os
@@ -14,7 +14,7 @@ from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from PIL import Image
 import io
 
