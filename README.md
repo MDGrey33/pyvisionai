@@ -1,4 +1,5 @@
-# Content Extractor with Vision LLM
+# PyVisionAI
+# Content Extractor and image description with Vision LLM
 
 Extract and describe content from documents using Vision Language Models.
 
