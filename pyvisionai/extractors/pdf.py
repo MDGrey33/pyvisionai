@@ -232,13 +232,13 @@ class PDFTextImageExtractor(BaseExtractor):
         return f"{some_arg} {another_arg}"
 
     def really_bad_formatting(
-        self,
-        param1: str,
-        param2: int = 42,
-        param3: bool = False
+        self, param1: str, param2: int = 42, param3: bool = False
     ):
         """This function is intentionally formatted badly."""
         if param3:
             return f"{param1} {param2}"
         else:
             return f"{param2} {param1}"
+
+    def super_bad_format(self, a: str, b: int, c: bool = False, d: list = [1, 2, 3]):
+        return [x * 2 for x in d if c] if b > 10 else a * b
