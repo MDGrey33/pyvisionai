@@ -8,32 +8,17 @@ import time
 import pytest
 import subprocess
 from datetime import datetime
-from git import Repo
 from pyvisionai import create_extractor, describe_image_ollama, describe_image_openai
 
 
-def get_commit_info():
-    """Get current git commit information."""
-    repo = Repo(os.getcwd())
-    commit = repo.head.commit
-    return {
-        "hash": commit.hexsha[:8],
-        "date": datetime.fromtimestamp(commit.committed_date).isoformat(),
-        "message": commit.message.strip(),
-    }
-
-
 def log_benchmark(file_type, method, metrics):
-    """Log benchmark results with git commit information."""
-    log_dir = "content/log"
+    """Log benchmark results."""
+    log_dir = os.path.join("content", "log")
     os.makedirs(log_dir, exist_ok=True)
     log_file = os.path.join(log_dir, "benchmark.log")
 
-    commit_info = get_commit_info()
-
     entry = {
         "timestamp": datetime.now().isoformat(),
-        "commit": commit_info,
         "test": {"file_type": file_type, "method": method},
         "metrics": metrics,
     }
@@ -46,8 +31,8 @@ def log_benchmark(file_type, method, metrics):
 @pytest.fixture(scope="module")
 def setup_test_env():
     """Set up test environment."""
-    output_dir = "./content/test/output"
-    log_dir = "./content/log"
+    output_dir = os.path.join("content", "test", "output")
+    log_dir = os.path.join("content", "log")
 
     # Record existing log files before test
     existing_logs = set()
@@ -97,7 +82,7 @@ def test_file_extraction_lib(file_type, method, setup_test_env):
     """Test file extraction using library API."""
 
     # Setup
-    source_file = f"./content/test/source/test{'_interactive' if file_type == 'html' else ''}.{file_type}"
+    source_file = os.path.join("content", "test", "source", f"test.{file_type}")
     output_dir = setup_test_env
 
     # Test API performance and functionality
@@ -208,8 +193,8 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
 
     # Setup
     output_dir = setup_test_env
-    source_path = "./content/test/source"
-    source_file = f"test{'_interactive' if file_type == 'html' else ''}.{file_type}"
+    source_path = os.path.join("content", "test", "source")
+    source_file = f"test.{file_type}"
 
     # Test CLI performance
     start_time = time.time()
@@ -410,10 +395,6 @@ def test_benchmark_log_structure():
 
         # Verify log structure
         assert "timestamp" in entry
-        assert "commit" in entry
-        assert "hash" in entry["commit"]
-        assert "date" in entry["commit"]
-        assert "message" in entry["commit"]
         assert "test" in entry
         assert "metrics" in entry
 

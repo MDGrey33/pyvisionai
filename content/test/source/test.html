@@ -1,57 +1,158 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Page</title>
+    <title>Exploring Nature</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            line-height: 1.6;
         }
         .header {
-            background-color: #4a90e2;
+            background-color: #2c5a3e;
             color: white;
             padding: 20px;
             text-align: center;
             border-radius: 5px;
+            margin-bottom: 20px;
         }
         .content {
-            margin-top: 20px;
-            line-height: 1.6;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
         }
         .image-container {
             text-align: center;
             margin: 20px 0;
+            position: relative;
         }
         img {
             max-width: 100%;
             height: auto;
             border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+        .biodiversity-stats {
+            display: none;
+            background-color: #e8f5e9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #2c5a3e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #1e3e2b;
+        }
+        .highlight {
+            background-color: #e8f5e9;
+            padding: 2px 5px;
+            border-radius: 3px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Vision AI Testing</h1>
-        <p>A sample page to test HTML processing</p>
+        <h1>Exploring Nature</h1>
+        <p>An Interactive Journey Through Natural Habitats</p>
     </div>
+
     <div class="content">
-        <h2>About This Test</h2>
-        <p>This is a test page to verify our HTML processing capabilities. It includes various elements like text, images, and styling to ensure proper rendering and capture.</p>
-        
-        <div class="image-container">
-            <img src="test.jpeg" alt="Test Image">
-            <p><em>Sample image for testing</em></p>
+        <h2>Introduction</h2>
+        <p>Nature offers an endless canvas of beauty, diversity, and inspiration. In this interactive document, we will explore the importance of preserving natural habitats and celebrating their uniqueness.</p>
+
+        <h2>Key Points</h2>
+        <h3>1. Biodiversity</h3>
+        <button onclick="toggleStats()">Show Biodiversity Statistics</button>
+        <div id="biodiversityStats" class="biodiversity-stats">
+            <h4>Global Biodiversity Numbers:</h4>
+            <ul id="speciesList">
+                <li>Mammals: 6,495 species</li>
+                <li>Birds: 11,158 species</li>
+                <li>Reptiles: 10,793 species</li>
+                <li>Amphibians: 8,230 species</li>
+                <li>Fish: 34,711 species</li>
+            </ul>
+            <p><em>Data updates every few seconds to simulate live tracking</em></p>
         </div>
 
-        <h2>Features Being Tested</h2>
-        <ul>
-            <li>Page layout and styling</li>
-            <li>Image rendering and processing</li>
-            <li>Text content extraction</li>
-            <li>Font rendering</li>
-        </ul>
+        <h3>2. Human Connection</h3>
+        <p>Nature provides psychological and physical benefits. Activities like <span class="highlight" onmouseover="showActivity(this, 'hiking')">hiking</span> and <span class="highlight" onmouseover="showActivity(this, 'birdwatching')">birdwatching</span> foster a sense of harmony with the environment.</p>
+
+        <div class="image-container">
+            <img src="test.jpeg" alt="Forest Scene" id="forestImage" onclick="zoomImage()">
+            <p><em>Click the image to zoom - A lush forest scene showcasing natural biodiversity</em></p>
+        </div>
+
+        <h2>Case Study: Amazon Rainforest</h2>
+        <p>The Amazon Rainforest, often called the "lungs of the Earth," produces <span id="oxygenPercentage">20</span>% of the world's oxygen and is home to countless unique species.</p>
     </div>
+
+    <script>
+        // Biodiversity stats toggle
+        function toggleStats() {
+            const stats = document.getElementById('biodiversityStats');
+            if (stats.style.display === 'none' || !stats.style.display) {
+                stats.style.display = 'block';
+                updateSpeciesNumbers();
+            } else {
+                stats.style.display = 'none';
+            }
+        }
+
+        // Random species number updates
+        function updateSpeciesNumbers() {
+            const list = document.getElementById('speciesList');
+            setInterval(() => {
+                list.children[Math.floor(Math.random() * 5)].style.color = '#2c5a3e';
+                setTimeout(() => {
+                    list.children[Math.floor(Math.random() * 5)].style.color = 'black';
+                }, 500);
+            }, 2000);
+        }
+
+        // Activity tooltip
+        function showActivity(element, activity) {
+            const activities = {
+                hiking: 'Hiking helps reduce stress and improve cardiovascular health',
+                birdwatching: 'Birdwatching enhances mindfulness and connection with nature'
+            };
+            element.title = activities[activity];
+        }
+
+        // Image zoom effect
+        function zoomImage() {
+            const img = document.getElementById('forestImage');
+            if (img.style.transform === 'scale(1.2)') {
+                img.style.transform = 'scale(1)';
+            } else {
+                img.style.transform = 'scale(1.2)';
+            }
+        }
+
+        // Oxygen percentage animation
+        let increasing = true;
+        setInterval(() => {
+            const element = document.getElementById('oxygenPercentage');
+            let value = parseInt(element.textContent);
+            if (increasing) {
+                value = value >= 22 ? 20 : value + 1;
+                increasing = value < 22;
+            } else {
+                value = value <= 18 ? 20 : value - 1;
+                increasing = value <= 18;
+            }
+            element.textContent = value;
+        }, 2000);
+    </script>
 </body>
 </html> 

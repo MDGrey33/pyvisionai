@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "pyvisionai"
-version = "0.2.0"
+version = "0.2.1"
 description = "A Python library for extracting and describing content from documents using Vision LLMs"
 authors = ["MDGrey33 <roland@abouyounes.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/MDGrey33/content-extractor-with-vision"
-keywords = ["pdf", "docx", "pptx", "vision", "llm", "extraction"]
+keywords = ["pdf", "docx", "pptx", "html", "vision", "llm", "extraction"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
