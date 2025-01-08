@@ -53,28 +53,59 @@ Extract and describe content from documents using Vision Language Models.
    poetry run playwright install  # Install browser dependencies
    ```
 
-3. **Create Working Directories** (optional)
+## Directory Structure
+
+The package uses the following default directory structure:
+
+```
+content/
+├── source/      # Default input directory for files to process
+├── extracted/   # Default output directory for processed files
+└── log/         # Directory for log files and benchmarks
+```
+
+These directories are created automatically when needed, but you can:
+1. Create them manually:
    ```bash
-   # The package will create these automatically if they don't exist
    mkdir -p content/source content/extracted content/log
    ```
-
-4. **Setup for Image Description**
-
-   For cloud image description (default, recommended):
+2. Override them with custom paths:
    ```bash
-   # Set OpenAI API key
-   export OPENAI_API_KEY='your-api-key'
+   # Specify custom input and output directories
+   file-extract -t pdf -s /path/to/inputs -o /path/to/outputs
+
+   # Process a single file with custom output
+   file-extract -t pdf -s ~/documents/file.pdf -o ~/results
    ```
 
-   For local image description (optional):
-   ```bash
-   # Start Ollama server
-   ollama serve
+Note: While the default directories provide a organized structure, you're free to use any directory layout that suits your needs by specifying custom paths with the `-s` (source) and `-o` (output) options.
 
-   # Pull the required model
-   ollama pull llama3.2-vision
-   ```
+## Setup for Image Description
+
+For cloud image description (default, recommended):
+```bash
+# Set OpenAI API key
+export OPENAI_API_KEY='your-api-key'
+```
+
+For local image description (optional):
+```bash
+# Start Ollama server
+ollama serve
+
+# Pull the required model
+ollama pull llama3.2-vision
+```
+
+## Features
+
+- Extract text and images from PDF, DOCX, PPTX, and HTML files
+- Capture interactive HTML pages as images with full rendering
+- Describe images using local (Ollama) or cloud-based (OpenAI) Vision Language Models
+- Save extracted text and image descriptions in markdown format
+- Support for both CLI and library usage
+- Multiple extraction methods for different use cases
+- Detailed logging with timestamps for all operations
 
 ## Usage
 
@@ -143,7 +174,7 @@ description = describe_image_ollama(
 ## Logging
 
 The application maintains detailed logs of all operations:
-- Logs are stored in `content/log/` with timestamp-based filenames
+- By default, logs are stored in `content/log/` with timestamp-based filenames
 - Each run creates a new log file: `pyvisionai_YYYYMMDD_HHMMSS.log`
 - Logs include:
   - Timestamp for each operation

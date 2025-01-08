@@ -8,28 +8,39 @@ build/
 dist/
 *.egg-info/
 
-# Project directories
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment
+.env
 env/
+venv/
+.python-version
+*.lock
+poetry.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project directories
 content/source/*
 !content/source/.include
 content/extracted/*
 !content/extracted/.include
 content/log/*
 !content/log/.include
-content/test/*
 
-# Keep test files
+# Test files
+content/test/*
 !content/test/
 !content/test/source/
 !content/test/source/*
 content/test/output/*
 !content/test/output/.include
-__pycache__/
-.DS_Store
-*.lock
-poetry.lock
-.env
+
+# Logs
 *.log
-dist/
-build/
-*.egg-info/
