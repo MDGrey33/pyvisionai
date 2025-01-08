@@ -9,6 +9,7 @@ from pyvisionai.extractors.docx import DocxTextImageExtractor
 from pyvisionai.extractors.docx_page import DocxPageImageExtractor
 from pyvisionai.extractors.pptx import PptxTextImageExtractor
 from pyvisionai.extractors.pptx_page import PptxPageImageExtractor
+from pyvisionai.extractors.html_page import HtmlPageImageExtractor
 from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL
 
 
@@ -25,6 +26,9 @@ EXTRACTORS: Dict[str, Dict[str, Type[BaseExtractor]]] = {
     "pptx": {
         "text_and_images": PptxTextImageExtractor,  # Keep for now, will remove after testing
         "page_as_image": PptxPageImageExtractor,  # Use new page-as-image extractor
+    },
+    "html": {
+        "page_as_image": HtmlPageImageExtractor,  # Only page_as_image for HTML
     },
 }
 

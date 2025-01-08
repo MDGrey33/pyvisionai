@@ -84,7 +84,7 @@ def main():
     parser.add_argument(
         "-t",
         "--type",
-        choices=["pdf", "docx", "pptx"],
+        choices=["pdf", "docx", "pptx", "html"],
         required=True,
         help="Type of file to process",
     )

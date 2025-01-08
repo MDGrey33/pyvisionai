@@ -6,6 +6,7 @@ from pyvisionai.extractors.docx import DocxTextImageExtractor
 from pyvisionai.extractors.docx_page import DocxPageImageExtractor
 from pyvisionai.extractors.pptx import PptxTextImageExtractor
 from pyvisionai.extractors.pptx_page import PptxPageImageExtractor
+from pyvisionai.extractors.html_page import HtmlPageImageExtractor
 
 __all__ = [
     "PDFTextImageExtractor",
@@ -14,4 +15,5 @@ __all__ = [
     "DocxPageImageExtractor",
     "PptxTextImageExtractor",
     "PptxPageImageExtractor",
+    "HtmlPageImageExtractor",
 ]

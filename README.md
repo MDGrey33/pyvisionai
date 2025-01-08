@@ -10,7 +10,8 @@ Extract and describe content from documents using Vision Language Models.
 
 ## Features
 
-- Extract text and images from PDF, DOCX, and PPTX files
+- Extract text and images from PDF, DOCX, PPTX, and HTML files
+- Capture interactive HTML pages as images with full rendering
 - Describe images using local (Ollama) or cloud-based (OpenAI) Vision Language Models
 - Save extracted text and image descriptions in markdown format
 - Support for both CLI and library usage
@@ -24,16 +25,22 @@ Extract and describe content from documents using Vision Language Models.
    # macOS (using Homebrew)
    brew install --cask libreoffice  # Required for DOCX/PPTX processing
    brew install poppler             # Required for PDF processing
+   pip install playwright          # Required for HTML processing
+   playwright install              # Install browser dependencies
 
    # Ubuntu/Debian
    sudo apt-get update
    sudo apt-get install libreoffice poppler-utils
+   pip install playwright
+   playwright install
 
    # Windows
    # Download and install:
    # - LibreOffice: https://www.libreoffice.org/download/download/
    # - Poppler: http://blog.alivate.com.au/poppler-windows/
    # Add poppler's bin directory to your system PATH
+   pip install playwright
+   playwright install
    ```
 
 2. **Install the Package**
@@ -41,8 +48,9 @@ Extract and describe content from documents using Vision Language Models.
    # Using pip
    pip install pyvisionai
 
-   # Using poetry
+   # Using poetry (will automatically install playwright as a dependency)
    poetry add pyvisionai
+   poetry run playwright install  # Install browser dependencies
    ```
 
 3. **Create Working Directories** (optional)
@@ -78,6 +86,7 @@ Extract and describe content from documents using Vision Language Models.
    file-extract -t pdf -s path/to/file.pdf -o output_dir
    file-extract -t docx -s path/to/file.docx -o output_dir
    file-extract -t pptx -s path/to/file.pptx -o output_dir
+   file-extract -t html -s path/to/file.html -o output_dir
 
    # Process with specific extractor
    file-extract -t pdf -s input.pdf -o output_dir -e text_and_images
@@ -104,12 +113,16 @@ Extract and describe content from documents using Vision Language Models.
 from pyvisionai import create_extractor, describe_image_openai, describe_image_ollama
 
 # 1. Extract content from files
-extractor = create_extractor("pdf")  # or "docx" or "pptx"
+extractor = create_extractor("pdf")  # or "docx", "pptx", or "html"
 output_path = extractor.extract("input.pdf", "output_dir")
 
 # With specific extraction method
 extractor = create_extractor("pdf", extractor_type="text_and_images")
 output_path = extractor.extract("input.pdf", "output_dir")
+
+# Extract from HTML (always uses page_as_image method)
+extractor = create_extractor("html")
+output_path = extractor.extract("page.html", "output_dir")
 
 # 2. Describe images
 # Using GPT-4 Vision (default, recommended)
@@ -160,7 +173,7 @@ This project is licensed under the [Apache License 2.0](LICENSE).
 file-extract [-h] -t TYPE -s SOURCE -o OUTPUT [-e EXTRACTOR] [-m MODEL] [-k API_KEY] [-v]
 
 Required Arguments:
-  -t, --type TYPE         File type to process (pdf, docx, pptx)
+  -t, --type TYPE         File type to process (pdf, docx, pptx, html)
   -s, --source SOURCE     Source file or directory path
   -o, --output OUTPUT     Output directory path
 
@@ -169,6 +182,7 @@ Optional Arguments:
   -e, --extractor TYPE   Extraction method:
                          - page_as_image: Convert pages to images (default)
                          - text_and_images: Extract text and images separately
+                         Note: HTML only supports page_as_image
   -m, --model MODEL      Vision model for image description:
                          - gpt4: GPT-4 Vision (default, recommended)
                          - llama: Local Llama model
@@ -199,8 +213,9 @@ Optional Arguments:
 ```bash
 # Basic usage with defaults (page_as_image method, GPT-4 Vision)
 file-extract -t pdf -s document.pdf -o output_dir
+file-extract -t html -s webpage.html -o output_dir  # HTML always uses page_as_image
 
-# Specify extraction method
+# Specify extraction method (not applicable for HTML)
 file-extract -t docx -s document.docx -o output_dir -e text_and_images
 
 # Use local Llama model for image description

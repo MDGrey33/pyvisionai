@@ -82,18 +82,22 @@ def setup_test_env():
 @pytest.mark.parametrize(
     "file_type,method",
     [
+        # Document formats
         ("pdf", "page_as_image"),
         ("pdf", "text_and_images"),
         ("docx", "page_as_image"),
         ("docx", "text_and_images"),
+        # Presentation formats
         ("pptx", "page_as_image"),
+        # Web formats
+        ("html", "page_as_image"),
     ],
 )
 def test_file_extraction_lib(file_type, method, setup_test_env):
     """Test file extraction using library API."""
 
     # Setup
-    source_file = f"./content/test/source/test.{file_type}"
+    source_file = f"./content/test/source/test{'_interactive' if file_type == 'html' else ''}.{file_type}"
     output_dir = setup_test_env
 
     # Test API performance and functionality
@@ -166,16 +170,37 @@ def test_file_extraction_lib(file_type, method, setup_test_env):
                 assert (
                     "forest" in content.lower()
                 ), "Expected forest description not found in DOCX"
+        elif file_type == "html":
+            # Verify specific content
+            assert "Page 1" in content
+            assert (
+                "Exploring Nature" in content
+            ), "Expected document title not found in HTML"
+            # Verify interactive elements are described
+            assert (
+                "interactive" in content.lower()
+            ), "Expected interactive elements description not found in HTML"
+            assert (
+                "biodiversity" in content.lower()
+            ), "Expected biodiversity section not found in HTML"
+            # Verify image descriptions
+            assert (
+                "[Image" in content and "forest" in content.lower()
+            ), "Expected forest description not found in HTML"
 
 
 @pytest.mark.parametrize(
     "file_type,method",
     [
+        # Document formats
         ("pdf", "page_as_image"),
         ("pdf", "text_and_images"),
         ("docx", "page_as_image"),
         ("docx", "text_and_images"),
+        # Presentation formats
         ("pptx", "page_as_image"),
+        # Web formats
+        ("html", "page_as_image"),
     ],
 )
 def test_file_extraction_cli(file_type, method, setup_test_env):
@@ -183,6 +208,8 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
 
     # Setup
     output_dir = setup_test_env
+    source_path = "./content/test/source"
+    source_file = f"test{'_interactive' if file_type == 'html' else ''}.{file_type}"
 
     # Test CLI performance
     start_time = time.time()
@@ -191,7 +218,7 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
         "--type",
         file_type,
         "--source",
-        "./content/test/source",
+        os.path.join(source_path, source_file),
         "--output",
         output_dir,
         "--extractor",
@@ -201,7 +228,8 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
     cli_time = time.time() - start_time
 
     # Get output path
-    output_path = os.path.join(output_dir, f"test_{file_type}.md")
+    base_name = os.path.splitext(source_file)[0]
+    output_path = os.path.join(output_dir, f"{base_name}_{file_type}.md")
     output_size = os.path.getsize(output_path) if os.path.exists(output_path) else 0
 
     # Log CLI benchmark results
@@ -259,6 +287,23 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
                 assert (
                     "forest" in content.lower()
                 ), "Expected forest description not found in DOCX"
+        elif file_type == "html":
+            # Verify specific content
+            assert "Page 1" in content
+            assert (
+                "Exploring Nature" in content
+            ), "Expected document title not found in HTML"
+            # Verify interactive elements are described
+            assert (
+                "interactive" in content.lower()
+            ), "Expected interactive elements description not found in HTML"
+            assert (
+                "biodiversity" in content.lower()
+            ), "Expected biodiversity section not found in HTML"
+            # Verify image descriptions
+            assert (
+                "[Image" in content and "forest" in content.lower()
+            ), "Expected forest description not found in HTML"
 
 
 # OpenAI Vision tests
