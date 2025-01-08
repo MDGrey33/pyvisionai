@@ -226,3 +226,7 @@ class PDFTextImageExtractor(BaseExtractor):
         except Exception as e:
             print(f"Error processing PDF: {str(e)}")
             raise
+
+    def test_black_formatting(self, some_arg: str, another_arg: int = 42) -> str:
+        """Test function with bad formatting."""
+        return f"{some_arg} {another_arg}"
