@@ -1,8 +1,9 @@
 """Common test fixtures and configuration."""
 
-import os
 import json
+import os
 from datetime import datetime
+
 import pytest
 
 
@@ -32,7 +33,9 @@ def setup_test_env():
     # Record existing log files before test
     existing_logs = set()
     if os.path.exists(log_dir):
-        existing_logs = {f for f in os.listdir(log_dir) if f.endswith(".log")}
+        existing_logs = {
+            f for f in os.listdir(log_dir) if f.endswith(".log")
+        }
 
     # Create directories
     os.makedirs(output_dir, exist_ok=True)
@@ -47,7 +50,9 @@ def setup_test_env():
 
     # Clean only test-generated log files
     if os.path.exists(log_dir):
-        current_logs = {f for f in os.listdir(log_dir) if f.endswith(".log")}
+        current_logs = {
+            f for f in os.listdir(log_dir) if f.endswith(".log")
+        }
         test_logs = current_logs - existing_logs
 
         for log_file in test_logs:
@@ -76,4 +81,3 @@ ids_file_extraction = (
     "PPTX using page-as-image method",
     "HTML using page-as-image method",
 )
-

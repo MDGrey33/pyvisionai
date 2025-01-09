@@ -3,7 +3,10 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from pyvisionai.describers import describe_image_ollama, describe_image_openai
+from pyvisionai.describers import (
+    describe_image_ollama,
+    describe_image_openai,
+)
 from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL
 
 

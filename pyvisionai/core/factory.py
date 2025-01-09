@@ -1,17 +1,16 @@
 """Factory for creating extractors."""
 
-from typing import Dict, Type, Optional
+from typing import Dict, Optional, Type
 
 from pyvisionai.extractors.base import BaseExtractor
-from pyvisionai.extractors.pdf import PDFTextImageExtractor
-from pyvisionai.extractors.pdf_page import PDFPageImageExtractor
 from pyvisionai.extractors.docx import DocxTextImageExtractor
 from pyvisionai.extractors.docx_page import DocxPageImageExtractor
+from pyvisionai.extractors.html_page import HtmlPageImageExtractor
+from pyvisionai.extractors.pdf import PDFTextImageExtractor
+from pyvisionai.extractors.pdf_page import PDFPageImageExtractor
 from pyvisionai.extractors.pptx import PptxTextImageExtractor
 from pyvisionai.extractors.pptx_page import PptxPageImageExtractor
-from pyvisionai.extractors.html_page import HtmlPageImageExtractor
 from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL
-
 
 # Map of file types to their extractors
 EXTRACTORS: Dict[str, Dict[str, Type[BaseExtractor]]] = {
@@ -56,7 +55,9 @@ def create_extractor(
     if file_type not in EXTRACTORS:
         raise ValueError(f"Unsupported file type: {file_type}")
     if extractor_type not in EXTRACTORS[file_type]:
-        raise ValueError(f"Unsupported extractor type: {extractor_type}")
+        raise ValueError(
+            f"Unsupported extractor type: {extractor_type}"
+        )
 
     extractor_class = EXTRACTORS[file_type][extractor_type]
     extractor = extractor_class()

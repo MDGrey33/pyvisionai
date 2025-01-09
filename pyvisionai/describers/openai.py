@@ -2,6 +2,7 @@
 
 import base64
 from typing import Optional
+
 from openai import OpenAI
 
 from ..utils.logger import logger

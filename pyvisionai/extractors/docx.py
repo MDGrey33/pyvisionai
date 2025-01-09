@@ -1,15 +1,17 @@
 """DOCX content extractor."""
 
-import os
-import io
 import concurrent.futures
+import io
+import os
 from dataclasses import dataclass
 from typing import List, Tuple
 
 from docx import Document
 from PIL import Image
 
-from pyvisionai.describers.ollama import describe_image_ollama as describe_image
+from pyvisionai.describers.ollama import (
+    describe_image_ollama as describe_image,
+)
 from pyvisionai.extractors.base import BaseExtractor
 
 
@@ -26,7 +28,9 @@ class ImageTask:
 class DocxTextImageExtractor(BaseExtractor):
     """Extract text and images from DOCX files."""
 
-    def extract_text_and_images(self, docx_path: str) -> Tuple[List[str], List[bytes]]:
+    def extract_text_and_images(
+        self, docx_path: str
+    ) -> Tuple[List[str], List[bytes]]:
         """Extract text and images from DOCX file."""
         doc = Document(docx_path)
         paragraphs = []
@@ -50,7 +54,9 @@ class DocxTextImageExtractor(BaseExtractor):
 
         return paragraphs, images
 
-    def save_image(self, image_data: bytes, output_dir: str, image_name: str) -> str:
+    def save_image(
+        self, image_data: bytes, output_dir: str, image_name: str
+    ) -> str:
         """Save an image to the output directory."""
         try:
             # Convert image data to PIL Image
@@ -77,12 +83,17 @@ class DocxTextImageExtractor(BaseExtractor):
             return task.index, image_description
         except Exception as e:
             print(f"Error processing image {task.image_name}: {str(e)}")
-            return task.index, f"Error: Could not process image {task.image_name}"
+            return (
+                task.index,
+                f"Error: Could not process image {task.image_name}",
+            )
 
     def extract(self, docx_path: str, output_dir: str) -> str:
         """Process DOCX file by extracting text and images separately."""
         try:
-            docx_filename = os.path.splitext(os.path.basename(docx_path))[0]
+            docx_filename = os.path.splitext(
+                os.path.basename(docx_path)
+            )[0]
 
             # Extract text and images
             paragraphs, images = self.extract_text_and_images(docx_path)
@@ -112,15 +123,21 @@ class DocxTextImageExtractor(BaseExtractor):
                 descriptions = [""] * len(image_tasks)
 
                 # Use ThreadPoolExecutor for parallel processing
-                with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+                with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=4
+                ) as executor:
                     # Submit all tasks
                     future_to_task = {
-                        executor.submit(self.process_image_task, task): task
+                        executor.submit(
+                            self.process_image_task, task
+                        ): task
                         for task in image_tasks
                     }
 
                     # Collect results as they complete
-                    for future in concurrent.futures.as_completed(future_to_task):
+                    for future in concurrent.futures.as_completed(
+                        future_to_task
+                    ):
                         idx, description = future.result()
                         descriptions[idx] = description
 
@@ -130,7 +147,9 @@ class DocxTextImageExtractor(BaseExtractor):
                     md_content += f"Description: {description}\n\n"
 
             # Save markdown file
-            md_file_path = os.path.join(output_dir, f"{docx_filename}_docx.md")
+            md_file_path = os.path.join(
+                output_dir, f"{docx_filename}_docx.md"
+            )
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 

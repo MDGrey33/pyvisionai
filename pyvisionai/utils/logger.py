@@ -1,7 +1,7 @@
 """Logging configuration for the pyvisionai package."""
 
-import os
 import logging
+import os
 from datetime import datetime
 
 
@@ -20,7 +20,9 @@ def setup_logger(name: str = "pyvisionai") -> logging.Logger:
 
     # Create formatters
     console_formatter = logging.Formatter("%(message)s")
-    file_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    file_formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s"
+    )
 
     # Console handler
     console_handler = logging.StreamHandler()

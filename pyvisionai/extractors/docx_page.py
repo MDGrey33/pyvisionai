@@ -3,8 +3,9 @@
 import os
 import subprocess
 import tempfile
-from PIL import Image
 import time
+
+from PIL import Image
 
 from pyvisionai.extractors.base import BaseExtractor
 
@@ -23,8 +24,12 @@ class DocxPageImageExtractor(BaseExtractor):
             abs_temp_dir = os.path.abspath(temp_dir)
 
             # The output PDF will have the same name as the input DOCX
-            docx_filename = os.path.splitext(os.path.basename(docx_path))[0]
-            pdf_path = os.path.join(abs_temp_dir, f"{docx_filename}.pdf")
+            docx_filename = os.path.splitext(
+                os.path.basename(docx_path)
+            )[0]
+            pdf_path = os.path.join(
+                abs_temp_dir, f"{docx_filename}.pdf"
+            )
 
             # Convert DOCX to PDF using LibreOffice
             cmd = [
@@ -38,7 +43,9 @@ class DocxPageImageExtractor(BaseExtractor):
             ]
 
             # Run the command and capture output
-            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            result = subprocess.run(
+                cmd, check=True, capture_output=True, text=True
+            )
 
             # Wait a moment for the file to be written
             time.sleep(1)
@@ -60,7 +67,9 @@ class DocxPageImageExtractor(BaseExtractor):
                 f"STDERR: {e.stderr}"
             ) from e
         except Exception as e:
-            raise RuntimeError(f"Failed to convert DOCX to PDF: {str(e)}") from e
+            raise RuntimeError(
+                f"Failed to convert DOCX to PDF: {str(e)}"
+            ) from e
 
     def convert_pages_to_images(self, pdf_path: str) -> list:
         """Convert PDF pages to images using pdf2image."""
@@ -68,7 +77,9 @@ class DocxPageImageExtractor(BaseExtractor):
 
         return convert_from_path(pdf_path, dpi=300)
 
-    def save_image(self, image: Image.Image, output_dir: str, image_name: str) -> str:
+    def save_image(
+        self, image: Image.Image, output_dir: str, image_name: str
+    ) -> str:
         """Save an image to the output directory."""
         img_path = os.path.join(output_dir, f"{image_name}.jpg")
         image.save(img_path, "JPEG", quality=95)
@@ -77,10 +88,14 @@ class DocxPageImageExtractor(BaseExtractor):
     def extract(self, docx_path: str, output_dir: str) -> str:
         """Process DOCX file by converting each page to an image."""
         try:
-            docx_filename = os.path.splitext(os.path.basename(docx_path))[0]
+            docx_filename = os.path.splitext(
+                os.path.basename(docx_path)
+            )[0]
 
             # Create temporary directory for page images
-            pages_dir = os.path.join(output_dir, f"{docx_filename}_pages")
+            pages_dir = os.path.join(
+                output_dir, f"{docx_filename}_pages"
+            )
             if not os.path.exists(pages_dir):
                 os.makedirs(pages_dir)
 
@@ -111,13 +126,17 @@ class DocxPageImageExtractor(BaseExtractor):
                 os.remove(img_path)
 
             # Save markdown file
-            md_file_path = os.path.join(output_dir, f"{docx_filename}_docx.md")
+            md_file_path = os.path.join(
+                output_dir, f"{docx_filename}_docx.md"
+            )
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 
             # Clean up temporary files and directories
             os.remove(pdf_path)
-            os.rmdir(os.path.dirname(pdf_path))  # Remove temp PDF directory
+            os.rmdir(
+                os.path.dirname(pdf_path)
+            )  # Remove temp PDF directory
             os.rmdir(pages_dir)  # Remove pages directory
 
             return md_file_path

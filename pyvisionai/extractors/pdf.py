@@ -2,23 +2,25 @@
 Extract text and images separately from PDF files using pdfminer.six and pypdf.
 """
 
+import io
 import os
+import re
+import zlib
 from io import StringIO
 from typing import List, Tuple
-import zlib
-import re
 
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
-from pypdf import PdfReader
 from PIL import Image
-import io
+from pypdf import PdfReader
 
-from pyvisionai.describers.ollama import describe_image_ollama as describe_image
+from pyvisionai.describers.ollama import (
+    describe_image_ollama as describe_image,
+)
 from pyvisionai.extractors.base import BaseExtractor
 
 
@@ -49,7 +51,9 @@ class PDFTextImageExtractor(BaseExtractor):
             parser = PDFParser(in_file)
             doc = PDFDocument(parser)
             rsrcmgr = PDFResourceManager()
-            device = TextConverter(rsrcmgr, output_string, laparams=LAParams())
+            device = TextConverter(
+                rsrcmgr, output_string, laparams=LAParams()
+            )
             interpreter = PDFPageInterpreter(rsrcmgr, device)
 
             # Get specific page
@@ -89,13 +93,20 @@ class PDFTextImageExtractor(BaseExtractor):
                             height = obj["/Height"]
 
                             # Get color mode
-                            mode = get_color_mode(obj.get("/ColorSpace", "/DeviceRGB"))
+                            mode = get_color_mode(
+                                obj.get("/ColorSpace", "/DeviceRGB")
+                            )
 
                             # Calculate expected data size
                             channels = len(mode)  # RGB=3, CMYK=4, L=1
-                            bits_per_component = obj.get("/BitsPerComponent", 8)
+                            bits_per_component = obj.get(
+                                "/BitsPerComponent", 8
+                            )
                             expected_size = (
-                                width * height * channels * (bits_per_component // 8)
+                                width
+                                * height
+                                * channels
+                                * (bits_per_component // 8)
                             )
 
                             # Try to decompress data if needed
@@ -113,7 +124,9 @@ class PDFTextImageExtractor(BaseExtractor):
 
                             # Create PIL Image from raw data
                             try:
-                                img = Image.frombytes(mode, (width, height), img_data)
+                                img = Image.frombytes(
+                                    mode, (width, height), img_data
+                                )
 
                                 # Convert to RGB if needed
                                 if mode != "RGB":
@@ -132,7 +145,9 @@ class PDFTextImageExtractor(BaseExtractor):
                             img_data = data
                             ext = "jp2"
                         else:
-                            print(f"Unsupported filter: {obj['/Filter']}")
+                            print(
+                                f"Unsupported filter: {obj['/Filter']}"
+                            )
                             continue
 
                         # Verify image data
@@ -143,8 +158,12 @@ class PDFTextImageExtractor(BaseExtractor):
 
                             # Check for black image
                             pixels = list(img.getdata())
-                            black_pixels = sum(1 for p in pixels if p == (0, 0, 0))
-                            black_percentage = (black_pixels / len(pixels)) * 100
+                            black_pixels = sum(
+                                1 for p in pixels if p == (0, 0, 0)
+                            )
+                            black_percentage = (
+                                black_pixels / len(pixels)
+                            ) * 100
                             if black_percentage > 90:
                                 print(
                                     f"Warning: Image is {black_percentage:.1f}% black"
@@ -168,7 +187,11 @@ class PDFTextImageExtractor(BaseExtractor):
         return images
 
     def save_image(
-        self, image_data: bytes, output_dir: str, image_name: str, ext: str
+        self,
+        image_data: bytes,
+        output_dir: str,
+        image_name: str,
+        ext: str,
     ) -> str:
         """Save an image to the output directory."""
         try:
@@ -188,7 +211,9 @@ class PDFTextImageExtractor(BaseExtractor):
     def extract(self, pdf_path: str, output_dir: str) -> str:
         """Process PDF file by extracting text and images separately."""
         try:
-            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[0]
+            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[
+                0
+            ]
             reader = PdfReader(pdf_path)
             num_pages = len(reader.pages)
 
@@ -203,21 +228,25 @@ class PDFTextImageExtractor(BaseExtractor):
                 # Extract images
                 images = self.extract_images(pdf_path, page_num)
                 for img_index, (img_data, ext) in enumerate(images):
-                    image_name = (
-                        f"{pdf_filename}_page_{page_num + 1}_image_{img_index + 1}"
+                    image_name = f"{pdf_filename}_page_{page_num + 1}_image_{img_index + 1}"
+                    img_path = self.save_image(
+                        img_data, output_dir, image_name, ext
                     )
-                    img_path = self.save_image(img_data, output_dir, image_name, ext)
 
                     # Get image description
                     image_description = describe_image(img_path)
                     md_content += f"[Image {img_index + 1}]\n"
-                    md_content += f"Description: {image_description}\n\n"
+                    md_content += (
+                        f"Description: {image_description}\n\n"
+                    )
 
                     # Clean up image file
                     os.remove(img_path)
 
             # Save markdown file
-            md_file_path = os.path.join(output_dir, f"{pdf_filename}_pdf.md")
+            md_file_path = os.path.join(
+                output_dir, f"{pdf_filename}_pdf.md"
+            )
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 

@@ -2,7 +2,9 @@
 
 import os
 import subprocess
+
 import pytest
+
 from pyvisionai import describe_image_ollama, describe_image_openai
 
 
@@ -18,7 +20,9 @@ def test_image_description_lib_gpt4(setup_test_env):
     # Use GPT-4 Vision
     description = describe_image_openai(image_path, model="gpt-4o-mini")
     # Basic length check
-    assert description and len(description) > 100, "Description seems too short"
+    assert (
+        description and len(description) > 100
+    ), "Description seems too short"
     # Content verification
     assert any(
         term in description.lower() for term in ["forest", "tree"]
@@ -48,7 +52,9 @@ def test_image_description_cli_gpt4(setup_test_env):
     result = subprocess.run(cmd, capture_output=True, text=True)
 
     # Verify output
-    assert result.returncode == 0, f"CLI command failed with: {result.stderr}"
+    assert (
+        result.returncode == 0
+    ), f"CLI command failed with: {result.stderr}"
     assert len(result.stdout) > 100, "Description seems too short"
     # Content verification
     assert any(
@@ -61,9 +67,13 @@ def test_image_description_lib_llama(setup_test_env):
     image_path = os.path.join("content", "test", "source", "test.jpeg")
 
     # Use Llama model
-    description = describe_image_ollama(image_path, model="llama3.2-vision")
+    description = describe_image_ollama(
+        image_path, model="llama3.2-vision"
+    )
     # Basic length check
-    assert description and len(description) > 100, "Description seems too short"
+    assert (
+        description and len(description) > 100
+    ), "Description seems too short"
     # Content verification
     assert any(
         term in description.lower() for term in ["forest", "tree"]
@@ -86,10 +96,11 @@ def test_image_description_cli_llama(setup_test_env):
     result = subprocess.run(cmd, capture_output=True, text=True)
 
     # Verify output
-    assert result.returncode == 0, f"CLI command failed with: {result.stderr}"
+    assert (
+        result.returncode == 0
+    ), f"CLI command failed with: {result.stderr}"
     assert len(result.stdout) > 100, "Description seems too short"
     # Content verification
     assert any(
         term in result.stdout.lower() for term in ["forest", "tree"]
     ), "Expected forest scene description not found"
-

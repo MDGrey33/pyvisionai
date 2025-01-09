@@ -1,12 +1,14 @@
 """Command-line interface for image description."""
 
-import os
 import argparse
+import os
 from typing import Optional
 
-from pyvisionai.describers import describe_image_ollama, describe_image_openai
+from pyvisionai.describers import (
+    describe_image_ollama,
+    describe_image_openai,
+)
 from pyvisionai.utils.logger import logger
-
 
 # Available models for each service
 OLLAMA_MODEL = "llama3.2-vision"
@@ -38,7 +40,9 @@ def describe_image_cli(
     try:
         # Validate image path
         if not os.path.exists(image_path):
-            raise FileNotFoundError(f"Image file not found: {image_path}")
+            raise FileNotFoundError(
+                f"Image file not found: {image_path}"
+            )
 
         # Set OpenAI API key if provided
         if api_key:
@@ -46,10 +50,14 @@ def describe_image_cli(
 
         # Get description based on model
         if model == "llama":
-            description = describe_image_ollama(image_path, model=OLLAMA_MODEL)
+            description = describe_image_ollama(
+                image_path, model=OLLAMA_MODEL
+            )
         elif model in ["gpt3", "gpt4"]:
             # Both GPT-3 and GPT-4 use cases use the same vision model
-            description = describe_image_openai(image_path, model=GPT4_MODEL)
+            description = describe_image_openai(
+                image_path, model=GPT4_MODEL
+            )
         else:
             raise ValueError(f"Unsupported model: {model}")
 
@@ -69,7 +77,9 @@ def main():
     parser = argparse.ArgumentParser(
         description="Describe an image using various models."
     )
-    parser.add_argument("-i", "--image", required=True, help="Path to the image file")
+    parser.add_argument(
+        "-i", "--image", required=True, help="Path to the image file"
+    )
     parser.add_argument(
         "-u",
         "--use-case",
@@ -78,10 +88,15 @@ def main():
         help="Model to use for description",
     )
     parser.add_argument(
-        "-k", "--api-key", help="OpenAI API key (required for GPT models)"
+        "-k",
+        "--api-key",
+        help="OpenAI API key (required for GPT models)",
     )
     parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Print verbose output"
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Print verbose output",
     )
 
     args = parser.parse_args()

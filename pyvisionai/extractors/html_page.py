@@ -1,19 +1,22 @@
 """HTML page-as-image extractor."""
 
-import os
 import io
+import os
 import tempfile
+
 from PIL import Image
 
+from pyvisionai.config.html_config import DEFAULT_CONFIG
 from pyvisionai.extractors.base import BaseExtractor
 from pyvisionai.extractors.html.browser import capture_webpage
-from pyvisionai.config.html_config import DEFAULT_CONFIG
 
 
 class HtmlPageImageExtractor(BaseExtractor):
     """Extract content from HTML files by converting pages to images."""
 
-    def save_image(self, image_data: bytes, output_dir: str, image_name: str) -> str:
+    def save_image(
+        self, image_data: bytes, output_dir: str, image_name: str
+    ) -> str:
         """Save an image to the output directory."""
         try:
             # Convert bytes to PIL Image
@@ -32,10 +35,14 @@ class HtmlPageImageExtractor(BaseExtractor):
     def extract(self, html_path: str, output_dir: str) -> str:
         """Process HTML file by converting to image."""
         try:
-            html_filename = os.path.splitext(os.path.basename(html_path))[0]
+            html_filename = os.path.splitext(
+                os.path.basename(html_path)
+            )[0]
 
             # Create temporary directory for page images
-            pages_dir = os.path.join(output_dir, f"{html_filename}_pages")
+            pages_dir = os.path.join(
+                output_dir, f"{html_filename}_pages"
+            )
             if not os.path.exists(pages_dir):
                 os.makedirs(pages_dir)
 
@@ -49,18 +56,26 @@ class HtmlPageImageExtractor(BaseExtractor):
             ) as temp_html:
                 # Convert relative paths to absolute
                 base_dir = os.path.dirname(os.path.abspath(html_path))
-                html_content = html_content.replace('src="', f'src="{base_dir}/')
-                html_content = html_content.replace("src='", f"src='{base_dir}/")
+                html_content = html_content.replace(
+                    'src="', f'src="{base_dir}/'
+                )
+                html_content = html_content.replace(
+                    "src='", f"src='{base_dir}/"
+                )
                 temp_html.write(html_content)
                 temp_path = temp_html.name
 
             try:
                 # Capture webpage as image
-                screenshot = capture_webpage(f"file://{temp_path}", DEFAULT_CONFIG)
+                screenshot = capture_webpage(
+                    f"file://{temp_path}", DEFAULT_CONFIG
+                )
 
                 # Save screenshot
                 image_name = "page_1"
-                img_path = self.save_image(screenshot, pages_dir, image_name)
+                img_path = self.save_image(
+                    screenshot, pages_dir, image_name
+                )
 
                 # Get page description using configured model
                 page_description = self.describe_image(img_path)
@@ -72,8 +87,12 @@ class HtmlPageImageExtractor(BaseExtractor):
                 md_content += f"Description: {page_description}\n\n"
 
                 # Save markdown file
-                md_file_path = os.path.join(output_dir, f"{html_filename}_html.md")
-                with open(md_file_path, "w", encoding="utf-8") as md_file:
+                md_file_path = os.path.join(
+                    output_dir, f"{html_filename}_html.md"
+                )
+                with open(
+                    md_file_path, "w", encoding="utf-8"
+                ) as md_file:
                     md_file.write(md_content)
 
                 # Clean up image file

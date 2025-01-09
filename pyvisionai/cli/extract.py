@@ -1,18 +1,18 @@
 """Command-line interface for file extraction."""
 
-import os
 import argparse
+import os
 from typing import Optional
 
 from pyvisionai.core.factory import create_extractor
-from pyvisionai.utils.logger import logger
 from pyvisionai.utils.config import (
-    DEFAULT_PDF_EXTRACTOR,
-    DEFAULT_IMAGE_MODEL,
     CONTENT_DIR,
-    SOURCE_DIR,
+    DEFAULT_IMAGE_MODEL,
+    DEFAULT_PDF_EXTRACTOR,
     EXTRACTED_DIR,
+    SOURCE_DIR,
 )
+from pyvisionai.utils.logger import logger
 
 
 def process_file(
@@ -46,7 +46,9 @@ def process_file(
         os.makedirs(file_output_dir, exist_ok=True)
 
         # Create and use appropriate extractor
-        extractor = create_extractor(file_type, extractor_type, model, api_key)
+        extractor = create_extractor(
+            file_type, extractor_type, model, api_key
+        )
         logger.info(f"Processing {file_type} file: {input_file}")
         logger.info(f"Output directory: {file_output_dir}")
         return extractor.extract(input_file, file_output_dir)
@@ -84,7 +86,12 @@ def process_directory(
             if filename.lower().endswith(f".{file_type}"):
                 input_file = os.path.join(input_dir, filename)
                 process_file(
-                    file_type, input_file, output_dir, extractor_type, model, api_key
+                    file_type,
+                    input_file,
+                    output_dir,
+                    extractor_type,
+                    model,
+                    api_key,
                 )
 
     except Exception as e:
@@ -105,7 +112,10 @@ def main():
         help="Type of file to process",
     )
     parser.add_argument(
-        "-s", "--source", default=SOURCE_DIR, help="Source file or directory"
+        "-s",
+        "--source",
+        default=SOURCE_DIR,
+        help="Source file or directory",
     )
     parser.add_argument(
         "-o", "--output", default=EXTRACTED_DIR, help="Output directory"
@@ -124,7 +134,9 @@ def main():
         default=DEFAULT_IMAGE_MODEL,
         help="Model to use for image descriptions",
     )
-    parser.add_argument("-k", "--api-key", help="OpenAI API key (required for GPT-4)")
+    parser.add_argument(
+        "-k", "--api-key", help="OpenAI API key (required for GPT-4)"
+    )
 
     args = parser.parse_args()
 

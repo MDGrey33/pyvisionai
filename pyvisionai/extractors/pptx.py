@@ -1,15 +1,17 @@
 """Extract text and images from PPTX files."""
 
-import os
-import io
 import concurrent.futures
+import io
+import os
 from dataclasses import dataclass
 from typing import List, Tuple
 
-from pptx import Presentation
 from PIL import Image
+from pptx import Presentation
 
-from pyvisionai.describers.ollama import describe_image_ollama as describe_image
+from pyvisionai.describers.ollama import (
+    describe_image_ollama as describe_image,
+)
 from pyvisionai.extractors.base import BaseExtractor
 
 
@@ -26,7 +28,9 @@ class ImageTask:
 class PptxTextImageExtractor(BaseExtractor):
     """Extract text and images from PPTX files."""
 
-    def extract_text_and_images(self, pptx_path: str) -> Tuple[List[str], List[bytes]]:
+    def extract_text_and_images(
+        self, pptx_path: str
+    ) -> Tuple[List[str], List[bytes]]:
         """Extract text and images from PPTX file."""
         prs = Presentation(pptx_path)
         texts = []
@@ -53,7 +57,9 @@ class PptxTextImageExtractor(BaseExtractor):
 
         return texts, images
 
-    def save_image(self, image_data: bytes, output_dir: str, image_name: str) -> str:
+    def save_image(
+        self, image_data: bytes, output_dir: str, image_name: str
+    ) -> str:
         """Save an image to the output directory."""
         try:
             # Convert image data to PIL Image
@@ -80,12 +86,17 @@ class PptxTextImageExtractor(BaseExtractor):
             return task.index, image_description
         except Exception as e:
             print(f"Error processing image {task.image_name}: {str(e)}")
-            return task.index, f"Error: Could not process image {task.image_name}"
+            return (
+                task.index,
+                f"Error: Could not process image {task.image_name}",
+            )
 
     def extract(self, pptx_path: str, output_dir: str) -> str:
         """Process PPTX file by extracting text and images separately."""
         try:
-            pptx_filename = os.path.splitext(os.path.basename(pptx_path))[0]
+            pptx_filename = os.path.splitext(
+                os.path.basename(pptx_path)
+            )[0]
 
             # Extract text and images
             texts, images = self.extract_text_and_images(pptx_path)
@@ -117,15 +128,21 @@ class PptxTextImageExtractor(BaseExtractor):
                 descriptions = [""] * len(image_tasks)
 
                 # Use ThreadPoolExecutor for parallel processing
-                with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+                with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=4
+                ) as executor:
                     # Submit all tasks
                     future_to_task = {
-                        executor.submit(self.process_image_task, task): task
+                        executor.submit(
+                            self.process_image_task, task
+                        ): task
                         for task in image_tasks
                     }
 
                     # Collect results as they complete
-                    for future in concurrent.futures.as_completed(future_to_task):
+                    for future in concurrent.futures.as_completed(
+                        future_to_task
+                    ):
                         idx, description = future.result()
                         descriptions[idx] = description
 
@@ -135,7 +152,9 @@ class PptxTextImageExtractor(BaseExtractor):
                     md_content += f"Description: {description}\n\n"
 
             # Save markdown file
-            md_file_path = os.path.join(output_dir, f"{pptx_filename}_pptx.md")
+            md_file_path = os.path.join(
+                output_dir, f"{pptx_filename}_pptx.md"
+            )
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 

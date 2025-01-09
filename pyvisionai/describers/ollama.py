@@ -1,13 +1,16 @@
 """Image description using Ollama's Llama3.2 Vision model."""
 
 import base64
-import requests
 from typing import Optional
+
+import requests
 
 from ..utils.logger import logger
 
 
-def describe_image_ollama(image_path: str, model: str = "llama3.2-vision") -> str:
+def describe_image_ollama(
+    image_path: str, model: str = "llama3.2-vision"
+) -> str:
     """
     Describe an image using Ollama's Llama3.2 Vision model.
 

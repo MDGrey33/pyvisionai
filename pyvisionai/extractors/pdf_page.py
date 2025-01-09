@@ -1,6 +1,7 @@
 """PDF page-as-image extractor."""
 
 import os
+
 from pdf2image import convert_from_path
 from PIL import Image
 
@@ -14,7 +15,9 @@ class PDFPageImageExtractor(BaseExtractor):
         """Convert PDF pages to images."""
         return convert_from_path(pdf_path, dpi=300)
 
-    def save_image(self, image: Image.Image, output_dir: str, image_name: str) -> str:
+    def save_image(
+        self, image: Image.Image, output_dir: str, image_name: str
+    ) -> str:
         """Save an image to the output directory."""
         img_path = os.path.join(output_dir, f"{image_name}.jpg")
         image.save(img_path, "JPEG", quality=95)
@@ -23,10 +26,14 @@ class PDFPageImageExtractor(BaseExtractor):
     def extract(self, pdf_path: str, output_dir: str) -> str:
         """Process PDF file by converting each page to an image."""
         try:
-            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[0]
+            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[
+                0
+            ]
 
             # Create temporary directory for page images
-            pages_dir = os.path.join(output_dir, f"{pdf_filename}_pages")
+            pages_dir = os.path.join(
+                output_dir, f"{pdf_filename}_pages"
+            )
             if not os.path.exists(pages_dir):
                 os.makedirs(pages_dir)
 
@@ -54,7 +61,9 @@ class PDFPageImageExtractor(BaseExtractor):
                 os.remove(img_path)
 
             # Save markdown file
-            md_file_path = os.path.join(output_dir, f"{pdf_filename}_pdf.md")
+            md_file_path = os.path.join(
+                output_dir, f"{pdf_filename}_pdf.md"
+            )
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 

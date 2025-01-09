@@ -1,17 +1,17 @@
 """Main command-line interface for file-extractor."""
 
-import os
 import argparse
+import os
 from typing import Optional
 
 from pyvisionai.core.factory import create_extractor
-from pyvisionai.utils.logger import logger
 from pyvisionai.utils.config import (
-    DEFAULT_PDF_EXTRACTOR,
     CONTENT_DIR,
-    SOURCE_DIR,
+    DEFAULT_PDF_EXTRACTOR,
     EXTRACTED_DIR,
+    SOURCE_DIR,
 )
+from pyvisionai.utils.logger import logger
 
 
 def process_file(
@@ -69,7 +69,9 @@ def process_directory(
             if filename.lower().endswith(f".{file_type}"):
                 input_file = os.path.join(input_dir, filename)
                 logger.info(f"Processing {input_file}...")
-                process_file(file_type, input_file, output_dir, extractor_type)
+                process_file(
+                    file_type, input_file, output_dir, extractor_type
+                )
 
     except Exception as e:
         logger.error(f"Error processing directory: {str(e)}")
@@ -89,7 +91,10 @@ def main():
         help="Type of file to process",
     )
     parser.add_argument(
-        "-s", "--source", default=SOURCE_DIR, help="Source file or directory"
+        "-s",
+        "--source",
+        default=SOURCE_DIR,
+        help="Source file or directory",
     )
     parser.add_argument(
         "-o", "--output", default=EXTRACTED_DIR, help="Output directory"
@@ -107,9 +112,13 @@ def main():
     try:
         # Determine if source is a file or directory
         if os.path.isfile(args.source):
-            process_file(args.type, args.source, args.output, args.extractor)
+            process_file(
+                args.type, args.source, args.output, args.extractor
+            )
         elif os.path.isdir(args.source):
-            process_directory(args.type, args.source, args.output, args.extractor)
+            process_directory(
+                args.type, args.source, args.output, args.extractor
+            )
         else:
             raise FileNotFoundError(f"Source not found: {args.source}")
 

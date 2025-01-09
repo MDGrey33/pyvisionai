@@ -1,7 +1,7 @@
 """Tests for benchmark logging functionality."""
 
-import os
 import json
+import os
 
 
 def test_benchmark_log_structure():
@@ -9,7 +9,9 @@ def test_benchmark_log_structure():
     log_dir = "content/log"
     log_file = os.path.join(log_dir, "benchmark.log")
 
-    assert os.path.exists(log_file), "Benchmark log file should be created"
+    assert os.path.exists(
+        log_file
+    ), "Benchmark log file should be created"
 
     with open(log_file, "r") as f:
         last_line = f.readlines()[-1]
@@ -27,4 +29,3 @@ def test_benchmark_log_structure():
             assert "extraction_time" in metrics
         assert "total_time" in metrics
         assert "output_size" in metrics
-

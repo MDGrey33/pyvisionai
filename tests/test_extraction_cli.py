@@ -1,13 +1,21 @@
 """CLI tests for file extraction functionality."""
 
 import os
-import time
 import subprocess
+import time
+
 import pytest
 
-from tests.conftest import log_benchmark, testdata_file_extraction, ids_file_extraction
-from tests.utils.verifiers import verify_basic_content, content_verifiers
+from tests.conftest import (
+    ids_file_extraction,
+    log_benchmark,
+    testdata_file_extraction,
+)
 from tests.utils.metrics import print_performance_metrics
+from tests.utils.verifiers import (
+    content_verifiers,
+    verify_basic_content,
+)
 
 
 @pytest.mark.parametrize(
@@ -40,8 +48,14 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
 
     # Get output path
     base_name = os.path.splitext(source_file)[0]
-    output_path = os.path.join(output_dir, f"{base_name}_{file_type}.md")
-    output_size = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+    output_path = os.path.join(
+        output_dir, f"{base_name}_{file_type}.md"
+    )
+    output_size = (
+        os.path.getsize(output_path)
+        if os.path.exists(output_path)
+        else 0
+    )
 
     # Log CLI benchmark results
     cli_metrics = {
@@ -57,14 +71,17 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
     )
 
     # Verify output
-    assert result.returncode == 0, f"CLI command failed with: {result.stderr}"
-    assert os.path.exists(output_path), f"Output file not found: {output_path}"
+    assert (
+        result.returncode == 0
+    ), f"CLI command failed with: {result.stderr}"
+    assert os.path.exists(
+        output_path
+    ), f"Output file not found: {output_path}"
     with open(output_path, "r") as f:
         content = f.read()
-        
+
         # Verify basic content requirements
         verify_basic_content(content)
-        
+
         # Verify file-type specific content
         content_verifiers[file_type](content)
-
