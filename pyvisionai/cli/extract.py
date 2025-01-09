@@ -9,6 +9,7 @@ from pyvisionai.utils.config import (
     CONTENT_DIR,
     DEFAULT_IMAGE_MODEL,
     DEFAULT_PDF_EXTRACTOR,
+    DEFAULT_PROMPT,
     EXTRACTED_DIR,
     SOURCE_DIR,
 )
@@ -22,6 +23,7 @@ def process_file(
     extractor_type: Optional[str] = None,
     model: Optional[str] = None,
     api_key: Optional[str] = None,
+    prompt: Optional[str] = None,
 ) -> str:
     """
     Process a single file using the appropriate extractor.
@@ -33,25 +35,23 @@ def process_file(
         extractor_type: Optional specific extractor type
         model: Optional model to use for image descriptions
         api_key: Optional OpenAI API key (required for GPT-4)
+        prompt: Optional custom prompt for image description
 
     Returns:
         str: Path to the output file
     """
     try:
-        # Get base name of the input file
-        base_name = os.path.splitext(os.path.basename(input_file))[0]
-        file_output_dir = os.path.join(output_dir, base_name)
-
         # Create output directory if it doesn't exist
-        os.makedirs(file_output_dir, exist_ok=True)
+        os.makedirs(output_dir, exist_ok=True)
 
         # Create and use appropriate extractor
         extractor = create_extractor(
             file_type, extractor_type, model, api_key
         )
-        logger.info(f"Processing {file_type} file: {input_file}")
-        logger.info(f"Output directory: {file_output_dir}")
-        return extractor.extract(input_file, file_output_dir)
+        # Set custom prompt if provided
+        if prompt:
+            extractor.prompt = prompt
+        return extractor.extract(input_file, output_dir)
 
     except Exception as e:
         logger.error(f"Error processing file: {str(e)}")
@@ -65,6 +65,7 @@ def process_directory(
     extractor_type: Optional[str] = None,
     model: Optional[str] = None,
     api_key: Optional[str] = None,
+    prompt: Optional[str] = None,
 ) -> None:
     """
     Process all files of a given type in a directory.
@@ -76,6 +77,7 @@ def process_directory(
         extractor_type: Optional specific extractor type
         model: Optional model to use for image descriptions
         api_key: Optional OpenAI API key (required for GPT-4)
+        prompt: Optional custom prompt for image description
     """
     try:
         # Create output directory if it doesn't exist
@@ -85,6 +87,7 @@ def process_directory(
         for filename in os.listdir(input_dir):
             if filename.lower().endswith(f".{file_type}"):
                 input_file = os.path.join(input_dir, filename)
+                logger.info(f"Processing {input_file}...")
                 process_file(
                     file_type,
                     input_file,
@@ -92,6 +95,7 @@ def process_directory(
                     extractor_type,
                     model,
                     api_key,
+                    prompt,
                 )
 
     except Exception as e:
@@ -107,7 +111,7 @@ def main():
     parser.add_argument(
         "-t",
         "--type",
-        choices=["pdf", "docx", "pptx"],
+        choices=["pdf", "docx", "pptx", "html"],
         required=True,
         help="Type of file to process",
     )
@@ -137,6 +141,11 @@ def main():
     parser.add_argument(
         "-k", "--api-key", help="OpenAI API key (required for GPT-4)"
     )
+    parser.add_argument(
+        "-p",
+        "--prompt",
+        help=f"Custom prompt for image description (default: {DEFAULT_PROMPT})",
+    )
 
     args = parser.parse_args()
 
@@ -150,6 +159,7 @@ def main():
                 args.extractor,
                 args.model,
                 args.api_key,
+                args.prompt,
             )
         elif os.path.isdir(args.source):
             process_directory(
@@ -159,6 +169,7 @@ def main():
                 args.extractor,
                 args.model,
                 args.api_key,
+                args.prompt,
             )
         else:
             raise FileNotFoundError(f"Source not found: {args.source}")

@@ -18,6 +18,7 @@ Extract and describe content from documents using Vision Language Models.
 - Support for both CLI and library usage
 - Multiple extraction methods for different use cases
 - Detailed logging with timestamps for all operations
+- Customizable image description prompts
 
 ## Installation
 
@@ -31,9 +32,10 @@ Extract and describe content from documents using Vision Language Models.
 
    # Ubuntu/Debian
    sudo apt-get update
-   sudo apt-get install libreoffice poppler-utils
-   pip install playwright
-   playwright install
+   sudo apt-get install -y libreoffice  # Required for DOCX/PPTX processing
+   sudo apt-get install -y poppler-utils # Required for PDF processing
+   pip install playwright               # Required for HTML processing
+   playwright install                   # Install browser dependencies
 
    # Windows
    # Download and install:
@@ -44,7 +46,7 @@ Extract and describe content from documents using Vision Language Models.
    playwright install
    ```
 
-2. **Install the Package**
+2. **Install PyVisionAI**
    ```bash
    # Using pip
    pip install pyvisionai
@@ -56,8 +58,7 @@ Extract and describe content from documents using Vision Language Models.
 
 ## Directory Structure
 
-The package uses the following default directory structure:
-
+By default, PyVisionAI uses the following directory structure:
 ```
 content/
 ├── source/      # Default input directory for files to process
@@ -135,6 +136,9 @@ ollama pull llama3.2-vision
    # Using local Llama model
    describe-image -i path/to/image.jpg -u llama
 
+   # Using custom prompt
+   describe-image -i image.jpg -p "List the main colors in this image"
+
    # Additional options
    describe-image -i image.jpg -v  # Verbose output
    ```
@@ -162,13 +166,15 @@ description = describe_image_openai(
     "image.jpg",
     model="gpt-4o-mini",  # default
     api_key="your-api-key",  # optional if set in environment
-    max_tokens=300  # default
+    max_tokens=300,  # default
+    prompt="Describe this image focusing on colors and textures"  # optional custom prompt
 )
 
 # Using local Llama model
 description = describe_image_ollama(
     "image.jpg",
-    model="llama3.2-vision"  # default
+    model="llama3.2-vision",  # default
+    prompt="List the main objects in this image"  # optional custom prompt
 )
 ```
 
@@ -220,11 +226,12 @@ Optional Arguments:
                          - llama: Local Llama model
   -k, --api-key KEY      OpenAI API key (can also be set via OPENAI_API_KEY env var)
   -v, --verbose          Enable verbose logging
+  -p, --prompt TEXT      Custom prompt for image description
 ```
 
 ### `describe-image` Command
 ```bash
-describe-image [-h] -i IMAGE [-m MODEL] [-k API_KEY] [-t MAX_TOKENS] [-v]
+describe-image [-h] -i IMAGE [-m MODEL] [-k API_KEY] [-t MAX_TOKENS] [-v] [-p PROMPT]
 
 Required Arguments:
   -i, --image IMAGE      Path to image file
@@ -236,6 +243,7 @@ Optional Arguments:
                         - llama: Local Llama model
   -k, --api-key KEY     OpenAI API key (can also be set via OPENAI_API_KEY env var)
   -t, --max-tokens NUM  Maximum tokens for response (default: 300)
+  -p, --prompt TEXT     Custom prompt for image description
   -v, --verbose         Enable verbose logging
 ```
 
@@ -258,6 +266,9 @@ file-extract -t pdf -s input_dir -o output_dir -v
 
 # Use custom OpenAI API key
 file-extract -t pdf -s document.pdf -o output_dir -k "your-api-key"
+
+# Use custom prompt for image descriptions
+file-extract -t pdf -s document.pdf -o output_dir -p "Focus on text content and layout"
 ```
 
 ### Image Description Examples
@@ -268,6 +279,9 @@ describe-image -i photo.jpg
 # Use local Llama model
 describe-image -i photo.jpg -m llama
 
+# Use custom prompt
+describe-image -i photo.jpg -p "List the main colors and their proportions"
+
 # Customize token limit
 describe-image -i photo.jpg -t 500
 
@@ -276,4 +290,7 @@ describe-image -i photo.jpg -v
 
 # Use custom OpenAI API key
 describe-image -i photo.jpg -k "your-api-key"
+
+# Combine options
+describe-image -i photo.jpg -m llama -p "Describe the lighting and shadows" -v
 ```

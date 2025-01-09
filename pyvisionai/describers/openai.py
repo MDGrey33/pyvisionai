@@ -5,23 +5,26 @@ from typing import Optional
 
 from openai import OpenAI
 
+from ..utils.config import DEFAULT_PROMPT, OPENAI_MODEL_NAME
 from ..utils.logger import logger
 
 
 def describe_image_openai(
     image_path: str,
-    model: str = "gpt-4o-mini",
+    model: Optional[str] = None,
     api_key: Optional[str] = None,
     max_tokens: int = 300,
+    prompt: Optional[str] = None,
 ) -> str:
     """
     Describe an image using OpenAI's GPT-4 Vision model.
 
     Args:
         image_path: Path to the image file
-        model: Name of the OpenAI model to use
+        model: Name of the OpenAI model to use (default: gpt-4o-mini)
         api_key: OpenAI API key (optional if set in environment)
         max_tokens: Maximum tokens in the response
+        prompt: Custom prompt for image description (optional)
 
     Returns:
         str: Description of the image
@@ -34,6 +37,11 @@ def describe_image_openai(
         with open(image_path, "rb") as image_file:
             image_data = base64.b64encode(image_file.read()).decode()
 
+        # Use default prompt if none provided
+        prompt = prompt or DEFAULT_PROMPT
+        # Use default model if none provided
+        model = model or OPENAI_MODEL_NAME
+
         # Prepare request
         response = client.chat.completions.create(
             model=model,
@@ -43,7 +51,7 @@ def describe_image_openai(
                     "content": [
                         {
                             "type": "text",
-                            "text": "Describe this image in detail. Preserve as much of the precise original text, format, images and style as possible.",
+                            "text": prompt,
                         },
                         {
                             "type": "image_url",

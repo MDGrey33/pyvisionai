@@ -7,7 +7,11 @@ from pyvisionai.describers import (
     describe_image_ollama,
     describe_image_openai,
 )
-from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL
+from pyvisionai.utils.config import (
+    DEFAULT_IMAGE_MODEL,
+    DEFAULT_PROMPT,
+    OPENAI_MODEL_NAME,
+)
 
 
 class BaseExtractor(ABC):
@@ -17,6 +21,7 @@ class BaseExtractor(ABC):
         """Initialize the extractor."""
         self.model = DEFAULT_IMAGE_MODEL
         self.api_key = None
+        self.prompt = None
 
     def describe_image(self, image_path: str) -> str:
         """
@@ -29,10 +34,16 @@ class BaseExtractor(ABC):
             str: Description of the image
         """
         if self.model == "llama":
-            return describe_image_ollama(image_path)
+            return describe_image_ollama(
+                image_path,
+                prompt=self.prompt,
+            )
         elif self.model == "gpt4":
             return describe_image_openai(
-                image_path, model="gpt-4o-mini", api_key=self.api_key
+                image_path,
+                model=OPENAI_MODEL_NAME,
+                api_key=self.api_key,
+                prompt=self.prompt,
             )
         else:
             raise ValueError(f"Unsupported model: {self.model}")

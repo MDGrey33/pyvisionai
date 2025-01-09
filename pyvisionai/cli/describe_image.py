@@ -8,11 +8,8 @@ from pyvisionai.describers import (
     describe_image_ollama,
     describe_image_openai,
 )
+from pyvisionai.utils.config import DEFAULT_PROMPT
 from pyvisionai.utils.logger import logger
-
-# Available models for each service
-OLLAMA_MODEL = "llama3.2-vision"
-GPT4_MODEL = "gpt-4o-mini"
 
 
 def describe_image_cli(
@@ -20,6 +17,7 @@ def describe_image_cli(
     model: str = "llama",
     api_key: Optional[str] = None,
     verbose: bool = False,
+    prompt: Optional[str] = None,
 ) -> str:
     """
     Describe an image using the specified model.
@@ -29,6 +27,7 @@ def describe_image_cli(
         model: Model to use (llama, gpt3, or gpt4)
         api_key: OpenAI API key (required for gpt3/gpt4)
         verbose: Whether to print verbose output
+        prompt: Custom prompt for image description (optional)
 
     Returns:
         str: Description of the image
@@ -51,12 +50,15 @@ def describe_image_cli(
         # Get description based on model
         if model == "llama":
             description = describe_image_ollama(
-                image_path, model=OLLAMA_MODEL
+                image_path,
+                prompt=prompt,
             )
         elif model in ["gpt3", "gpt4"]:
             # Both GPT-3 and GPT-4 use cases use the same vision model
             description = describe_image_openai(
-                image_path, model=GPT4_MODEL
+                image_path,
+                api_key=api_key,
+                prompt=prompt,
             )
         else:
             raise ValueError(f"Unsupported model: {model}")
@@ -98,12 +100,21 @@ def main():
         action="store_true",
         help="Print verbose output",
     )
+    parser.add_argument(
+        "-p",
+        "--prompt",
+        help=f"Custom prompt for image description (default: {DEFAULT_PROMPT})",
+    )
 
     args = parser.parse_args()
 
     try:
         description = describe_image_cli(
-            args.image, args.use_case, args.api_key, args.verbose
+            args.image,
+            args.use_case,
+            args.api_key,
+            args.verbose,
+            args.prompt,
         )
         print(description)
     except Exception as e:
