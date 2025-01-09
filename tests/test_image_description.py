@@ -131,9 +131,12 @@ def test_custom_prompt_cli_gpt4(setup_test_env):
         "-v",
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
-    assert result.returncode == 0, f"CLI command failed with: {result.stderr}"
+    assert (
+        result.returncode == 0
+    ), f"CLI command failed with: {result.stderr}"
     assert any(
-        term in result.stdout.lower() for term in ["color", "green", "brown"]
+        term in result.stdout.lower()
+        for term in ["color", "green", "brown"]
     ), "Custom prompt was not reflected in GPT-4 output"
 
     # Test with default prompt
@@ -148,8 +151,12 @@ def test_custom_prompt_cli_gpt4(setup_test_env):
         "-v",
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
-    assert result.returncode == 0, f"CLI command failed with: {result.stderr}"
-    assert len(result.stdout) > 100, "Default prompt output seems too short"
+    assert (
+        result.returncode == 0
+    ), f"CLI command failed with: {result.stderr}"
+    assert (
+        len(result.stdout) > 100
+    ), "Default prompt output seems too short"
 
 
 def test_custom_prompt_cli_llama(setup_test_env):
@@ -169,9 +176,12 @@ def test_custom_prompt_cli_llama(setup_test_env):
         "-v",
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
-    assert result.returncode == 0, f"CLI command failed with: {result.stderr}"
+    assert (
+        result.returncode == 0
+    ), f"CLI command failed with: {result.stderr}"
     assert any(
-        term in result.stdout.lower() for term in ["color", "green", "brown"]
+        term in result.stdout.lower()
+        for term in ["color", "green", "brown"]
     ), "Custom prompt was not reflected in Llama output"
 
     # Test with default prompt
@@ -184,8 +194,12 @@ def test_custom_prompt_cli_llama(setup_test_env):
         "-v",
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
-    assert result.returncode == 0, f"CLI command failed with: {result.stderr}"
-    assert len(result.stdout) > 100, "Default prompt output seems too short"
+    assert (
+        result.returncode == 0
+    ), f"CLI command failed with: {result.stderr}"
+    assert (
+        len(result.stdout) > 100
+    ), "Default prompt output seems too short"
 
 
 def test_custom_prompt_lib_gpt4(setup_test_env):
@@ -205,7 +219,8 @@ def test_custom_prompt_lib_gpt4(setup_test_env):
         api_key=api_key,
     )
     assert any(
-        term in description.lower() for term in ["color", "green", "brown"]
+        term in description.lower()
+        for term in ["color", "green", "brown"]
     ), "Custom prompt was not reflected in GPT-4 output"
 
     # Test with default prompt
@@ -213,7 +228,9 @@ def test_custom_prompt_lib_gpt4(setup_test_env):
         image_path,
         api_key=api_key,
     )
-    assert len(description) > 100, "Default prompt output seems too short"
+    assert (
+        len(description) > 100
+    ), "Default prompt output seems too short"
     assert any(
         term in description.lower() for term in ["forest", "tree"]
     ), "Default prompt should describe the scene"
