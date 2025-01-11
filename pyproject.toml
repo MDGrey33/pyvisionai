@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyvisionai"
-version = "0.2.1"
+version = "0.2.2"
 description = "A Python library for extracting and describing content from documents using Vision LLMs"
 authors = ["MDGrey33 <roland@abouyounes.com>"]
 license = "Apache-2.0"
@@ -33,7 +33,7 @@ use_parentheses = true
 ensure_newline_before_comments = true
 
 [tool.poetry.scripts]
-file-extract = "pyvisionai.cli.main:main"
+file-extract = "pyvisionai.cli.extract:main"
 describe-image = "pyvisionai.cli.describe_image:main"
 
 [tool.poetry.dependencies]

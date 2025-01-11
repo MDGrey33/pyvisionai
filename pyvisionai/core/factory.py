@@ -10,7 +10,7 @@ from pyvisionai.extractors.pdf import PDFTextImageExtractor
 from pyvisionai.extractors.pdf_page import PDFPageImageExtractor
 from pyvisionai.extractors.pptx import PptxTextImageExtractor
 from pyvisionai.extractors.pptx_page import PptxPageImageExtractor
-from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL
+from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL, DEFAULT_PROMPT
 
 # Map of file types to their extractors
 EXTRACTORS: Dict[str, Dict[str, Type[BaseExtractor]]] = {
@@ -37,6 +37,7 @@ def create_extractor(
     extractor_type: str = "page_as_image",
     model: str = DEFAULT_IMAGE_MODEL,
     api_key: Optional[str] = None,
+    prompt: Optional[str] = None,
 ) -> BaseExtractor:
     """
     Create an extractor instance based on file type and extraction method.
@@ -48,6 +49,7 @@ def create_extractor(
             - text_and_images: Extract text and images separately
         model: Model to use for image descriptions (llama, gpt4)
         api_key: OpenAI API key (required for GPT-4)
+        prompt: Custom prompt for image description (optional)
 
     Returns:
         BaseExtractor: An instance of the appropriate extractor
@@ -63,4 +65,5 @@ def create_extractor(
     extractor = extractor_class()
     extractor.model = model
     extractor.api_key = api_key
+    extractor.prompt = prompt or DEFAULT_PROMPT
     return extractor

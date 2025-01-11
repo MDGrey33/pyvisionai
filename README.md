@@ -126,7 +126,12 @@ ollama pull llama3.2-vision
 
    # Process all files in a directory
    file-extract -t pdf -s input_dir -o output_dir
+
+   # Example with custom prompt
+   file-extract -t pdf -s document.pdf -o output_dir -p "Extract the exact text as present in the image and write one sentence about each visual in the image"
    ```
+
+   **Note:** The custom prompt for file extraction will affect the content of the output document. In case of page_as_image It should contain instructions to extract text and describe visuals. Variations are acceptable as long as they encompass these tasks. Avoid prompts like "What's the color of this picture?" as they may not yield the desired results.
 
 2. **Describe Images**
    ```bash
@@ -294,3 +299,58 @@ describe-image -i photo.jpg -k "your-api-key"
 # Combine options
 describe-image -i photo.jpg -m llama -p "Describe the lighting and shadows" -v
 ```
+
+## Custom Prompts
+
+PyVisionAI supports custom prompts for both file extraction and image description. Custom prompts allow you to control how content is extracted and described.
+
+### Using Custom Prompts
+
+1. **CLI Usage**
+   ```bash
+   # File extraction with custom prompt
+   file-extract -t pdf -s document.pdf -o output_dir -p "Extract all text verbatim and describe any diagrams or images in detail"
+
+   # Image description with custom prompt
+   describe-image -i image.jpg -p "List the main colors and describe the layout of elements"
+   ```
+
+2. **Library Usage**
+   ```python
+   # File extraction with custom prompt
+   extractor = create_extractor(
+       "pdf",
+       extractor_type="page_as_image",
+       prompt="Extract all text exactly as it appears and provide detailed descriptions of any charts or diagrams"
+   )
+   output_path = extractor.extract("input.pdf", "output_dir")
+
+   # Image description with custom prompt
+   description = describe_image_openai(
+       "image.jpg",
+       prompt="Focus on spatial relationships between objects and any text content"
+   )
+   ```
+
+3. **Environment Variable**
+   ```bash
+   # Set default prompt via environment variable
+   export FILE_EXTRACTOR_PROMPT="Extract text and describe visual elements with emphasis on layout"
+   ```
+
+### Writing Effective Prompts
+
+1. **For Page-as-Image Method**
+   - Include instructions for both text extraction and visual description since the entire page is processed as an image
+   - Example: "Extract the exact text as it appears on the page and describe any images, diagrams, or visual elements in detail"
+
+2. **For Text-and-Images Method**
+   - Focus only on image description since text is extracted separately
+   - The model only sees the images, not the text content
+   - Example: "Describe the visual content, focusing on what the image represents and any visual elements it contains"
+
+3. **For Image Description**
+   - Be specific about what aspects to focus on
+   - Example: "Describe the main elements, their arrangement, and any text visible in the image"
+
+Note: For page-as-image method, prompts must include both text extraction and visual description instructions as the entire page is processed as an image. For text-and-images method, prompts should focus solely on image description as text is handled separately.

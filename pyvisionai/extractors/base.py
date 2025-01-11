@@ -21,7 +21,7 @@ class BaseExtractor(ABC):
         """Initialize the extractor."""
         self.model = DEFAULT_IMAGE_MODEL
         self.api_key = None
-        self.prompt = None
+        self.prompt = DEFAULT_PROMPT
 
     def describe_image(self, image_path: str) -> str:
         """

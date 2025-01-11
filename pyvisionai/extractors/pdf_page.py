@@ -67,7 +67,7 @@ class PDFPageImageExtractor(BaseExtractor):
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 
-            # Clean up pages directory
+            # Clean up pages directory after all pages are processed
             os.rmdir(pages_dir)
 
             return md_file_path
