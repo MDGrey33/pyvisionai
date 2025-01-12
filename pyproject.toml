@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyvisionai"
-version = "0.2.2"
+version = "0.2.3"
 description = "A Python library for extracting and describing content from documents using Vision LLMs"
 authors = ["MDGrey33 <roland@abouyounes.com>"]
 license = "Apache-2.0"
@@ -32,6 +32,21 @@ force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 
+[tool.pydocstyle]
+convention = "google"
+add_select = ["D417"]
+add_ignore = ["D100", "D104"]  # Ignore missing docstrings in modules and packages
+
+[tool.flake8]
+max-line-length = 72
+extend-ignore = ["E203", "W503"]  # For Black compatibility
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist"
+]
+
 [tool.poetry.scripts]
 file-extract = "pyvisionai.cli.extract:main"
 describe-image = "pyvisionai.cli.describe_image:main"
@@ -53,6 +68,9 @@ playwright = "^1.41.0"
 pytest = "^7.4.4"
 black = "^24.10.0"
 isort = "^5.13.2"
+pydocstyle = "^6.3.0"
+flake8 = "^7.0.0"
+flake8-pyproject = "^1.2.3"  # For pyproject.toml support
 
 [build-system]
 requires = ["poetry-core"]
