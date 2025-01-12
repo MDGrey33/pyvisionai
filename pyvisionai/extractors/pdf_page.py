@@ -1,6 +1,8 @@
 """PDF page-as-image extractor."""
 
+import concurrent.futures
 import os
+from typing import Tuple
 
 from pdf2image import convert_from_path
 from PIL import Image
@@ -23,17 +25,42 @@ class PDFPageImageExtractor(BaseExtractor):
         image.save(img_path, "JPEG", quality=95)
         return img_path
 
+    def process_page(
+        self, page_data: Tuple[int, Image.Image], pages_dir: str
+    ) -> Tuple[int, str]:
+        """Process a single page.
+        
+        Args:
+            page_data: Tuple of (page number, page image)
+            pages_dir: Directory to save page images
+
+        Returns:
+            Tuple of (page number, page description)
+        """
+        try:
+            page_num, image = page_data
+            # Save page image
+            image_name = f"page_{page_num + 1}"
+            img_path = self.save_image(image, pages_dir, image_name)
+
+            # Get page description using configured model
+            page_description = self.describe_image(img_path)
+
+            # Clean up image file
+            os.remove(img_path)
+
+            return page_num, page_description
+        except Exception as e:
+            print(f"Error processing page {page_num + 1}: {str(e)}")
+            return page_num, f"Error: Could not process page {page_num + 1}"
+
     def extract(self, pdf_path: str, output_dir: str) -> str:
         """Process PDF file by converting each page to an image."""
         try:
-            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[
-                0
-            ]
+            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[0]
 
             # Create temporary directory for page images
-            pages_dir = os.path.join(
-                output_dir, f"{pdf_filename}_pages"
-            )
+            pages_dir = os.path.join(output_dir, f"{pdf_filename}_pages")
             if not os.path.exists(pages_dir):
                 os.makedirs(pages_dir)
 
@@ -43,22 +70,28 @@ class PDFPageImageExtractor(BaseExtractor):
             # Generate markdown content
             md_content = f"# {pdf_filename}\n\n"
 
-            # Process each page
-            for page_num, image in enumerate(images):
-                # Save page image
-                image_name = f"page_{page_num + 1}"
-                img_path = self.save_image(image, pages_dir, image_name)
+            # Process pages in parallel
+            descriptions = [""] * len(images)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+                # Create page tasks
+                page_tasks = [(i, img) for i, img in enumerate(images)]
+                
+                # Submit all tasks
+                future_to_page = {
+                    executor.submit(self.process_page, task, pages_dir): task[0]
+                    for task in page_tasks
+                }
 
-                # Get page description using configured model
-                page_description = self.describe_image(img_path)
+                # Collect results as they complete
+                for future in concurrent.futures.as_completed(future_to_page):
+                    page_num, description = future.result()
+                    descriptions[page_num] = description
 
-                # Add to markdown
+            # Add descriptions to markdown in correct order
+            for page_num, description in enumerate(descriptions):
                 md_content += f"## Page {page_num + 1}\n\n"
                 md_content += f"[Image {page_num + 1}]\n"
-                md_content += f"Description: {page_description}\n\n"
-
-                # Clean up image file
-                os.remove(img_path)
+                md_content += f"Description: {description}\n\n"
 
             # Save markdown file
             md_file_path = os.path.join(
