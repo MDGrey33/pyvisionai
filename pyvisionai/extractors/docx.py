@@ -9,9 +9,6 @@ from typing import List, Tuple
 from docx import Document
 from PIL import Image
 
-from pyvisionai.describers.ollama import (
-    describe_image_ollama as describe_image,
-)
 from pyvisionai.extractors.base import BaseExtractor
 
 
@@ -78,7 +75,7 @@ class DocxTextImageExtractor(BaseExtractor):
             img_path = self.save_image(
                 task.image_data, task.output_dir, task.image_name
             )
-            image_description = describe_image(img_path)
+            image_description = self.describe_image(img_path)
             os.remove(img_path)  # Clean up
             return task.index, image_description
         except Exception as e:
