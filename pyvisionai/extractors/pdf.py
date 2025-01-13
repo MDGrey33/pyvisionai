@@ -8,6 +8,8 @@ import re
 import zlib
 from io import StringIO
 from typing import List, Tuple
+import concurrent.futures
+from dataclasses import dataclass
 
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
@@ -18,10 +20,16 @@ from pdfminer.pdfparser import PDFParser
 from PIL import Image
 from pypdf import PdfReader
 
-from pyvisionai.describers.ollama import (
-    describe_image_ollama as describe_image,
-)
 from pyvisionai.extractors.base import BaseExtractor
+
+
+@dataclass
+class PageTask:
+    """Task for processing a single page."""
+    page_num: int
+    pdf_path: str
+    output_dir: str
+    filename: str
 
 
 def get_color_mode(color_space) -> str:
@@ -208,45 +216,75 @@ class PDFTextImageExtractor(BaseExtractor):
             print(f"Error saving image: {str(e)}")
             raise
 
+    def process_page(self, task: PageTask) -> tuple[int, str]:
+        """Process a single page, extracting text and images."""
+        try:
+            # Extract text
+            text_content = self.extract_text(task.pdf_path, task.page_num)
+            
+            # Extract images
+            images = self.extract_images(task.pdf_path, task.page_num)
+            
+            # Build page content
+            page_content = f"## Page {task.page_num + 1}\n\n{text_content}\n\n"
+            
+            # Process images for this page
+            for img_index, (img_data, ext) in enumerate(images):
+                image_name = f"{task.filename}_page_{task.page_num + 1}_image_{img_index + 1}"
+                img_path = self.save_image(img_data, task.output_dir, image_name, ext)
+
+                # Get image description using base class method
+                image_description = self.describe_image(img_path)
+                page_content += f"[Image {img_index + 1}]\n"
+                page_content += f"Description: {image_description}\n\n"
+
+                # Clean up image file
+                os.remove(img_path)
+            
+            return task.page_num, page_content
+        except Exception as e:
+            print(f"Error processing page {task.page_num + 1}: {str(e)}")
+            return task.page_num, f"Error: Could not process page {task.page_num + 1}\n\n"
+
     def extract(self, pdf_path: str, output_dir: str) -> str:
         """Process PDF file by extracting text and images separately."""
         try:
-            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[
-                0
-            ]
+            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[0]
             reader = PdfReader(pdf_path)
             num_pages = len(reader.pages)
 
             md_content = f"# {pdf_filename}\n\n"
 
-            for page_num in range(num_pages):
-                # Extract text
-                text_content = self.extract_text(pdf_path, page_num)
-                md_content += f"## Page {page_num + 1}\n\n"
-                md_content += text_content + "\n\n"
+            # Create page tasks
+            page_tasks = [
+                PageTask(
+                    page_num=i,
+                    pdf_path=pdf_path,
+                    output_dir=output_dir,
+                    filename=pdf_filename
+                )
+                for i in range(num_pages)
+            ]
 
-                # Extract images
-                images = self.extract_images(pdf_path, page_num)
-                for img_index, (img_data, ext) in enumerate(images):
-                    image_name = f"{pdf_filename}_page_{page_num + 1}_image_{img_index + 1}"
-                    img_path = self.save_image(
-                        img_data, output_dir, image_name, ext
-                    )
+            # Process pages in parallel
+            results = [""] * num_pages
+            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+                # Submit all tasks
+                future_to_page = {
+                    executor.submit(self.process_page, task): task.page_num
+                    for task in page_tasks
+                }
 
-                    # Get image description
-                    image_description = describe_image(img_path)
-                    md_content += f"[Image {img_index + 1}]\n"
-                    md_content += (
-                        f"Description: {image_description}\n\n"
-                    )
+                # Collect results as they complete
+                for future in concurrent.futures.as_completed(future_to_page):
+                    page_num, page_content = future.result()
+                    results[page_num] = page_content
 
-                    # Clean up image file
-                    os.remove(img_path)
+            # Add all pages to markdown in correct order
+            md_content += "".join(results)
 
             # Save markdown file
-            md_file_path = os.path.join(
-                output_dir, f"{pdf_filename}_pdf.md"
-            )
+            md_file_path = os.path.join(output_dir, f"{pdf_filename}_pdf.md")
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 
