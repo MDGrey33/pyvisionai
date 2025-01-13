@@ -1,5 +1,32 @@
-"""
-Extract text and images separately from PDF files using pdfminer.six and pypdf.
+"""Extract text and images separately from PDF files using pdfminer.six and pypdf.
+
+This module provides functionality to extract both text and images from PDF files,
+processing them page by page and combining the results into a markdown file.
+
+Key Features:
+- Text extraction using pdfminer.six for accurate text content
+- Image extraction using PyPDF2 for various image formats (JPEG, PNG, JPEG2000)
+- Image format conversion and validation
+- Automatic image description generation
+- Markdown output generation with interleaved text and images
+
+Implementation Notes:
+- Uses sequential processing for image extraction within pages rather than parallel
+  processing. Testing showed that parallel image processing within pages actually
+  decreased performance due to:
+  1. The overhead of thread creation/management exceeded benefits for typical
+     number of images per page (usually 1-3 images)
+  2. The image description API calls being the main bottleneck, which doesn't
+     benefit from local parallelization
+  3. Additional memory overhead from holding multiple images in memory
+
+Classes:
+    PDFTextImageExtractor: Main class for extracting text and images from PDFs
+
+Dependencies:
+    - pdfminer.six: For text extraction
+    - PyPDF2: For image extraction
+    - Pillow: For image processing
 """
 
 import io
