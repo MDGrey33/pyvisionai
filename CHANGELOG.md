@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2024-03-21
+
+### Changed
+- Implemented parallel processing for DOCX text and images extraction
+  - Added concurrent processing of paragraphs and images
+  - Improved performance through ThreadPoolExecutor implementation
+  - Maintained document structure and content order
+  - Fixed image placement to ensure correct positioning within text
+  - Added proper error handling and cleanup
+  - Performance results: ~72% reduction in processing time (189s → 53s)
+
+- Implemented parallel processing for DOCX page-as-image extraction
+  - Added PageTask dataclass for encapsulating page processing data
+  - Introduced process_page method for individual page handling
+  - Modified extract method to use ThreadPoolExecutor with 4 workers
+  - Maintained page order using indexed results collection
+
+### Fixed
+- Added docstring to PDF extractor explaining sequential processing decision
+- Fixed test infrastructure to properly use poetry run in CLI tests
+
 ## [0.2.3] - 2024-03-20
 
 ### Changed

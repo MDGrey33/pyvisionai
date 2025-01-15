@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyvisionai"
-version = "0.2.3"
+version = "0.2.4"
 description = "A Python library for extracting and describing content from documents using Vision LLMs"
 authors = ["MDGrey33 <roland@abouyounes.com>"]
 license = "Apache-2.0"
@@ -52,7 +52,7 @@ file-extract = "pyvisionai.cli.extract:main"
 describe-image = "pyvisionai.cli.describe_image:main"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 requests = "^2.32.3"
 ollama = "^0.4.2"
 pillow = "^11.0.0"

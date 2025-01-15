@@ -5,6 +5,7 @@ from typing import Optional
 
 from .ollama import describe_image_ollama
 from .openai import describe_image_openai
+from ..utils.config import DEFAULT_IMAGE_MODEL
 
 
 def describe_image(image_path: str, model: Optional[str] = None) -> str:
@@ -18,8 +19,10 @@ def describe_image(image_path: str, model: Optional[str] = None) -> str:
     Returns:
         str: Description of the image
     """
-    # Default to Ollama's llava model
-    if not model or model == "llava":
+    # Use configured default if no model specified
+    model = model or DEFAULT_IMAGE_MODEL
+
+    if model == "llama":
         return describe_image_ollama(image_path)
     elif model == "gpt4":
         return describe_image_openai(image_path)
