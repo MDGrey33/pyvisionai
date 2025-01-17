@@ -82,8 +82,8 @@ class HtmlPageImageExtractor(BaseExtractor):
 
                 # Generate markdown content
                 md_content = f"# {html_filename}\n\n"
-                md_content += f"## Page 1\n\n"
-                md_content += f"[Image 1]\n"
+                md_content += "## Page 1\n\n"
+                md_content += "[Image 1]\n"
                 md_content += f"Description: {page_description}\n\n"
 
                 # Save markdown file

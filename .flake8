@@ -18,22 +18,8 @@ ignore =
     E501,
     # Unused imports
     F401,
-    # Unused variables
-    F841,
     # Line break before operator
-    W503,
-    # Continuation line under-indented
-    E128,
-    # Star imports
-    F403,
-    # Names from star imports
-    F405,
-    # Module imports not at top
-    E402,
-    # Lambda assignments
-    E731,
-    # f-string missing placeholders
-    F541
+    W503
 
 # Exclude directories
 exclude =
