@@ -1,5 +1,48 @@
 [flake8]
-ignore = E501,F401,F841,W503,E226,E128,F403,F405,E402,E731,F541,E203,W291,W293,E251,E303,E201,E202,E203,E211,E221,E222,E241,E251,E261,E271,E272,E302,E305,E401,E502,E701,E702,E703,E711,E712,E713,E714,E721,E741,E742,E743,W191,W291,W292,W293,W391,W503,W504,F403,F405,F811,F821,F841
-select = E9,F63,F7,F82,E722
-exclude = .git,venv
+# Select only critical error types
+select =
+    # Runtime errors
+    E9,
+    # Invalid syntax
+    F63,
+    # Syntax errors
+    F7,
+    # Undefined variables
+    F82,
+    # Bare except clauses
+    E722
+
+# Ignore non-critical issues
+ignore =
+    # Line too long
+    E501,
+    # Unused imports
+    F401,
+    # Unused variables
+    F841,
+    # Line break before operator
+    W503,
+    # Missing whitespace
+    E226,
+    # Continuation line under-indented
+    E128,
+    # Star imports
+    F403,
+    # Names from star imports
+    F405,
+    # Module imports not at top
+    E402,
+    # Lambda assignments
+    E731,
+    # f-string missing placeholders
+    F541
+
+# Exclude directories
+exclude =
+    # Git directory
+    .git,
+    # Virtual environments
+    venv
+
+# Maximum complexity
 max-complexity = 20 

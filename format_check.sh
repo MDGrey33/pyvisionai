@@ -22,11 +22,9 @@ else
     exit 1
 fi
 
-# Run flake8 with our focused configuration
+# Run flake8 with explicit ignore flags
 echo -e "\nRunning flake8 (critical issues only)..."
-if flake8 ./examples ./pyvisionai ./tests \
-    --select E9,F63,F7,F82,E722 \
-    --ignore E501,F401,F841,W503,E226,E128,F403,F405,E402,E731,F541; then
+if flake8 ./examples ./pyvisionai ./tests --ignore=E501,F401,F841,W503,E226,E128,F403,F405,E402,E731,F541 --select=E9,F63,F7,F82,E722; then
     green "✓ No critical issues found"
 else
     red "✗ Critical issues were found"
