@@ -1,0 +1,32 @@
+[flake8]
+# Exclude line length checks completely
+extend-ignore = E501
+
+# Focus on critical issues first
+select = 
+    # Critical errors that may cause bugs
+    E9,    # Runtime errors
+    F63,   # Invalid syntax, undefined names
+    F7,    # Syntax errors
+    F82,   # Undefined variables
+    E722,  # Bare except clauses
+    F401,  # Unused imports
+    F841   # Unused variables
+
+# Exclude standard directories and files
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    *.pyc,
+    .venv,
+    venv
+
+# Special handling for specific files
+per-file-ignores =
+    __init__.py: F401
+    tests/*: F401,F811
+
+# Reasonable complexity threshold
+max-complexity = 15 

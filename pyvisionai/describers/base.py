@@ -3,9 +3,9 @@
 import os
 from typing import Optional
 
+from ..utils.config import DEFAULT_IMAGE_MODEL
 from .ollama import describe_image_ollama
 from .openai import describe_image_openai
-from ..utils.config import DEFAULT_IMAGE_MODEL
 
 
 def describe_image(image_path: str, model: Optional[str] = None) -> str:

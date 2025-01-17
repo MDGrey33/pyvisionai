@@ -29,7 +29,7 @@ class PDFPageImageExtractor(BaseExtractor):
         self, page_data: Tuple[int, Image.Image], pages_dir: str
     ) -> Tuple[int, str]:
         """Process a single page.
-        
+
         Args:
             page_data: Tuple of (page number, page image)
             pages_dir: Directory to save page images
@@ -52,15 +52,22 @@ class PDFPageImageExtractor(BaseExtractor):
             return page_num, page_description
         except Exception as e:
             print(f"Error processing page {page_num + 1}: {str(e)}")
-            return page_num, f"Error: Could not process page {page_num + 1}"
+            return (
+                page_num,
+                f"Error: Could not process page {page_num + 1}",
+            )
 
     def extract(self, pdf_path: str, output_dir: str) -> str:
         """Process PDF file by converting each page to an image."""
         try:
-            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[0]
+            pdf_filename = os.path.splitext(os.path.basename(pdf_path))[
+                0
+            ]
 
             # Create temporary directory for page images
-            pages_dir = os.path.join(output_dir, f"{pdf_filename}_pages")
+            pages_dir = os.path.join(
+                output_dir, f"{pdf_filename}_pages"
+            )
             if not os.path.exists(pages_dir):
                 os.makedirs(pages_dir)
 
@@ -72,18 +79,24 @@ class PDFPageImageExtractor(BaseExtractor):
 
             # Process pages in parallel
             descriptions = [""] * len(images)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=4
+            ) as executor:
                 # Create page tasks
                 page_tasks = [(i, img) for i, img in enumerate(images)]
-                
+
                 # Submit all tasks
                 future_to_page = {
-                    executor.submit(self.process_page, task, pages_dir): task[0]
+                    executor.submit(
+                        self.process_page, task, pages_dir
+                    ): task[0]
                     for task in page_tasks
                 }
 
                 # Collect results as they complete
-                for future in concurrent.futures.as_completed(future_to_page):
+                for future in concurrent.futures.as_completed(
+                    future_to_page
+                ):
                     page_num, description = future.result()
                     descriptions[page_num] = description
 

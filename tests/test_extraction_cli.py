@@ -49,11 +49,11 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
         "--extractor",
         method,
     ]
-    
+
     # Add API key for text_and_images method
     if method == "text_and_images":
         cmd.extend(["--api-key", api_key])
-    
+
     result = subprocess.run(cmd, capture_output=True, text=True)
     cli_time = time.time() - start_time
 
