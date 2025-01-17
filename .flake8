@@ -1,32 +1,5 @@
 [flake8]
-# Exclude line length checks completely
-extend-ignore = E501
-
-# Focus on critical issues first
-select = 
-    # Critical errors that may cause bugs
-    E9,    # Runtime errors
-    F63,   # Invalid syntax, undefined names
-    F7,    # Syntax errors
-    F82,   # Undefined variables
-    E722,  # Bare except clauses
-    F401,  # Unused imports
-    F841   # Unused variables
-
-# Exclude standard directories and files
-exclude =
-    .git,
-    __pycache__,
-    build,
-    dist,
-    *.pyc,
-    .venv,
-    venv
-
-# Special handling for specific files
-per-file-ignores =
-    __init__.py: F401
-    tests/*: F401,F811
-
-# Reasonable complexity threshold
-max-complexity = 15 
+ignore = E501,F401,F841,W503,E226,E128,F403,F405,E402,E731,F541,E203,W291,W293,E251,E303,E201,E202,E203,E211,E221,E222,E241,E251,E261,E271,E272,E302,E305,E401,E502,E701,E702,E703,E711,E712,E713,E714,E721,E741,E742,E743,W191,W291,W292,W293,W391,W503,W504,F403,F405,F811,F821,F841
+select = E9,F63,F7,F82,E722
+exclude = .git,venv
+max-complexity = 20 

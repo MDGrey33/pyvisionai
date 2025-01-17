@@ -72,7 +72,13 @@ async def process_page(
                             state="visible",
                             timeout=timeout["wait_for_idle"],
                         )
-                    except:
+                    except TimeoutError:
+                        # Skip if element not found within timeout
+                        continue
+                    except Exception as e:
+                        print(
+                            f"Error waiting for selector {selector}: {str(e)}"
+                        )
                         continue
 
             # Remove ads if configured
@@ -85,7 +91,10 @@ async def process_page(
                             .forEach(el => el.remove())
                         """
                         )
-                    except:
+                    except Exception as e:
+                        print(
+                            f"Error removing ads with selector {selector}: {str(e)}"
+                        )
                         continue
 
             # Add small delay for final renders

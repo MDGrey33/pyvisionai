@@ -148,7 +148,8 @@ class PDFTextImageExtractor(BaseExtractor):
                             # Try to decompress data if needed
                             try:
                                 img_data = zlib.decompress(data)
-                            except:
+                            except zlib.error:
+                                # If decompression fails, use raw data
                                 img_data = data
 
                             # Verify data size
