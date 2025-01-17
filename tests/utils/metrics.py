@@ -16,4 +16,4 @@ def print_performance_metrics(
         print(f"Setup time: {setup_time:.2f}s")
         print(f"Extraction time: {extraction_time:.2f}s")
     print(f"Total time: {total_time:.2f}s")
-    print(f"Output size: {output_size/1024:.2f}KB")
+    print(f"Output size: {output_size / 1024:.2f}KB")

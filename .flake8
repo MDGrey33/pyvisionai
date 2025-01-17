@@ -22,8 +22,6 @@ ignore =
     F841,
     # Line break before operator
     W503,
-    # Missing whitespace
-    E226,
     # Continuation line under-indented
     E128,
     # Star imports
@@ -45,4 +43,8 @@ exclude =
     venv
 
 # Maximum complexity
-max-complexity = 20 
+max-complexity = 15 
+
+per-file-ignores =
+    __init__.py:F401
+    tests/*:F401 
