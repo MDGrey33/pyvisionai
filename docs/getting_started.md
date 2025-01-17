@@ -12,10 +12,10 @@ Before using PyVisionAI, ensure you have:
    # macOS
    brew install --cask libreoffice  # For DOCX/PPTX
    brew install poppler             # For PDF
-   
+
    # Ubuntu/Debian
    sudo apt-get install -y libreoffice poppler-utils
-   
+
    # Windows
    # Install LibreOffice and Poppler manually
    ```
@@ -31,7 +31,7 @@ Before using PyVisionAI, ensure you have:
    ```bash
    # For OpenAI Vision (recommended)
    export OPENAI_API_KEY='your-api-key'
-   
+
    # For local Llama (optional)
    # First install and start Ollama
    brew install ollama    # macOS
@@ -116,7 +116,7 @@ def process_directory(input_dir: str, output_dir: str):
         ".docx": create_extractor("docx"),
         ".pptx": create_extractor("pptx")
     }
-    
+
     for filename in os.listdir(input_dir):
         ext = os.path.splitext(filename)[1].lower()
         if ext in extractors:
@@ -199,7 +199,7 @@ Description: A bar chart showing sales data for Q1 2024...
    ```bash
    # If you see LibreOffice errors:
    brew install --cask libreoffice  # macOS
-   
+
    # If you see Poppler errors:
    brew install poppler  # macOS
    ```
@@ -212,4 +212,4 @@ Description: A bar chart showing sales data for Q1 2024...
 3. **Slow Processing**
    - Consider using cloud-based GPT-4 Vision for faster results
    - Process files in parallel for batch operations
-   - Use SSD storage for better I/O performance 
+   - Use SSD storage for better I/O performance

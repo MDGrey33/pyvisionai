@@ -29,8 +29,8 @@ exclude =
     venv
 
 # Maximum complexity
-max-complexity = 15 
+max-complexity = 15
 
 per-file-ignores =
     __init__.py:F401
-    tests/*:F401 
+    tests/*:F401

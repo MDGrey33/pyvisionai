@@ -56,7 +56,7 @@ def create_extractor(
 
     Returns:
         An instance of the appropriate extractor class
-    
+
     Raises:
         ValueError: If file_type or extractor_type is invalid
     """
@@ -78,7 +78,7 @@ class BaseExtractor:
 
         Returns:
             str: Path to the generated markdown file
-        
+
         Raises:
             FileNotFoundError: If input_file doesn't exist
             ExtractionError: If extraction fails
@@ -109,7 +109,7 @@ def describe_image_openai(
 
     Returns:
         str: Description of the image
-    
+
     Raises:
         FileNotFoundError: If image file doesn't exist
         APIError: If API call fails
@@ -130,7 +130,7 @@ def describe_image_ollama(
 
     Returns:
         str: Description of the image
-    
+
     Raises:
         FileNotFoundError: If image file doesn't exist
         ConnectionError: If Ollama server is not running
@@ -236,4 +236,4 @@ except Exception as e:
 3. **Error Handling**
    - Always implement proper error handling
    - Check input file existence before processing
-   - Validate output directory permissions 
+   - Validate output directory permissions

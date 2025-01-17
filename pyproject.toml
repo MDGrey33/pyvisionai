@@ -22,6 +22,18 @@ packages = [
 line-length = 72
 target-version = ['py312']
 include = '\.pyi?$'
+# Skip string normalization for better readability
+skip-string-normalization = true
+# Enable preview features for latest formatting
+preview = true
+# Exclude specific paths
+extend-exclude = '''
+# Exclude git directory
+/(
+    \.git
+    | \.venv
+)/
+'''
 
 [tool.isort]
 profile = "black"
@@ -38,14 +50,10 @@ add_select = ["D417"]
 add_ignore = ["D100", "D104"]  # Ignore missing docstrings in modules and packages
 
 [tool.flake8]
-max-line-length = 72
-extend-ignore = ["E203", "W503"]  # For Black compatibility
-exclude = [
-    ".git",
-    "__pycache__",
-    "build",
-    "dist"
-]
+select = ["E9", "F63", "F7", "F82", "E722"]
+extend-ignore = ["E501", "F401", "W503", "E226", "E128", "F403", "F405", "E402", "E731", "F541"]
+max-complexity = 20
+exclude = [".git", "venv"]
 
 [tool.poetry.scripts]
 file-extract = "pyvisionai.cli.extract:main"

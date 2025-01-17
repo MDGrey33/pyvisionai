@@ -50,4 +50,4 @@ This document lists the third-party software packages used by PyVisionAI, along 
    limitations under the License.
 ```
 
-Note: Full license texts for other dependencies can be found in their respective repositories. 
+Note: Full license texts for other dependencies can be found in their respective repositories.

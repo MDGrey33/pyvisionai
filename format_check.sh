@@ -31,4 +31,4 @@ else
     exit 1
 fi
 
-green "\n✓ All checks passed!" 
+green "\n✓ All checks passed!"

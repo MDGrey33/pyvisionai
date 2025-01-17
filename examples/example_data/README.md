@@ -42,4 +42,4 @@ Feel free to add more example files, but please:
 1. Keep files small and focused
 2. Include files that demonstrate specific features
 3. Update this README when adding new files
-4. Avoid copyrighted content 
+4. Avoid copyrighted content

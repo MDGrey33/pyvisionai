@@ -71,4 +71,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial release with support for PDF, DOCX, and PPTX file processing
 - Text and image extraction capabilities
 - Image description using Vision LLMs
-- Command-line interface for file extraction and image description 
+- Command-line interface for file extraction and image description
