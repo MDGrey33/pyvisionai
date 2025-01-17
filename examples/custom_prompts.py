@@ -56,12 +56,16 @@ def example_technical_documentation():
     
     try:
         output_path = extractor.extract(
-            "example_data/technical_doc.pdf",
-            "output/technical"
+            os.path.join("example_data", "technical_doc.pdf"),
+            os.path.join("output", "technical")
         )
         print(f"Technical content extracted to: {output_path}")
+    except FileNotFoundError as e:
+        print(f"Error processing technical doc: File not found - {e.filename}")
+    except PermissionError as e:
+        print(f"Error processing technical doc: Permission denied - {e.filename}")
     except Exception as e:
-        print(f"Error processing technical doc: {e}")
+        print(f"Error processing technical doc: {type(e).__name__}: {str(e)}")
 
 def example_business_report():
     """Example: Process business report with charts."""
@@ -75,12 +79,16 @@ def example_business_report():
     
     try:
         output_path = extractor.extract(
-            "example_data/charts.pptx",
-            "output/business"
+            os.path.join("example_data", "charts.pptx"),
+            os.path.join("output", "business")
         )
         print(f"Business content extracted to: {output_path}")
+    except FileNotFoundError as e:
+        print(f"Error processing business report: File not found - {e.filename}")
+    except PermissionError as e:
+        print(f"Error processing business report: Permission denied - {e.filename}")
     except Exception as e:
-        print(f"Error processing business report: {e}")
+        print(f"Error processing business report: {type(e).__name__}: {str(e)}")
 
 def example_research_paper():
     """Example: Process academic research paper."""
@@ -94,12 +102,16 @@ def example_research_paper():
     
     try:
         output_path = extractor.extract(
-            "example_data/research_paper.pdf",
-            "output/academic"
+            os.path.join("example_data", "research_paper.pdf"),
+            os.path.join("output", "academic")
         )
         print(f"Academic content extracted to: {output_path}")
+    except FileNotFoundError as e:
+        print(f"Error processing research paper: File not found - {e.filename}")
+    except PermissionError as e:
+        print(f"Error processing research paper: Permission denied - {e.filename}")
     except Exception as e:
-        print(f"Error processing research paper: {e}")
+        print(f"Error processing research paper: {type(e).__name__}: {str(e)}")
 
 def example_chart_analysis():
     """Example: Detailed chart analysis."""
@@ -108,13 +120,15 @@ def example_chart_analysis():
     try:
         # Analyze chart using specialized prompt
         description = describe_image_openai(
-            "example_data/chart.png",
+            os.path.join("example_data", "chart.png"),
             prompt=SPECIALIZED_PROMPTS["chart"]
         )
         print("\nChart Analysis:")
         print(description)
+    except FileNotFoundError as e:
+        print(f"Error analyzing chart: File not found - {e.filename}")
     except Exception as e:
-        print(f"Error analyzing chart: {e}")
+        print(f"Error analyzing chart: {type(e).__name__}: {str(e)}")
 
 def example_table_extraction():
     """Example: Extract and structure tabular data."""
@@ -128,12 +142,16 @@ def example_table_extraction():
     
     try:
         output_path = extractor.extract(
-            "example_data/report.docx",
-            "output/tables"
+            os.path.join("example_data", "report.docx"),
+            os.path.join("output", "tables")
         )
         print(f"Table content extracted to: {output_path}")
+    except FileNotFoundError as e:
+        print(f"Error extracting tables: File not found - {e.filename}")
+    except PermissionError as e:
+        print(f"Error extracting tables: Permission denied - {e.filename}")
     except Exception as e:
-        print(f"Error extracting tables: {e}")
+        print(f"Error extracting tables: {type(e).__name__}: {str(e)}")
 
 def example_combined_analysis():
     """Example: Combine multiple prompts for complex documents."""
@@ -153,12 +171,16 @@ def example_combined_analysis():
     
     try:
         output_path = extractor.extract(
-            "example_data/complex.pdf",
-            "output/combined"
+            os.path.join("example_data", "complex.pdf"),
+            os.path.join("output", "combined")
         )
         print(f"Combined analysis saved to: {output_path}")
+    except FileNotFoundError as e:
+        print(f"Error in combined analysis: File not found - {e.filename}")
+    except PermissionError as e:
+        print(f"Error in combined analysis: Permission denied - {e.filename}")
     except Exception as e:
-        print(f"Error in combined analysis: {e}")
+        print(f"Error in combined analysis: {type(e).__name__}: {str(e)}")
 
 def example_custom_prompt_builder():
     """Example: Build custom prompts based on content type."""
@@ -189,22 +211,23 @@ def example_custom_prompt_builder():
     
     try:
         output_path = extractor.extract(
-            "example_data/mixed_content.pdf",
-            "output/custom"
+            os.path.join("example_data", "mixed_content.pdf"),
+            os.path.join("output", "custom")
         )
         print(f"Custom prompt analysis saved to: {output_path}")
+    except FileNotFoundError as e:
+        print(f"Error in custom analysis: File not found - {e.filename}")
+    except PermissionError as e:
+        print(f"Error in custom analysis: Permission denied - {e.filename}")
     except Exception as e:
-        print(f"Error in custom prompt analysis: {e}")
+        print(f"Error in custom analysis: {type(e).__name__}: {str(e)}")
 
 def main():
     """Run all custom prompt examples."""
     # Create output directories
-    os.makedirs("output/technical", exist_ok=True)
-    os.makedirs("output/business", exist_ok=True)
-    os.makedirs("output/academic", exist_ok=True)
-    os.makedirs("output/tables", exist_ok=True)
-    os.makedirs("output/combined", exist_ok=True)
-    os.makedirs("output/custom", exist_ok=True)
+    for dir_name in ["technical", "business", "academic", "tables", 
+                    "combined", "custom"]:
+        os.makedirs(os.path.join("output", dir_name), exist_ok=True)
     
     # Run examples
     example_technical_documentation()

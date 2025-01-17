@@ -23,15 +23,16 @@ def example_pdf_extraction():
     
     try:
         # Extract content from PDF
+        input_file = "example_data/sample.pdf"
         output_path = extractor.extract(
-            "example_data/sample.pdf",
-            "output/pdf"
+            input_file,
+            os.path.join("output", "pdf")
         )
         print(f"PDF content extracted to: {output_path}")
     except FileNotFoundError:
-        print("Error: PDF file not found")
+        print("Error processing technical doc: File not found - example_data/sample.pdf")
     except Exception as e:
-        print(f"Error extracting PDF: {e}")
+        print(f"Error processing technical doc: {type(e).__name__}: {str(e)}")
 
 def example_docx_extraction():
     """Example: Extract content from a Word document."""
@@ -45,15 +46,16 @@ def example_docx_extraction():
     
     try:
         # Extract content from DOCX
+        input_file = "example_data/sample.docx"
         output_path = extractor.extract(
-            "example_data/sample.docx",
-            "output/docx"
+            input_file,
+            os.path.join("output", "docx")
         )
         print(f"DOCX content extracted to: {output_path}")
     except FileNotFoundError:
-        print("Error: DOCX file not found")
+        print("Error processing technical doc: File not found - example_data/sample.docx")
     except Exception as e:
-        print(f"Error extracting DOCX: {e}")
+        print(f"Error processing technical doc: {type(e).__name__}: {str(e)}")
 
 def example_pptx_extraction():
     """Example: Extract content from a PowerPoint presentation."""
@@ -67,15 +69,16 @@ def example_pptx_extraction():
     
     try:
         # Extract content from PPTX
+        input_file = "example_data/sample.pptx"
         output_path = extractor.extract(
-            "example_data/sample.pptx",
-            "output/pptx"
+            input_file,
+            os.path.join("output", "pptx")
         )
         print(f"PPTX content extracted to: {output_path}")
     except FileNotFoundError:
-        print("Error: PPTX file not found")
+        print("Error processing technical doc: File not found - example_data/sample.pptx")
     except Exception as e:
-        print(f"Error extracting PPTX: {e}")
+        print(f"Error processing technical doc: {type(e).__name__}: {str(e)}")
 
 def example_html_extraction():
     """Example: Extract content from a web page."""
@@ -88,11 +91,11 @@ def example_html_extraction():
         # Extract content from HTML
         output_path = extractor.extract(
             "https://example.com",
-            "output/html"
+            os.path.join("output", "html")
         )
         print(f"HTML content extracted to: {output_path}")
     except Exception as e:
-        print(f"Error extracting HTML: {e}")
+        print(f"Error extracting HTML: {type(e).__name__}: {str(e)}")
 
 def example_image_description():
     """Example: Describe individual images."""
@@ -100,24 +103,25 @@ def example_image_description():
     
     try:
         # Describe image using OpenAI Vision
+        input_file = "example_data/sample_image.jpg"
         description = describe_image_openai(
-            "example_data/sample_image.jpg",
+            input_file,
             prompt="Describe the main elements and any text in this image"
         )
         print("Image Description:")
         print(description)
     except FileNotFoundError:
-        print("Error: Image file not found")
+        print("Error analyzing chart: File not found - example_data/sample_image.jpg")
     except Exception as e:
-        print(f"Error describing image: {e}")
+        print(f"Error analyzing chart: {type(e).__name__}: {str(e)}")
 
 def main():
     """Run all examples."""
     # Create output directories
-    ensure_dir("output/pdf")
-    ensure_dir("output/docx")
-    ensure_dir("output/pptx")
-    ensure_dir("output/html")
+    ensure_dir(os.path.join("output", "pdf"))
+    ensure_dir(os.path.join("output", "docx"))
+    ensure_dir(os.path.join("output", "pptx"))
+    ensure_dir(os.path.join("output", "html"))
     
     # Run examples
     example_pdf_extraction()
