@@ -3,6 +3,10 @@
 
 Extract and describe content from documents using Vision Language Models.
 
+## Repository
+
+https://github.com/MDGrey33/pyvisionai
+
 ## Requirements
 
 - Python 3.8 or higher
@@ -354,3 +358,35 @@ PyVisionAI supports custom prompts for both file extraction and image descriptio
    - Example: "Describe the main elements, their arrangement, and any text visible in the image"
 
 Note: For page-as-image method, prompts must include both text extraction and visual description instructions as the entire page is processed as an image. For text-and-images method, prompts should focus solely on image description as text is handled separately.
+
+## Contributing
+
+We welcome contributions to PyVisionAI! Whether you're fixing bugs, improving documentation, or proposing new features, your help is appreciated.
+
+Please read our [Contributing Guidelines](CONTRIBUTING.md) for detailed information on:
+- Setting up your development environment
+- Code style and standards
+- Testing requirements
+- Pull request process
+- Documentation guidelines
+
+### Quick Start for Contributors
+
+1. Fork and clone the repository
+2. Install development dependencies:
+   ```bash
+   pip install poetry
+   poetry install
+   ```
+3. Install pre-commit hooks:
+   ```bash
+   poetry run pre-commit install
+   ```
+4. Make your changes
+5. Run tests:
+   ```bash
+   poetry run pytest
+   ```
+6. Submit a pull request
+
+For more detailed instructions, see [CONTRIBUTING.md](CONTRIBUTING.md).
