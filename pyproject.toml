@@ -79,7 +79,25 @@ isort = "^5.13.2"
 pydocstyle = "^6.3.0"
 flake8 = "^7.0.0"
 flake8-pyproject = "^1.2.3"  # For pyproject.toml support
+pytest-cov = "^4.1.0"  # For coverage reporting
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+source = ["pyvisionai"]
+omit = ["tests/*", "examples/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+]
+show_missing = true
+fail_under = 80

@@ -44,3 +44,9 @@ content/test/output/*
 
 # Logs
 *.log
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
