@@ -24,7 +24,7 @@ def log_benchmark(file_type, method, metrics):
         f.write(json.dumps(entry) + "\n")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", name="setup_test_env")
 def setup_test_env():
     """Set up test environment."""
     output_dir = os.path.join("content", "test", "output")
@@ -43,7 +43,7 @@ def setup_test_env():
 
     yield output_dir
 
-    # Cleanup output directory
+    # Cleanup output directory (cleanup phase)
     if os.path.exists(output_dir):
         for file in os.listdir(output_dir):
             file_path = os.path.join(output_dir, file)

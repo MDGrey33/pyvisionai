@@ -187,7 +187,7 @@ class PptxPageImageExtractor(BaseExtractor):
             ) as executor:
                 # Submit all tasks
                 future_to_task = {
-                    executor.submit(self.process_slide_task, task): task
+                    executor.submit(self.process_slide, task): task
                     for task in slide_tasks
                 }
 

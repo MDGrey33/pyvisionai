@@ -80,6 +80,7 @@ pydocstyle = "^6.3.0"
 flake8 = "^7.0.0"
 flake8-pyproject = "^1.2.3"  # For pyproject.toml support
 pytest-cov = "^4.1.0"  # For coverage reporting
+pytest-order = "^1.2.0"  # For controlling test execution order
 
 [build-system]
 requires = ["poetry-core"]
@@ -101,3 +102,10 @@ exclude_lines = [
 ]
 show_missing = true
 fail_under = 80
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-order>=1.2.0",  # For controlling test execution order
+]
