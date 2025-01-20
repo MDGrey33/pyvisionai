@@ -5,7 +5,7 @@ description = "A Python library for extracting and describing content from docum
 authors = ["MDGrey33 <roland@abouyounes.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-repository = "https://github.com/MDGrey33/content-extractor-with-vision"
+repository = "https://github.com/MDGrey33/pyvisionai"
 keywords = ["pdf", "docx", "pptx", "html", "vision", "llm", "extraction"]
 classifiers = [
     "Development Status :: 4 - Beta",
