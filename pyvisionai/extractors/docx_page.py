@@ -1,6 +1,7 @@
 """DOCX page-as-image extractor."""
 
 import concurrent.futures
+import logging
 import os
 import subprocess
 import tempfile
@@ -11,6 +12,8 @@ from typing import Tuple
 from PIL import Image
 
 from pyvisionai.extractors.base import BaseExtractor
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -114,7 +117,9 @@ class DocxPageImageExtractor(BaseExtractor):
 
             return task.index, page_description
         except Exception as e:
-            print(f"Error processing page {task.image_name}: {str(e)}")
+            logger.error(
+                f"Error processing page {task.image_name}: {str(e)}"
+            )
             return (
                 task.index,
                 f"Error: Could not process page {task.image_name}",
@@ -123,6 +128,8 @@ class DocxPageImageExtractor(BaseExtractor):
     def extract(self, docx_path: str, output_dir: str) -> str:
         """Process DOCX file by converting each page to an image."""
         try:
+            logger.info("Processing DOCX file...")
+
             docx_filename = os.path.splitext(
                 os.path.basename(docx_path)
             )[0]
@@ -136,9 +143,11 @@ class DocxPageImageExtractor(BaseExtractor):
 
             # Convert DOCX to PDF first
             pdf_path = self.convert_to_pdf(docx_path)
+            logger.info("Converted DOCX to PDF")
 
             # Convert PDF pages to images
             images = self.convert_pages_to_images(pdf_path)
+            logger.info(f"Converting {len(images)} pages to images")
 
             # Generate markdown content
             md_content = f"# {docx_filename}\n\n"
@@ -193,8 +202,9 @@ class DocxPageImageExtractor(BaseExtractor):
             )  # Remove temp PDF directory
             os.rmdir(pages_dir)  # Remove pages directory
 
+            logger.info("DOCX processing completed successfully")
             return md_file_path
 
         except Exception as e:
-            print(f"Error processing DOCX: {str(e)}")
+            logger.error(f"Error processing DOCX: {str(e)}")
             raise

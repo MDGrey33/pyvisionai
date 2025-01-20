@@ -24,8 +24,11 @@ def test_benchmark_log_structure():
 
         # Verify metrics structure
         metrics = entry["metrics"]
+        assert "interface" in metrics
+        assert "total_time" in metrics
+        assert "output_size" in metrics
+
+        # Additional metrics for API interface
         if metrics["interface"] == "api":
             assert "setup_time" in metrics
             assert "extraction_time" in metrics
-        assert "total_time" in metrics
-        assert "output_size" in metrics

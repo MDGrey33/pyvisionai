@@ -1,6 +1,10 @@
-"""PPTX page-as-image extractor."""
+"""PPTX page-as-image extractor.
+
+Converts PPTX files to images by first converting to PDF using LibreOffice,
+then converting PDF pages to images using pdf2image."""
 
 import concurrent.futures
+import logging
 import os
 import subprocess
 import tempfile
@@ -10,6 +14,8 @@ from dataclasses import dataclass
 from PIL import Image
 
 from pyvisionai.extractors.base import BaseExtractor
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -23,7 +29,11 @@ class SlideTask:
 
 
 class PptxPageImageExtractor(BaseExtractor):
-    """Extract content from PPTX files by converting slides to images."""
+    """Extract content from PPTX files by converting slides to images.
+
+    Uses LibreOffice to convert PPTX to PDF, then pdf2image to convert
+    PDF pages to images. Each slide is processed in parallel to generate
+    descriptions."""
 
     def convert_to_pdf(self, pptx_path: str) -> str:
         """Convert PPTX to PDF using LibreOffice."""
@@ -97,8 +107,18 @@ class PptxPageImageExtractor(BaseExtractor):
         image.save(img_path, "JPEG", quality=95)
         return img_path
 
-    def process_slide_task(self, task: SlideTask) -> tuple[int, str]:
-        """Process a single slide task."""
+    def process_slide(self, task: SlideTask) -> tuple[int, str]:
+        """Process a single slide.
+
+        Saves the slide as an image, generates a description using the configured
+        model, then cleans up the image file.
+
+        Args:
+            task: SlideTask containing the slide image and processing details
+
+        Returns:
+            Tuple of (slide index, description)
+        """
         try:
             # Save slide image
             img_path = self.save_image(
@@ -113,7 +133,9 @@ class PptxPageImageExtractor(BaseExtractor):
 
             return task.index, slide_description
         except Exception as e:
-            print(f"Error processing slide {task.image_name}: {str(e)}")
+            logger.error(
+                f"Error processing slide {task.image_name}: {str(e)}"
+            )
             return (
                 task.index,
                 f"Error: Could not process slide {task.image_name}",
@@ -122,6 +144,8 @@ class PptxPageImageExtractor(BaseExtractor):
     def extract(self, pptx_path: str, output_dir: str) -> str:
         """Process PPTX file by converting each slide to an image."""
         try:
+            logger.info("Processing PPTX file...")
+
             pptx_filename = os.path.splitext(
                 os.path.basename(pptx_path)
             )[0]
@@ -135,14 +159,16 @@ class PptxPageImageExtractor(BaseExtractor):
 
             # Convert PPTX to PDF first
             pdf_path = self.convert_to_pdf(pptx_path)
+            logger.info("Converted PPTX to PDF")
 
             # Convert PDF pages to images
             images = self.convert_pages_to_images(pdf_path)
+            logger.info(f"Converting {len(images)} slides to images")
 
             # Generate markdown content
             md_content = f"# {pptx_filename}\n\n"
 
-            # Prepare slide tasks
+            # Create slide tasks
             slide_tasks = []
             for slide_num, image in enumerate(images):
                 image_name = f"slide_{slide_num + 1}"
@@ -185,15 +211,16 @@ class PptxPageImageExtractor(BaseExtractor):
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 
-            # Clean up temporary files and directories
+            # Clean up temporary files
             os.remove(pdf_path)
             os.rmdir(
                 os.path.dirname(pdf_path)
             )  # Remove temp PDF directory
             os.rmdir(slides_dir)  # Remove slides directory
 
+            logger.info("PPTX processing completed successfully")
             return md_file_path
 
         except Exception as e:
-            print(f"Error processing PPTX: {str(e)}")
+            logger.error(f"Error processing PPTX: {str(e)}")
             raise

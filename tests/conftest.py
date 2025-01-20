@@ -46,7 +46,12 @@ def setup_test_env():
     # Cleanup output directory
     if os.path.exists(output_dir):
         for file in os.listdir(output_dir):
-            os.remove(os.path.join(output_dir, file))
+            file_path = os.path.join(output_dir, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+            except (OSError, PermissionError):
+                pass  # Skip files we can't remove
 
     # Clean only test-generated log files
     if os.path.exists(log_dir):
@@ -56,11 +61,10 @@ def setup_test_env():
         test_logs = current_logs - existing_logs
 
         for log_file in test_logs:
-            os.remove(os.path.join(log_dir, log_file))
-
-        # Only remove log directory if it's empty and wasn't pre-existing
-        if not os.listdir(log_dir) and not existing_logs:
-            os.rmdir(log_dir)
+            try:
+                os.remove(os.path.join(log_dir, log_file))
+            except (OSError, PermissionError):
+                pass  # Skip files we can't remove
 
 
 # Test data for file extraction

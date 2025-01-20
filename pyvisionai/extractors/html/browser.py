@@ -1,6 +1,7 @@
 """Browser management for HTML processing."""
 
 import asyncio
+import logging
 from typing import Optional
 
 from playwright.async_api import Browser, Page, async_playwright
@@ -10,6 +11,8 @@ from pyvisionai.config.html_config import (
     DEFAULT_CONFIG,
     WAIT_SELECTORS,
 )
+
+logger = logging.getLogger(__name__)
 
 
 async def setup_browser(config: Optional[dict] = None) -> Browser:
@@ -76,7 +79,7 @@ async def process_page(
                         # Skip if element not found within timeout
                         continue
                     except Exception as e:
-                        print(
+                        logger.warning(
                             f"Error waiting for selector {selector}: {str(e)}"
                         )
                         continue
@@ -92,7 +95,7 @@ async def process_page(
                         """
                         )
                     except Exception as e:
-                        print(
+                        logger.warning(
                             f"Error removing ads with selector {selector}: {str(e)}"
                         )
                         continue

@@ -1,6 +1,7 @@
 """PDF page-as-image extractor."""
 
 import concurrent.futures
+import logging
 import os
 from typing import Tuple
 
@@ -8,6 +9,8 @@ from pdf2image import convert_from_path
 from PIL import Image
 
 from pyvisionai.extractors.base import BaseExtractor
+
+logger = logging.getLogger(__name__)
 
 
 class PDFPageImageExtractor(BaseExtractor):
@@ -51,7 +54,9 @@ class PDFPageImageExtractor(BaseExtractor):
 
             return page_num, page_description
         except Exception as e:
-            print(f"Error processing page {page_num + 1}: {str(e)}")
+            logger.error(
+                f"Error processing page {page_num + 1}: {str(e)}"
+            )
             return (
                 page_num,
                 f"Error: Could not process page {page_num + 1}",
@@ -71,8 +76,10 @@ class PDFPageImageExtractor(BaseExtractor):
             if not os.path.exists(pages_dir):
                 os.makedirs(pages_dir)
 
+            logger.info("Processing PDF file...")
             # Convert PDF pages to images
             images = self.convert_pages_to_images(pdf_path)
+            logger.info(f"Converting {len(images)} pages to images")
 
             # Generate markdown content
             md_content = f"# {pdf_filename}\n\n"
@@ -116,8 +123,9 @@ class PDFPageImageExtractor(BaseExtractor):
             # Clean up pages directory after all pages are processed
             os.rmdir(pages_dir)
 
+            logger.info("PDF processing completed successfully")
             return md_file_path
 
         except Exception as e:
-            print(f"Error processing PDF: {str(e)}")
+            logger.error(f"Error processing PDF: {str(e)}")
             raise
