@@ -48,6 +48,7 @@ from PIL import Image
 from pypdf import PdfReader
 
 from pyvisionai.extractors.base import BaseExtractor
+from pyvisionai.utils.logger import logger
 
 
 @dataclass
@@ -154,7 +155,7 @@ class PDFTextImageExtractor(BaseExtractor):
 
                             # Verify data size
                             if len(img_data) != expected_size:
-                                print(
+                                logger.warning(
                                     f"Warning: Data size mismatch. Got {len(img_data)}, expected {expected_size}"
                                 )
                                 continue
@@ -175,14 +176,16 @@ class PDFTextImageExtractor(BaseExtractor):
                                 img_data = img_byte_arr.getvalue()
                                 ext = "png"
                             except Exception as e:
-                                print(f"Error creating image: {str(e)}")
+                                logger.error(
+                                    f"Error creating image: {str(e)}"
+                                )
                                 continue
                         elif obj["/Filter"] == "/JPXDecode":
                             # JPEG2000
                             img_data = data
                             ext = "jp2"
                         else:
-                            print(
+                            logger.warning(
                                 f"Unsupported filter: {obj['/Filter']}"
                             )
                             continue
@@ -202,7 +205,7 @@ class PDFTextImageExtractor(BaseExtractor):
                                 black_pixels / len(pixels)
                             ) * 100
                             if black_percentage > 90:
-                                print(
+                                logger.warning(
                                     f"Warning: Image is {black_percentage:.1f}% black"
                                 )
                                 continue
@@ -213,12 +216,16 @@ class PDFTextImageExtractor(BaseExtractor):
                             img_data = img_byte_arr.getvalue()
 
                         except Exception as e:
-                            print(f"Error verifying image: {str(e)}")
+                            logger.error(
+                                f"Error verifying image: {str(e)}"
+                            )
                             continue
 
                         images.append((img_data, ext))
                     except Exception as e:
-                        print(f"Error extracting image: {str(e)}")
+                        logger.error(
+                            f"Error extracting image: {str(e)}"
+                        )
                         continue
 
         return images
@@ -242,7 +249,7 @@ class PDFTextImageExtractor(BaseExtractor):
             image.save(img_path, "JPEG", quality=95)
             return img_path
         except Exception as e:
-            print(f"Error saving image: {str(e)}")
+            logger.error(f"Error saving image: {str(e)}")
             raise
 
     def process_page(self, task: PageTask) -> tuple[int, str]:
@@ -278,7 +285,7 @@ class PDFTextImageExtractor(BaseExtractor):
 
             return task.page_num, page_content
         except Exception as e:
-            print(
+            logger.error(
                 f"Error processing page {task.page_num + 1}: {str(e)}"
             )
             return (
@@ -338,8 +345,12 @@ class PDFTextImageExtractor(BaseExtractor):
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 
+            # For status/info messages
+            logger.info("Processing PDF file...")
+            logger.info("PDF processing completed successfully")
+
             return md_file_path
 
         except Exception as e:
-            print(f"Error processing PDF: {str(e)}")
+            logger.error(f"Error processing PDF: {str(e)}")
             raise

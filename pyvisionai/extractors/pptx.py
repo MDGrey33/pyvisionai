@@ -10,6 +10,7 @@ from PIL import Image
 from pptx import Presentation
 
 from pyvisionai.extractors.base import BaseExtractor
+from pyvisionai.utils.logger import logger
 
 
 @dataclass
@@ -49,7 +50,9 @@ class PptxTextImageExtractor(BaseExtractor):
                         image_data = rel.target_part.blob
                         images.append(image_data)
                     except Exception as e:
-                        print(f"Error extracting image: {str(e)}")
+                        logger.error(
+                            f"Error extracting image: {str(e)}"
+                        )
                         continue
 
         return texts, images
@@ -69,7 +72,7 @@ class PptxTextImageExtractor(BaseExtractor):
             image.save(img_path, "JPEG", quality=95)
             return img_path
         except Exception as e:
-            print(f"Error saving image: {str(e)}")
+            logger.error(f"Error saving image: {str(e)}")
             raise
 
     def process_image_task(self, task: ImageTask) -> tuple[int, str]:
@@ -82,7 +85,9 @@ class PptxTextImageExtractor(BaseExtractor):
             os.remove(img_path)  # Clean up
             return task.index, image_description
         except Exception as e:
-            print(f"Error processing image {task.image_name}: {str(e)}")
+            logger.error(
+                f"Error processing image {task.image_name}: {str(e)}"
+            )
             return (
                 task.index,
                 f"Error: Could not process image {task.image_name}",
@@ -155,8 +160,13 @@ class PptxTextImageExtractor(BaseExtractor):
             with open(md_file_path, "w", encoding="utf-8") as md_file:
                 md_file.write(md_content)
 
+            # Add info logging
+            logger.info("Processing PPTX file...")
+            logger.info(f"Extracted {len(images)} images")
+            logger.info("PPTX processing completed successfully")
+
             return md_file_path
 
         except Exception as e:
-            print(f"Error processing PPTX: {str(e)}")
+            logger.error(f"Error processing PPTX: {str(e)}")
             raise

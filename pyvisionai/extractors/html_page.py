@@ -9,6 +9,7 @@ from PIL import Image
 from pyvisionai.config.html_config import DEFAULT_CONFIG
 from pyvisionai.extractors.base import BaseExtractor
 from pyvisionai.extractors.html.browser import capture_webpage
+from pyvisionai.utils.logger import logger
 
 
 class HtmlPageImageExtractor(BaseExtractor):
@@ -29,7 +30,7 @@ class HtmlPageImageExtractor(BaseExtractor):
             image.save(img_path, "JPEG", quality=95)
             return img_path
         except Exception as e:
-            print(f"Error saving image: {str(e)}")
+            logger.error(f"Error saving image: {str(e)}")
             raise
 
     def extract(self, html_path: str, output_dir: str) -> str:
@@ -98,6 +99,10 @@ class HtmlPageImageExtractor(BaseExtractor):
                 # Clean up image file
                 os.remove(img_path)
 
+                logger.info("Processing HTML file...")
+                logger.info(f"Extracted content and saved to markdown")
+                logger.info("HTML processing completed successfully")
+
                 return md_file_path
 
             finally:
@@ -107,5 +112,5 @@ class HtmlPageImageExtractor(BaseExtractor):
                 os.rmdir(pages_dir)
 
         except Exception as e:
-            print(f"Error processing HTML: {str(e)}")
+            logger.error(f"Error processing HTML: {str(e)}")
             raise
