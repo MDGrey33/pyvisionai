@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2024-01-21
+
+### Added
+- Implemented comprehensive logging across all extractors:
+  - Added structured logging for PDF processing stages
+  - Added progress tracking for DOCX file conversions and page processing
+  - Added detailed logging for PPTX slide extraction and conversion
+  - Added HTML processing status and element detection logging
+
+### Changed
+- Standardized logging patterns across all extractors:
+  - Consistent start/completion messages
+  - Clear error reporting with context
+  - Progress indicators for multi-step operations
+  - Performance metrics logging
+- Replaced print statements with proper logger calls
+- Added logging initialization in all core modules
+- Standardized log message format and levels:
+  - INFO for progress and success
+  - WARNING for non-critical issues
+  - ERROR for operation failures
+
+### Improved
+- Enhanced benchmark testing reliability:
+  - Added self-contained benchmark test fixtures
+  - Improved test independence from environment
+  - Added comprehensive validation of benchmark metrics
+  - Removed dependency on pre-existing log files
+- Added performance metrics logging for both CLI and API interfaces
+
+### Documentation
+- Added logging configuration examples
+- Updated docstrings with logging details
+- Added benchmark metrics documentation
+
 ## [0.2.4] - 2024-03-21
 
 ### Changed
