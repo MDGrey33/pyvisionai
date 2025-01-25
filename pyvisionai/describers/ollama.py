@@ -7,6 +7,7 @@ import requests
 
 from ..utils.config import DEFAULT_PROMPT, OLLAMA_MODEL_NAME
 from ..utils.logger import logger
+from ..utils.retry import RetryManager, RetryStrategy
 from .base import VisionModel
 
 
@@ -20,10 +21,19 @@ class LlamaVisionModel(VisionModel):
     ):
         super().__init__(api_key=api_key, prompt=prompt)
         self.model_name = OLLAMA_MODEL_NAME
+        # Initialize retry manager with exponential backoff
+        self.retry_manager = RetryManager(
+            max_attempts=3,
+            strategy=RetryStrategy.EXPONENTIAL,
+            base_delay=1.0,
+            max_delay=10.0,
+            logger=logger,
+        )
 
     def describe_image(self, image_path: str) -> str:
         """Describe an image using Ollama's Llama3.2 Vision model."""
-        try:
+
+        def _make_request():
             # Read and encode image
             with open(image_path, "rb") as image_file:
                 image_data = base64.b64encode(
@@ -55,6 +65,9 @@ class LlamaVisionModel(VisionModel):
 
             return description
 
+        try:
+            # Execute with retry
+            return self.retry_manager.execute(_make_request)
         except Exception as e:
             logger.error(
                 f"Error describing image with Ollama: {str(e)}"

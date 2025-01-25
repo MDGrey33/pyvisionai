@@ -1,0 +1,22 @@
+feat(api): Add retry mechanism for API calls
+
+Add robust retry mechanism to handle transient API failures:
+- Add RetryManager with configurable retry strategies (exponential, linear, constant)
+- Add custom error hierarchy (RetryableError, APIError, RateLimitError, etc.)
+- Integrate retry with Ollama and OpenAI API calls
+- Add comprehensive test suite with mocked API responses
+- Add logging for retry attempts and failures
+
+The retry mechanism handles:
+- Connection errors (network issues)
+- Rate limiting (429 responses)
+- Server errors (5xx responses)
+- API-specific errors (OpenAI/Ollama)
+
+Tests:
+- Add test_api_retry.py with mocked API responses
+- Add test coverage for all retry scenarios
+- Mock time.sleep for faster test execution
+
+This change improves reliability of API calls without breaking existing functionality.
+No migration needed for existing code.

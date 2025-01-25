@@ -11,10 +11,26 @@ from .config import (
     SOURCE_DIR,
 )
 from .logger import logger, setup_logger
+from .retry import (
+    APIError,
+    ConnectionError,
+    RateLimitError,
+    RetryableError,
+    RetryManager,
+    RetryStrategy,
+    TemporaryError,
+)
 
 __all__ = [
     "logger",
     "setup_logger",
+    "RetryManager",
+    "RetryStrategy",
+    "RetryableError",
+    "APIError",
+    "RateLimitError",
+    "TemporaryError",
+    "ConnectionError",
     "DEFAULT_PDF_EXTRACTOR",
     "DEFAULT_IMAGE_MODEL",
     "OPENAI_API_KEY",

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.7] - Unreleased
+
+### Added
+- Added retry mechanism for handling transient failures:
+  - Implemented RetryManager with configurable strategies
+  - Added support for exponential, linear, and constant backoff
+  - Added comprehensive logging for retry attempts
+  - Added proper error handling and delay management
+
+### TODO
+- Integrate retry mechanism with API calls:
+  - Add retry for Ollama API calls (connection errors, rate limits, server errors)
+  - Add retry for OpenAI API calls (rate limits, server errors, timeouts)
+  - Add tests to verify retry behavior with mocked API responses
+
 ## [0.2.6] - 2024-01-25
 
 ### Added

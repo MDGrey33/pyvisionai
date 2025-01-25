@@ -7,6 +7,7 @@ from openai import OpenAI
 
 from ..utils.config import DEFAULT_PROMPT, OPENAI_MODEL_NAME
 from ..utils.logger import logger
+from ..utils.retry import RetryManager, RetryStrategy
 from .base import VisionModel
 
 
@@ -21,10 +22,19 @@ class GPT4VisionModel(VisionModel):
         super().__init__(api_key=api_key, prompt=prompt)
         self.max_tokens = 300
         self.model_name = OPENAI_MODEL_NAME
+        # Initialize retry manager with exponential backoff
+        self.retry_manager = RetryManager(
+            max_attempts=3,
+            strategy=RetryStrategy.EXPONENTIAL,
+            base_delay=1.0,
+            max_delay=10.0,
+            logger=logger,
+        )
 
     def describe_image(self, image_path: str) -> str:
         """Describe an image using OpenAI's GPT-4 Vision model."""
-        try:
+
+        def _make_request():
             # Initialize client
             client = OpenAI(api_key=self.api_key)
 
@@ -68,6 +78,9 @@ class GPT4VisionModel(VisionModel):
 
             return description
 
+        try:
+            # Execute with retry
+            return self.retry_manager.execute(_make_request)
         except Exception as e:
             logger.error(
                 f"Error describing image with OpenAI: {str(e)}"
