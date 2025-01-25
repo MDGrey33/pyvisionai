@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] - 2024-01-25
+
+### Added
+- Implemented Model Factory pattern for vision models:
+  - Added VisionModel base class with abstract methods
+  - Added ModelFactory for centralized model management
+  - Added concrete implementations for GPT4 and Llama models
+  - Added comprehensive logging for model lifecycle
+  - Added configuration validation for each model type
+
+### Changed
+- Refactored model initialization to use factory pattern
+- Improved error handling in model creation and validation
+- Standardized model interface across all implementations
+- Enhanced logging with model-specific context
+
+### Documentation
+- Added docstrings for new model classes
+- Updated logging documentation
+- Added model factory usage examples
+
 ## [0.2.5] - 2024-01-21
 
 ### Added

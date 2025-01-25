@@ -1,11 +1,11 @@
 """Tests for the base image description functionality."""
 
 import os
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from pyvisionai.describers.base import describe_image
+from pyvisionai.describers.base import ModelFactory, describe_image
 from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL
 
 
@@ -14,33 +14,27 @@ def test_describe_image_with_default_model():
     test_image = "test.jpg"
     expected_description = "A test image description"
 
-    with (
-        patch(
-            "pyvisionai.describers.base.describe_image_ollama"
-        ) as mock_ollama,
-        patch(
-            "pyvisionai.describers.base.describe_image_openai"
-        ) as mock_openai,
-    ):
+    # Create mock model
+    mock_model = MagicMock()
+    mock_model.describe_image.return_value = expected_description
 
-        # Set up the mock based on default model
-        if DEFAULT_IMAGE_MODEL == "llama":
-            mock_ollama.return_value = expected_description
-            mock_openai.return_value = "Should not be called"
-        else:  # gpt4
-            mock_openai.return_value = expected_description
-            mock_ollama.return_value = "Should not be called"
+    # Create mock model class
+    mock_model_class = MagicMock()
+    mock_model_class.return_value = mock_model
 
-        result = describe_image(test_image)
-        assert result == expected_description
+    # Register mock model
+    if DEFAULT_IMAGE_MODEL == "llama":
+        ModelFactory.register_model("llama", mock_model_class)
+    else:  # gpt4
+        ModelFactory.register_model("gpt4", mock_model_class)
 
-        # Verify correct model was called
-        if DEFAULT_IMAGE_MODEL == "llama":
-            mock_ollama.assert_called_once_with(test_image)
-            mock_openai.assert_not_called()
-        else:  # gpt4
-            mock_openai.assert_called_once_with(test_image)
-            mock_ollama.assert_not_called()
+    # Call function
+    result = describe_image(test_image)
+    assert result == expected_description
+
+    # Verify model was created and called
+    mock_model_class.assert_called_once()
+    mock_model.describe_image.assert_called_once_with(test_image)
 
 
 def test_describe_image_with_llama():
@@ -48,13 +42,24 @@ def test_describe_image_with_llama():
     test_image = "test.jpg"
     expected_description = "A test image description"
 
-    with patch(
-        "pyvisionai.describers.base.describe_image_ollama"
-    ) as mock_ollama:
-        mock_ollama.return_value = expected_description
-        result = describe_image(test_image, model="llama")
-        assert result == expected_description
-        mock_ollama.assert_called_once_with(test_image)
+    # Create mock model
+    mock_model = MagicMock()
+    mock_model.describe_image.return_value = expected_description
+
+    # Create mock model class
+    mock_model_class = MagicMock()
+    mock_model_class.return_value = mock_model
+
+    # Register mock model
+    ModelFactory.register_model("llama", mock_model_class)
+
+    # Call function
+    result = describe_image(test_image, model="llama")
+    assert result == expected_description
+
+    # Verify model was created and called
+    mock_model_class.assert_called_once()
+    mock_model.describe_image.assert_called_once_with(test_image)
 
 
 def test_describe_image_with_gpt4():
@@ -62,13 +67,24 @@ def test_describe_image_with_gpt4():
     test_image = "test.jpg"
     expected_description = "A test image description"
 
-    with patch(
-        "pyvisionai.describers.base.describe_image_openai"
-    ) as mock_openai:
-        mock_openai.return_value = expected_description
-        result = describe_image(test_image, model="gpt4")
-        assert result == expected_description
-        mock_openai.assert_called_once_with(test_image)
+    # Create mock model
+    mock_model = MagicMock()
+    mock_model.describe_image.return_value = expected_description
+
+    # Create mock model class
+    mock_model_class = MagicMock()
+    mock_model_class.return_value = mock_model
+
+    # Register mock model
+    ModelFactory.register_model("gpt4", mock_model_class)
+
+    # Call function
+    result = describe_image(test_image, model="gpt4")
+    assert result == expected_description
+
+    # Verify model was created and called
+    mock_model_class.assert_called_once()
+    mock_model.describe_image.assert_called_once_with(test_image)
 
 
 def test_describe_image_with_unsupported_model():
@@ -77,7 +93,7 @@ def test_describe_image_with_unsupported_model():
     unsupported_model = "unsupported_model"
 
     with pytest.raises(
-        ValueError, match=f"Unsupported model: {unsupported_model}"
+        ValueError, match=f"Unsupported model type: {unsupported_model}"
     ):
         describe_image(test_image, model=unsupported_model)
 
@@ -86,25 +102,20 @@ def test_describe_image_with_nonexistent_file():
     """Test image description with a file that doesn't exist."""
     test_image = "nonexistent.jpg"
 
-    # Both models should raise FileNotFoundError for missing files
-    with patch(
-        "pyvisionai.describers.base.describe_image_ollama"
-    ) as mock_ollama:
-        mock_ollama.side_effect = FileNotFoundError(
-            f"File not found: {test_image}"
-        )
-        with pytest.raises(
-            FileNotFoundError, match=f"File not found: {test_image}"
-        ):
-            describe_image(test_image, model="llama")
+    # Create mock model that raises FileNotFoundError
+    mock_model = MagicMock()
+    mock_model.describe_image.side_effect = FileNotFoundError(
+        f"File not found: {test_image}"
+    )
 
-    with patch(
-        "pyvisionai.describers.base.describe_image_openai"
-    ) as mock_openai:
-        mock_openai.side_effect = FileNotFoundError(
-            f"File not found: {test_image}"
-        )
-        with pytest.raises(
-            FileNotFoundError, match=f"File not found: {test_image}"
-        ):
-            describe_image(test_image, model="gpt4")
+    # Create mock model class
+    mock_model_class = MagicMock()
+    mock_model_class.return_value = mock_model
+
+    # Register mock model
+    ModelFactory.register_model("llama", mock_model_class)
+
+    with pytest.raises(
+        FileNotFoundError, match=f"File not found: {test_image}"
+    ):
+        describe_image(test_image, model="llama")
