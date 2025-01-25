@@ -1,0 +1,113 @@
+# Cursor AI Assistant Rules
+
+## Core Development Principles
+
+### 1. Code Quality
+- Write clean, readable, and maintainable Python code
+- Follow PEP 8 style guidelines
+- Use type hints for better code clarity
+- Keep functions and classes focused and small
+- Maintain clear module boundaries
+
+### 2. Test-Driven Development
+- Write tests before implementation
+- Ensure tests are meaningful and cover critical paths
+- Focus on testing behavior, not implementation
+- Use pytest fixtures effectively
+- Include performance benchmarks for critical operations
+
+### 3. AI/Vision Specific Guidelines
+- Document model assumptions and limitations
+- Include input/output specifications
+- Handle edge cases in image/document processing
+- Consider resource usage (memory, CPU)
+- Implement proper error handling for external services
+
+### 4. Project Architecture
+- Keep extraction and description logic separate
+- Make components pluggable and extensible
+- Follow dependency injection patterns
+- Maintain backward compatibility
+- Design clear interfaces between components
+
+### 5. Performance & Security
+- Profile code for performance bottlenecks
+- Implement proper resource cleanup
+- Handle large files and datasets efficiently
+- Secure handling of API keys and credentials
+- Validate all external inputs
+
+### 6. Dependencies
+- Pin dependency versions
+- Document dependency purposes
+- Keep dependencies minimal and justified
+- Regular security updates
+- Handle dependency conflicts gracefully
+
+## Implementation Process
+
+### 1. Assessment
+- Understand requirements
+- Identify potential challenges
+- Consider performance implications
+- Plan testing strategy
+
+### 2. Implementation
+- Write tests first
+- Implement solution
+- Document key decisions
+- Add type hints and docstrings
+
+### 3. Verification
+- Run test suite
+- Verify performance
+- Check error handling
+- Review documentation
+
+## Decision Making Process
+
+### 1. Data Collection
+- Review recent changes (CHANGELOG.md)
+- Analyze codebase structure
+- Check existing issues and PRs
+- Review test coverage reports
+
+### 2. Analysis Requirements
+- Gather metrics and benchmarks
+- Review at least 3 key files
+- Consider multiple alternatives
+- Document trade-offs
+
+### 3. Impact Assessment
+- Consider backward compatibility
+- Evaluate maintenance burden
+- Assess performance implications
+- Consider security implications
+
+### 4. Recommendation
+- Present data-backed suggestions
+- Provide clear rationale
+- Include alternative approaches
+- List potential risks
+
+## Response Format
+
+For complex changes:
+1. Explain approach and rationale
+2. List implementation steps
+3. Note testing strategy
+4. Highlight potential issues
+
+For simple changes:
+1. Brief explanation
+2. Direct implementation
+3. Quick verification
+
+## Code Review Checklist
+
+- Tests included and passing
+- Documentation updated
+- Type hints present
+- Error handling implemented
+- Performance considered
+- Security implications checked
