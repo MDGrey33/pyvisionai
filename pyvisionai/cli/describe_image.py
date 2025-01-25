@@ -8,13 +8,13 @@ from pyvisionai.describers import (
     describe_image_ollama,
     describe_image_openai,
 )
-from pyvisionai.utils.config import DEFAULT_PROMPT
+from pyvisionai.utils.config import DEFAULT_IMAGE_MODEL, DEFAULT_PROMPT
 from pyvisionai.utils.logger import logger
 
 
 def describe_image_cli(
     image_path: str,
-    model: str = "llama",
+    model: str = DEFAULT_IMAGE_MODEL,
     api_key: Optional[str] = None,
     verbose: bool = False,
     prompt: Optional[str] = None,
@@ -86,7 +86,7 @@ def main():
         "-u",
         "--use-case",
         choices=["llama", "gpt3", "gpt4"],
-        default="llama",
+        default=DEFAULT_IMAGE_MODEL,
         help="Model to use for description",
     )
     parser.add_argument(

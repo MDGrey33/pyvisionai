@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.7] - Unreleased
+## [0.2.7] - 2024-03-22
 
 ### Added
 - Added retry mechanism for handling transient failures:
@@ -14,11 +14,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added comprehensive logging for retry attempts
   - Added proper error handling and delay management
 
-### TODO
-- Integrate retry mechanism with API calls:
-  - Add retry for Ollama API calls (connection errors, rate limits, server errors)
-  - Add retry for OpenAI API calls (rate limits, server errors, timeouts)
-  - Add tests to verify retry behavior with mocked API responses
+
+### Changed
+- Improved error handling in model selection:
+  - Enhanced connection error handling for API calls
+  - Added graceful fallback when default model is unavailable
+  - Improved error messages with detailed failure context
+- Enhanced test coverage:
+  - Added tests for retry mechanism with various strategies
+  - Added tests for model fallback scenarios
+  - Added mocked API tests for connection failures
+
+### Fixed
+- Fixed model selection to properly handle connection failures
+- Fixed retry delays to prevent excessive wait times
+- Fixed logging to capture all retry and fallback attempts
 
 ## [0.2.6] - 2024-01-25
 

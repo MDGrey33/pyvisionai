@@ -1,10 +1,40 @@
 """Common test fixtures and configuration."""
 
 import json
+import logging
 import os
+import shutil
 from datetime import datetime
+from unittest.mock import patch
 
 import pytest
+
+from pyvisionai.utils.logger import setup_logger
+
+
+def copy_test_files(source_dir):
+    """Copy test files to the test environment."""
+    test_files = {
+        "pdf": "test.pdf",
+        "docx": "test.docx",
+        "pptx": "test.pptx",
+        "html": "test.html",
+    }
+
+    for _, filename in test_files.items():
+        src = os.path.join("content", "test", "source", filename)
+        dst = os.path.join(source_dir, filename)
+        if os.path.exists(src):
+            shutil.copy2(src, dst)
+        else:
+            # Create a simple HTML file for testing if it doesn't exist
+            if filename.endswith(".html"):
+                with open(dst, "w") as f:
+                    f.write(
+                        "<html><body><h1>Test HTML</h1></body></html>"
+                    )
+            else:
+                raise FileNotFoundError(f"Test file not found: {src}")
 
 
 def log_benchmark(file_type, method, metrics):
@@ -24,47 +54,47 @@ def log_benchmark(file_type, method, metrics):
         f.write(json.dumps(entry) + "\n")
 
 
-@pytest.fixture(scope="module", name="setup_test_env")
-def setup_test_env():
-    """Set up test environment."""
-    output_dir = os.path.join("content", "test", "output")
-    log_dir = os.path.join("content", "log")
+@pytest.fixture(autouse=True)
+def mock_sleep():
+    """Mock time.sleep globally to speed up tests."""
+    with patch('time.sleep'):
+        yield
 
-    # Record existing log files before test
-    existing_logs = set()
-    if os.path.exists(log_dir):
-        existing_logs = {
-            f for f in os.listdir(log_dir) if f.endswith(".log")
-        }
+
+@pytest.fixture
+def benchmark_logger():
+    """Create a logger for benchmark results."""
+    logger = logging.getLogger("benchmark")
+    logger.setLevel(logging.INFO)
+    return logger
+
+
+@pytest.fixture
+def setup_test_env(tmp_path):
+    """Set up test environment with required directories."""
+    content_dir = tmp_path / "content"
+    source_dir = content_dir / "source"
+    extracted_dir = content_dir / "extracted"
+    log_dir = content_dir / "logs"
 
     # Create directories
-    os.makedirs(output_dir, exist_ok=True)
-    os.makedirs(log_dir, exist_ok=True)
+    content_dir.mkdir()
+    source_dir.mkdir()
+    extracted_dir.mkdir()
+    log_dir.mkdir()
 
-    yield output_dir
+    # Copy test files
+    copy_test_files(str(source_dir))
 
-    # Cleanup output directory (cleanup phase)
-    if os.path.exists(output_dir):
-        for file in os.listdir(output_dir):
-            file_path = os.path.join(output_dir, file)
-            try:
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
-            except (OSError, PermissionError):
-                pass  # Skip files we can't remove
+    # Set up logging
+    setup_logger("pyvisionai.test", log_dir=log_dir)
 
-    # Clean only test-generated log files
-    if os.path.exists(log_dir):
-        current_logs = {
-            f for f in os.listdir(log_dir) if f.endswith(".log")
-        }
-        test_logs = current_logs - existing_logs
-
-        for log_file in test_logs:
-            try:
-                os.remove(os.path.join(log_dir, log_file))
-            except (OSError, PermissionError):
-                pass  # Skip files we can't remove
+    return {
+        "content_dir": str(content_dir),
+        "source_dir": str(source_dir),
+        "extracted_dir": str(extracted_dir),
+        "log_dir": str(log_dir),
+    }
 
 
 # Test data for file extraction

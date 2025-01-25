@@ -92,8 +92,46 @@ def describe_image(image_path: str, model: Optional[str] = None) -> str:
         str: Description of the image
     """
     # Use configured default if no model specified
-    model = model or DEFAULT_IMAGE_MODEL
+    model_type = model or DEFAULT_IMAGE_MODEL
 
-    # Use factory to create model instance
-    model_instance = ModelFactory.create_model(model_type=model)
-    return model_instance.describe_image(image_path)
+    # Try the specified/default model first
+    try:
+        model_instance = ModelFactory.create_model(
+            model_type=model_type
+        )
+        return model_instance.describe_image(image_path)
+    except (ConnectionError, ConnectionRefusedError) as e:
+        logger.warning(f"Failed to connect to {model_type}: {str(e)}")
+
+        # If the default model fails, try other available models
+        if (
+            not model
+        ):  # Only try alternatives if no specific model was requested
+            for alt_model in ModelFactory._models.keys():
+                if alt_model != model_type:
+                    try:
+                        logger.info(
+                            f"Attempting to use alternative model: {alt_model}"
+                        )
+                        model_instance = ModelFactory.create_model(
+                            model_type=alt_model
+                        )
+                        return model_instance.describe_image(image_path)
+                    except (
+                        ConnectionError,
+                        ConnectionRefusedError,
+                    ) as e:
+                        logger.warning(
+                            f"Failed to connect to {alt_model}: {str(e)}"
+                        )
+                        continue
+                    except Exception as e:
+                        logger.error(
+                            f"Error using {alt_model}: {str(e)}"
+                        )
+                        continue
+
+        # If we get here, either a specific model was requested or all alternatives failed
+        raise ConnectionError(
+            f"Failed to connect to {model_type} and no working alternatives found"
+        )

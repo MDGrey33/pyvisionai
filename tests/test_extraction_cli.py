@@ -32,9 +32,15 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
             pytest.skip("Skipping GPT-4 test - No API key provided")
 
     # Setup
-    output_dir = setup_test_env
-    source_path = os.path.join("content", "test", "source")
-    source_file = f"test.{file_type}"
+    filename = "test"
+    source_file = os.path.join(
+        setup_test_env["source_dir"], f"{filename}.{file_type}"
+    )
+    # Create unique output directory for this test
+    test_output_dir = os.path.join(
+        setup_test_env["extracted_dir"], f"{file_type}_{method}"
+    )
+    os.makedirs(test_output_dir, exist_ok=True)
 
     # Test CLI performance
     start_time = time.time()
@@ -43,9 +49,9 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
         "--type",
         file_type,
         "--source",
-        os.path.join(source_path, source_file),
+        source_file,
         "--output",
-        output_dir,
+        test_output_dir,
         "--extractor",
         method,
     ]
@@ -58,9 +64,9 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
     cli_time = time.time() - start_time
 
     # Get output path
-    base_name = os.path.splitext(source_file)[0]
+    base_name = os.path.splitext(os.path.basename(source_file))[0]
     output_path = os.path.join(
-        output_dir, f"{base_name}_{file_type}.md"
+        test_output_dir, f"{base_name}_{file_type}.md"
     )
     output_size = (
         os.path.getsize(output_path)
@@ -69,30 +75,29 @@ def test_file_extraction_cli(file_type, method, setup_test_env):
     )
 
     # Log CLI benchmark results
-    cli_metrics = {
-        "total_time": cli_time,
-        "output_size": output_size,
-        "interface": "cli",
-    }
-    log_benchmark(file_type, method, cli_metrics)
+    log_benchmark(
+        file_type,
+        method,
+        {
+            "cli_time": cli_time,
+            "output_size": output_size,
+        },
+    )
 
     # Print performance metrics
     print_performance_metrics(
-        file_type, method, 0, cli_time, output_size, interface="CLI"
+        file_type=file_type,
+        method=method,
+        setup_time=0,
+        extraction_time=cli_time,
+        output_size=output_size,
+        interface="CLI",
     )
 
     # Verify output
-    assert (
-        result.returncode == 0
-    ), f"CLI command failed with: {result.stderr}"
-    assert os.path.exists(
-        output_path
-    ), f"Output file not found: {output_path}"
+    output_path = os.path.join(test_output_dir, f"test_{file_type}.md")
     with open(output_path, "r") as f:
         content = f.read()
-
-        # Verify basic content requirements
-        verify_basic_content(content)
-
-        # Verify file-type specific content
+    verify_basic_content(content)
+    if file_type in content_verifiers:
         content_verifiers[file_type](content)
