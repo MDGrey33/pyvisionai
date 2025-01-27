@@ -1,4 +1,3 @@
-
 ```mermaid
 graph TD
     classDef function fill:#4169E1,stroke:#000080,stroke-width:2px,color:white
@@ -19,14 +18,9 @@ graph TD
     end
 
     subgraph EXAMPLES["✨ EXAMPLES"]
-        OpenAIExample["description = describe_image_openai('image.jpg', model='gpt4', api_key='key')"]
+        OpenAIExample["description = describe_image_openai('image.jpg', model='gpt4', api_key='key', prompt='custom prompt')"]
 
-        OllamaExample["# Local Llama
-        description = describe_image_ollama(
-            'image.jpg',
-            model='llama3.2-vision',
-            prompt='custom prompt'
-        )"]
+        OllamaExample["description = describe_image_ollama('image.jpg', model='llama3.2-vision', prompt='custom prompt')"]
     end
 
     subgraph OPENAI_PARAMS["📝 OpenAI Parameters"]
