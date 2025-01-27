@@ -1,3 +1,4 @@
+
 ```mermaid
 graph TD
     classDef required fill:#ff6666,stroke:#ff0000,stroke-width:2px,color:black
@@ -72,4 +73,3 @@ graph TD
     class Extractor,Model,Key,Prompt optional
     class ExtractorDefault,ModelDefault,KeyDefault,PromptDefault,SourceDefault,OutputDefault default
     class Basic,Directory,Advanced example
-```
