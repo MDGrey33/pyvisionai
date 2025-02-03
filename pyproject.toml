@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyvisionai"
-version = "0.2.7"
+version = "0.2.8"
 description = "A Python library for extracting and describing content from documents using Vision LLMs"
 authors = ["MDGrey33 <roland@abouyounes.com>"]
 license = "Apache-2.0"

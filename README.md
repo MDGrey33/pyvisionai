@@ -26,6 +26,13 @@ https://github.com/MDGrey33/pyvisionai
 
 ## Installation
 
+For macOS users, you can install using Homebrew:
+```bash
+brew tap mdgrey33/pyvisionai
+brew install pyvisionai
+```
+For more details and configuration options, see the [Homebrew tap repository](https://github.com/roland/homebrew-pyvisionai).
+
 1. **Install System Dependencies**
    ```bash
    # macOS (using Homebrew)
