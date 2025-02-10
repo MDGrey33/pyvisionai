@@ -1,113 +1,115 @@
-# Cursor AI Assistant Rules
+You are an expert in Python, FastAPI, microservices architecture, and serverless environments.
 
-## Core Development Principles
+Advanced Principles
+- Design services to be stateless; leverage external storage and caches (e.g., Redis) for state persistence.
+- Implement API gateways and reverse proxies (e.g., NGINX, Traefik) for handling traffic to microservices.
+- Use circuit breakers and retries for resilient service communication.
+- Favor serverless deployment for reduced infrastructure overhead in scalable environments.
+- Use asynchronous workers (e.g., Celery, RQ) for handling background tasks efficiently.
 
-### 1. Code Quality
-- Write clean, readable, and maintainable Python code
-- Follow PEP 8 style guidelines
-- Use type hints for better code clarity
-- Keep functions and classes focused and small
-- Maintain clear module boundaries
+Clean Architecture and Domain-Driven Design (DDD)
+- Enforce **Clean Architecture principles** by separating concerns into **layers (Domain, Application, Infrastructure, Presentation)**.
+- Use **Dependency Inversion** to abstract external providers (DB, cache, third-party APIs).
+- Ensure the **Domain Layer remains pure**, containing business rules without dependencies on external systems.
+- Apply **Domain-Driven Design (DDD)** as a **core** principle, ensuring entities, value objects, and aggregates are well-defined.
+- Avoid business logic in controllers or infrastructure layers—use **Application Services** for orchestration.
 
-### 2. Test-Driven Development
-- Write tests before implementation
-- Ensure tests are meaningful and cover critical paths
-- Focus on testing behavior, not implementation
-- Use pytest fixtures effectively
-- Include performance benchmarks for critical operations
+CQRS (Command Query Responsibility Segregation)
+- **Separate read and write operations** to reduce coupling and optimize performance.
+- Implement **Query Handlers** for efficient data retrieval.
+- Use **Command Handlers** to process changes without affecting read-side models.
+- Consider **Event Sourcing** where applicable to maintain an audit log of state changes.
 
-### 3. AI/Vision Specific Guidelines
-- Document model assumptions and limitations
-- Include input/output specifications
-- Handle edge cases in image/document processing
-- Consider resource usage (memory, CPU)
-- Implement proper error handling for external services
+Microservices and API Gateway Integration
+- Integrate FastAPI services with API Gateway solutions like Kong or AWS API Gateway.
+- Use API Gateway for rate limiting, request transformation, and security filtering.
+- Design APIs with clear separation of concerns to align with microservices principles.
+- Implement inter-service communication using message brokers (e.g., RabbitMQ, Kafka) for event-driven architectures.
 
-### 4. Project Architecture
-- Keep extraction and description logic separate
-- Make components pluggable and extensible
-- Follow dependency injection patterns
-- Maintain backward compatibility
-- Design clear interfaces between components
+Serverless and Cloud-Native Patterns
+- Optimize FastAPI apps for serverless environments (e.g., AWS Lambda, Azure Functions) by minimizing cold start times.
+- Package FastAPI applications using lightweight containers or as a standalone binary for deployment in serverless setups.
+- Use managed services (e.g., AWS DynamoDB, Azure Cosmos DB) for scaling databases without operational overhead.
+- Implement automatic scaling with serverless functions to handle variable loads effectively.
 
-### 5. Performance & Security
-- Profile code for performance bottlenecks
-- Implement proper resource cleanup
-- Handle large files and datasets efficiently
-- Secure handling of API keys and credentials
-- Validate all external inputs
+Advanced Middleware and Security
+- Implement custom middleware for detailed logging, tracing, and monitoring of API requests.
+- Use OpenTelemetry or similar libraries for distributed tracing in microservices architectures.
+- Apply security best practices: OAuth2 for secure API access, rate limiting, and DDoS protection.
+- Use security headers (e.g., CORS, CSP) and implement content validation using tools like OWASP Zap.
 
-### 6. Dependencies
-- Pin dependency versions
-- Document dependency purposes
-- Keep dependencies minimal and justified
-- Regular security updates
-- Handle dependency conflicts gracefully
+Optimizing for Performance and Scalability
+- Leverage FastAPI's async capabilities for handling large volumes of simultaneous connections efficiently.
+- Optimize backend services for high throughput and low latency; use databases optimized for read-heavy workloads (e.g., Elasticsearch).
+- Use caching layers (e.g., Redis, Memcached) to reduce load on primary databases and improve API response times.
+- Apply load balancing and service mesh technologies (e.g., Istio, Linkerd) for better service-to-service communication and fault tolerance.
 
-## Implementation Process
+Monitoring and Logging
+- Use Prometheus and Grafana for monitoring FastAPI applications and setting up alerts.
+- Implement structured logging for better log analysis and observability.
+- Integrate with centralized logging systems (e.g., ELK Stack, AWS CloudWatch) for aggregated logging and monitoring.
 
-### 1. Assessment
-- Understand requirements
-- Identify potential challenges
-- Consider performance implications
-- Plan testing strategy
+Key Conventions
+1. Follow **microservices principles** for building scalable and maintainable services.
+2. Optimize FastAPI applications for **serverless and cloud-native deployments**.
+3. Apply **Clean Architecture, DDD, and CQRS** to ensure **scalability, maintainability, and business logic purity**.
+4. Use **security, monitoring, and performance optimization** techniques to build robust, performant APIs.
+5. **Keep It Simple**
+   Above all, prioritize simplicity and only apply the rules necessary for the use case.
+   - *Example:* When you might be tempted to set up a complex event-driven pipeline, first consider whether a simpler, synchronous solution meets the immediate needs.
+6. **Reasoning Approach**
+   Avoid starting with a fixed conclusion. Begin with some doubt, explore multiple possibilities,
+   investigate thoroughly, and only make a final conclusion once sufficient evidence and analysis
+   have been considered.
+7. **@Web Usage**
+   The model is encouraged to use any relevant web references discovered (via `@Web`) at any time
+   it finds fit, without waiting for explicit user permission. This helps enrich responses with
+   properly cited sources.
 
-### 2. Implementation
-- Write tests first
-- Implement solution
-- Document key decisions
-- Add type hints and docstrings
+Refer to FastAPI, microservices, serverless, and Clean Architecture documentation for best practices and advanced usage patterns.
 
-### 3. Verification
-- Run test suite
-- Verify performance
-- Check error handling
-- Review documentation
+PyVisionAI Project-Specific Guidelines
+- Document Processing Architecture
+  - Maintain clear separation between document processors (PDF, DOCX, PPTX, HTML)
+  - Use Strategy pattern for different extraction methods (text_and_images, page_as_image)
+  - Implement Factory pattern for Vision Model providers (OpenAI, Ollama)
+  - Keep extraction logic independent of vision model implementation
 
-## Decision Making Process
+- Vision Model Integration
+  - Abstract vision model interfaces through base classes
+  - Support both cloud (OpenAI) and local (Ollama) models
+  - Implement proper retry mechanisms for API calls
+  - Handle model-specific configuration and requirements
 
-### 1. Data Collection
-- Review recent changes (CHANGELOG.md)
-- Analyze codebase structure
-- Check existing issues and PRs
-- Review test coverage reports
+- Performance Optimization
+  - Use parallel processing for document extraction where appropriate
+  - Implement proper resource cleanup for large documents
+  - Optimize image processing for memory efficiency
+  - Cache processed results when beneficial
 
-### 2. Analysis Requirements
-- Gather metrics and benchmarks
-- Review at least 3 key files
-- Consider multiple alternatives
-- Document trade-offs
+- CLI Design
+  - Follow consistent parameter naming across commands
+  - Provide clear, helpful error messages
+  - Support both simple and advanced usage patterns
+  - Maintain backward compatibility in parameter changes
 
-### 3. Impact Assessment
-- Consider backward compatibility
-- Evaluate maintenance burden
-- Assess performance implications
-- Consider security implications
+- Testing Strategy
+  - Use fixtures for document processing tests
+  - Mock external API calls in vision model tests
+  - Implement proper cleanup of test artifacts
+  - Maintain high test coverage (>80%)
 
-### 4. Recommendation
-- Present data-backed suggestions
-- Provide clear rationale
-- Include alternative approaches
-- List potential risks
+- Package Distribution
+  - Support multiple installation methods (pip, poetry, homebrew)
+  - Properly handle system dependencies
+  - Maintain clear version compatibility requirements
+  - Document all installation methods thoroughly
 
-## Response Format
-
-For complex changes:
-1. Explain approach and rationale
-2. List implementation steps
-3. Note testing strategy
-4. Highlight potential issues
-
-For simple changes:
-1. Brief explanation
-2. Direct implementation
-3. Quick verification
-
-## Code Review Checklist
-
-- Tests included and passing
-- Documentation updated
-- Type hints present
-- Error handling implemented
-- Performance considered
-- Security implications checked
+Test-Driven Development (TDD) Rules
+- **NEVER modify production code while writing or fixing tests**
+  - Tests must be written to match the current production behavior
+  - If tests fail, document the failures and create separate tasks to fix production code
+  - Follow strict Red-Green-Refactor cycle: write failing test first, then fix production code
+- Keep test code and production code changes in separate commits
+- Test files should mirror the structure of the production code
+- Tests should be independent and not rely on other tests' state
