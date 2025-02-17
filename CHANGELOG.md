@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2024-03-25
+
+### Added
+#### Claude Vision Integration
+- Added `ClaudeVisionModel` class for Anthropic's Claude Vision API integration
+- Implemented robust retry logic and error handling for Claude API calls
+- Added support for custom prompts with Claude Vision
+- Added `describe_image_claude` function to main API
+
+#### Testing Framework
+- Added Claude-specific test markers (`@pytest.mark.claude`)
+- Added comprehensive test suite for Claude Vision model:
+  - Unit tests for initialization, configuration, and error handling
+  - Integration tests with real API calls
+  - Rate limit and retry logic tests
+  - Custom prompt handling tests
+  - CLI interface tests
+
+#### Documentation
+- Added Claude Vision model documentation in `docs/getting_started.md`
+- Updated API documentation with Claude Vision integration details
+- Added environment setup instructions for Anthropic API key
+- Enhanced testing documentation with Claude-specific examples
+- Updated CLI help messages with Claude Vision options
+
+#### Configuration
+- Added `ANTHROPIC_API_KEY` environment variable support
+- Added Claude Vision model configuration in factory system
+- Added retry strategy configuration for API calls
+
+#### CLI Updates
+- Added Claude Vision support to `describe-image` CLI command
+- Added `-u claude` option for model selection
+- Added support for custom prompts with Claude Vision
+
+### Enhanced
+- Improved error handling with specific error types for API issues
+- Enhanced retry logic for rate limits and server errors
+- Updated model factory to support Claude Vision
+- Improved test fixtures for better test isolation
+- Enhanced documentation with more comprehensive examples
+
+### Fixed
+- Proper handling of empty responses from Claude API
+- Correct error propagation for authentication issues
+- Improved rate limit handling with exponential backoff
+
 ## [0.2.8] - 2024-01-31
 
 ### Added
