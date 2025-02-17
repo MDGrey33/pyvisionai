@@ -1,15 +1,50 @@
-"""Common test fixtures and configuration."""
+"""Test configuration and shared fixtures."""
 
 import json
 import logging
 import os
 import shutil
 from datetime import datetime
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
+from pyvisionai.utils.benchmark import BenchmarkLogger
 from pyvisionai.utils.logger import setup_logger
+
+
+# Configure logging
+def configure_test_logging():
+    """Configure logging to suppress verbose output."""
+    logging.getLogger("httpcore").setLevel(logging.ERROR)
+    logging.getLogger("httpx").setLevel(logging.ERROR)
+    logging.getLogger("openai").setLevel(logging.ERROR)
+    logging.getLogger("anthropic").setLevel(logging.ERROR)
+
+    # Disable propagation for these loggers
+    for logger_name in ["httpcore", "httpx", "openai", "anthropic"]:
+        logger = logging.getLogger(logger_name)
+        logger.propagate = False
+
+
+logger = logging.getLogger(__name__)
+configure_test_logging()
+
+# Test data for file extraction
+testdata_file_extraction = [
+    ("pdf", "page_as_image"),
+    ("pdf", "text_and_images"),
+    ("docx", "page_as_image"),
+    ("docx", "text_and_images"),
+    ("pptx", "page_as_image"),
+    ("pptx", "text_and_images"),
+]
+
+ids_file_extraction = [
+    f"{filetype}-{method}"
+    for filetype, method in testdata_file_extraction
+]
 
 
 def copy_test_files(source_dir):
@@ -37,21 +72,61 @@ def copy_test_files(source_dir):
                 raise FileNotFoundError(f"Test file not found: {src}")
 
 
-def log_benchmark(file_type, method, metrics):
-    """Log benchmark results."""
-    log_dir = os.path.join("content", "log")
-    os.makedirs(log_dir, exist_ok=True)
-    log_file = os.path.join(log_dir, "benchmark.log")
+@pytest.fixture
+def benchmark_log_file(tmp_path):
+    """Create a temporary benchmark log file."""
+    log_dir = tmp_path / "logs"
+    log_dir.mkdir()
+    return log_dir / "benchmark.log"
 
-    entry = {
-        "timestamp": datetime.now().isoformat(),
-        "test": {"file_type": file_type, "method": method},
-        "metrics": metrics,
-    }
 
-    # Append to log file
-    with open(log_file, "a") as f:
-        f.write(json.dumps(entry) + "\n")
+@pytest.fixture
+def benchmark_logger(benchmark_log_file):
+    """Create a benchmark logger with a temporary file."""
+    logger = BenchmarkLogger(log_dir=benchmark_log_file.parent)
+    logger.logger = logging.getLogger("benchmark")
+    logger.logger.setLevel(logging.INFO)
+    return logger
+
+
+def log_benchmark(file_type, method, metrics, log_dir=None):
+    """Log benchmark results using the benchmark logger.
+
+    Args:
+        file_type: Type of file being processed
+        method: Extraction method used
+        metrics: Dictionary containing benchmark metrics
+        log_dir: Optional directory for log file (default: content/log)
+    """
+    logger = BenchmarkLogger(log_dir or "content/log")
+    logger.log(file_type, method, metrics)
+
+
+@pytest.fixture(autouse=True)
+def clean_benchmark_logs():
+    """Clean up benchmark logs after each test."""
+    yield
+    log_file = Path("content/log/benchmark.log")
+    lock_file = Path("content/log/benchmark.log.lock")
+    if log_file.exists():
+        log_file.unlink()
+    if lock_file.exists():
+        lock_file.unlink()
+
+
+def pytest_configure(config):
+    """Register custom markers."""
+    config.addinivalue_line("markers", "integration: integration tests")
+    config.addinivalue_line(
+        "markers", "cli: command line interface tests"
+    )
+    config.addinivalue_line(
+        "markers", "openai: tests requiring OpenAI API"
+    )
+    config.addinivalue_line(
+        "markers", "claude: tests requiring Claude API"
+    )
+    config.addinivalue_line("markers", "ollama: tests requiring Ollama")
 
 
 @pytest.fixture(autouse=True)
@@ -61,12 +136,27 @@ def mock_sleep():
         yield
 
 
+@pytest.fixture(autouse=True)
+def skip_by_api_key(request):
+    """Skip tests if required API key is missing."""
+    if request.node.get_closest_marker('openai'):
+        if not os.getenv('OPENAI_API_KEY'):
+            pytest.skip('OpenAI API key missing')
+    elif request.node.get_closest_marker('claude'):
+        if not os.getenv('ANTHROPIC_API_KEY'):
+            pytest.skip('Anthropic API key missing')
+
+
 @pytest.fixture
-def benchmark_logger():
-    """Create a logger for benchmark results."""
-    logger = logging.getLogger("benchmark")
-    logger.setLevel(logging.INFO)
-    return logger
+def test_image_path():
+    """Provide path to test image."""
+    return str(Path("content") / "test" / "source" / "test.jpeg")
+
+
+@pytest.fixture
+def mock_api_response():
+    """Provide mock API response."""
+    return {"text": "A forest scene with tall trees and green foliage."}
 
 
 @pytest.fixture
@@ -78,10 +168,8 @@ def setup_test_env(tmp_path):
     log_dir = content_dir / "logs"
 
     # Create directories
-    content_dir.mkdir()
-    source_dir.mkdir()
-    extracted_dir.mkdir()
-    log_dir.mkdir()
+    for dir_path in [content_dir, source_dir, extracted_dir, log_dir]:
+        dir_path.mkdir(exist_ok=True)
 
     # Copy test files
     copy_test_files(str(source_dir))
@@ -95,23 +183,3 @@ def setup_test_env(tmp_path):
         "extracted_dir": str(extracted_dir),
         "log_dir": str(log_dir),
     }
-
-
-# Test data for file extraction
-testdata_file_extraction = (
-    ("pdf", "page_as_image"),
-    ("pdf", "text_and_images"),
-    ("docx", "page_as_image"),
-    ("docx", "text_and_images"),
-    ("pptx", "page_as_image"),
-    ("html", "page_as_image"),
-)
-
-ids_file_extraction = (
-    "PDF using page-as-image method",
-    "PDF using text-and-images method",
-    "DOCX using page-as-image method",
-    "DOCX using text-and-images method",
-    "PPTX using page-as-image method",
-    "HTML using page-as-image method",
-)

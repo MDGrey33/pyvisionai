@@ -87,6 +87,31 @@ def test_describe_image_with_gpt4():
     mock_model.describe_image.assert_called_once_with(test_image)
 
 
+def test_describe_image_with_claude():
+    """Test image description with Claude model."""
+    test_image = "test.jpg"
+    expected_description = "A test image description"
+
+    # Create mock model
+    mock_model = MagicMock()
+    mock_model.describe_image.return_value = expected_description
+
+    # Create mock model class
+    mock_model_class = MagicMock()
+    mock_model_class.return_value = mock_model
+
+    # Register mock model
+    ModelFactory.register_model("claude", mock_model_class)
+
+    # Call function
+    result = describe_image(test_image, model="claude")
+    assert result == expected_description
+
+    # Verify model was created and called
+    mock_model_class.assert_called_once()
+    mock_model.describe_image.assert_called_once_with(test_image)
+
+
 def test_describe_image_with_unsupported_model():
     """Test image description with an unsupported model."""
     test_image = "test.jpg"
@@ -206,6 +231,11 @@ def test_describe_image_all_models_fail():
         "Failed to connect"
     )
 
+    failed_model3 = MagicMock()
+    failed_model3.describe_image.side_effect = ConnectionError(
+        "Failed to connect"
+    )
+
     # Create mock model classes
     failed_model_class1 = MagicMock()
     failed_model_class1.return_value = failed_model1
@@ -213,9 +243,13 @@ def test_describe_image_all_models_fail():
     failed_model_class2 = MagicMock()
     failed_model_class2.return_value = failed_model2
 
-    # Register both failing models
+    failed_model_class3 = MagicMock()
+    failed_model_class3.return_value = failed_model3
+
+    # Register all failing models
     ModelFactory.register_model("gpt4", failed_model_class1)
     ModelFactory.register_model("llama", failed_model_class2)
+    ModelFactory.register_model("claude", failed_model_class3)
 
     # Call function without specifying model
     with pytest.raises(
@@ -224,8 +258,10 @@ def test_describe_image_all_models_fail():
     ):
         describe_image(test_image)
 
-    # Verify both models were tried
+    # Verify all models were tried
     failed_model_class1.assert_called_once()
     failed_model1.describe_image.assert_called_once_with(test_image)
     failed_model_class2.assert_called_once()
     failed_model2.describe_image.assert_called_once_with(test_image)
+    failed_model_class3.assert_called_once()
+    failed_model3.describe_image.assert_called_once_with(test_image)

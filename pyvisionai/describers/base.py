@@ -10,6 +10,41 @@ from ..utils.config import DEFAULT_IMAGE_MODEL
 logger = logging.getLogger(__name__)
 
 
+class BaseVisionModel(ABC):
+    """Base class for vision models."""
+
+    def __init__(self):
+        """Initialize the base vision model."""
+        pass
+
+    @abstractmethod
+    def _validate_config(self) -> None:
+        """Validate the model configuration.
+
+        Raises:
+            ValueError: If the configuration is invalid
+        """
+        pass
+
+    @abstractmethod
+    def describe_image(
+        self, image_path: str, prompt: Optional[str] = None
+    ) -> str:
+        """Describe an image using the vision model.
+
+        Args:
+            image_path: Path to the image file
+            prompt: Custom prompt to use for description (optional)
+
+        Returns:
+            str: Image description
+
+        Raises:
+            ValueError: If the image path is invalid or the model configuration is invalid
+        """
+        pass
+
+
 class VisionModel(ABC):
     """Base class for vision models."""
 
