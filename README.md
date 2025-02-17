@@ -17,7 +17,9 @@ https://github.com/MDGrey33/pyvisionai
 
 - Extract text and images from PDF, DOCX, PPTX, and HTML files
 - Capture interactive HTML pages as images with full rendering
-- Describe images using local (Ollama) or cloud-based (OpenAI) Vision Language Models
+- Describe images using:
+  - Cloud-based models (OpenAI GPT-4 Vision, Anthropic Claude Vision)
+  - Local models (Ollama's Llama Vision)
 - Save extracted text and image descriptions in markdown format
 - Support for both CLI and library usage
 - Multiple extraction methods for different use cases
@@ -97,24 +99,50 @@ Note: While the default directories provide a organized structure, you're free t
 
 For cloud image description (default, recommended):
 ```bash
-# Set OpenAI API key
-export OPENAI_API_KEY='your-api-key'
+# Set OpenAI API key (for GPT-4 Vision)
+export OPENAI_API_KEY='your-openai-key'
+
+# Or set Anthropic API key (for Claude Vision)
+export ANTHROPIC_API_KEY='your-anthropic-key'
 ```
 
 For local image description (optional):
 ```bash
+# Install Ollama
+# macOS
+brew install ollama
+
+# Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Windows
+# Download from https://ollama.com/download/windows
+
 # Start Ollama server
 ollama serve
 
 # Pull the required model
 ollama pull llama3.2-vision
+
+# Verify installation
+ollama list  # Should show llama3.2-vision
+curl http://localhost:11434/api/tags  # Should return JSON response
 ```
+
+Note: The local Llama model:
+- Runs entirely on your machine
+- No API key required
+- Requires about 8GB of disk space
+- Needs 16GB+ RAM for optimal performance
+- May be slower than cloud models but offers privacy
 
 ## Features
 
 - Extract text and images from PDF, DOCX, PPTX, and HTML files
 - Capture interactive HTML pages as images with full rendering
-- Describe images using local (Ollama) or cloud-based (OpenAI) Vision Language Models
+- Describe images using:
+  - Cloud-based models (OpenAI GPT-4 Vision, Anthropic Claude Vision)
+  - Local models (Ollama's Llama Vision)
 - Save extracted text and image descriptions in markdown format
 - Support for both CLI and library usage
 - Multiple extraction methods for different use cases
@@ -132,6 +160,11 @@ ollama pull llama3.2-vision
    file-extract -t pptx -s path/to/file.pptx -o output_dir
    file-extract -t html -s path/to/file.html -o output_dir
 
+   # Process with specific model
+   file-extract -t pdf -s input.pdf -o output_dir -m claude
+   file-extract -t pdf -s input.pdf -o output_dir -m gpt4
+   file-extract -t pdf -s input.pdf -o output_dir -m llama
+
    # Process with specific extractor
    file-extract -t pdf -s input.pdf -o output_dir -e text_and_images
 
@@ -146,8 +179,11 @@ ollama pull llama3.2-vision
 
 2. **Describe Images**
    ```bash
-   # Using GPT-4 Vision (default, recommended)
+   # Using GPT-4 Vision (default)
    describe-image -i path/to/image.jpg
+
+   # Using Claude Vision
+   describe-image -i path/to/image.jpg -u claude -k your-anthropic-key
 
    # Using local Llama model
    describe-image -i path/to/image.jpg -u llama
@@ -162,35 +198,48 @@ ollama pull llama3.2-vision
 ### Library Usage
 
 ```python
-from pyvisionai import create_extractor, describe_image_openai, describe_image_ollama
+from pyvisionai import (
+    create_extractor,
+    describe_image_openai,
+    describe_image_claude,
+    describe_image_ollama
+)
 
 # 1. Extract content from files
-extractor = create_extractor("pdf")  # or "docx", "pptx", or "html"
+# Using GPT-4 Vision (default)
+extractor = create_extractor("pdf")
 output_path = extractor.extract("input.pdf", "output_dir")
 
-# With specific extraction method
+# Using Claude Vision
+extractor = create_extractor("pdf", model="claude")
+output_path = extractor.extract("input.pdf", "output_dir")
+
+# Using specific extraction method
 extractor = create_extractor("pdf", extractor_type="text_and_images")
 output_path = extractor.extract("input.pdf", "output_dir")
 
-# Extract from HTML (always uses page_as_image method)
-extractor = create_extractor("html")
-output_path = extractor.extract("page.html", "output_dir")
-
 # 2. Describe images
-# Using GPT-4 Vision (default, recommended)
+# Using GPT-4 Vision
 description = describe_image_openai(
     "image.jpg",
     model="gpt-4o-mini",  # default
-    api_key="your-api-key",  # optional if set in environment
+    api_key="your-openai-key",  # optional if set in environment
     max_tokens=300,  # default
-    prompt="Describe this image focusing on colors and textures"  # optional custom prompt
+    prompt="Describe this image focusing on colors and textures"  # optional
+)
+
+# Using Claude Vision
+description = describe_image_claude(
+    "image.jpg",
+    api_key="your-anthropic-key",  # optional if set in environment
+    prompt="Describe this image focusing on colors and textures"  # optional
 )
 
 # Using local Llama model
 description = describe_image_ollama(
     "image.jpg",
     model="llama3.2-vision",  # default
-    prompt="List the main objects in this image"  # optional custom prompt
+    prompt="List the main objects in this image"  # optional
 )
 ```
 
@@ -209,12 +258,35 @@ The application maintains detailed logs of all operations:
 ## Environment Variables
 
 ```bash
-# Required for OpenAI Vision (if using cloud description)
-export OPENAI_API_KEY='your-api-key'
+# Required for OpenAI Vision (if using GPT-4)
+export OPENAI_API_KEY='your-openai-key'
+
+# Required for Claude Vision (if using Claude)
+export ANTHROPIC_API_KEY='your-anthropic-key'
 
 # Optional: Ollama host (if using local description)
 export OLLAMA_HOST='http://localhost:11434'
 ```
+
+## Performance Optimization
+
+1. **Memory Management**
+   - Use `text_and_images` method for large documents
+   - Process files in smaller batches
+   - Monitor memory usage during batch processing
+   - Clean up temporary files regularly
+
+2. **Processing Speed**
+   - Cloud models (GPT-4, Claude) are generally faster than local models
+   - Use parallel processing for batch operations
+   - Consider SSD storage for better I/O performance
+   - Optimize image sizes before processing
+
+3. **API Usage**
+   - Implement proper rate limiting
+   - Use appropriate retry mechanisms
+   - Cache results when possible
+   - Monitor API quotas and usage
 
 ## License
 
@@ -238,29 +310,31 @@ Optional Arguments:
                          - text_and_images: Extract text and images separately
                          Note: HTML only supports page_as_image
   -m, --model MODEL      Vision model for image description:
-                         - gpt4: GPT-4 Vision (default, recommended)
+                         - gpt4: GPT-4 Vision (default)
+                         - claude: Claude Vision
                          - llama: Local Llama model
-  -k, --api-key KEY      OpenAI API key (can also be set via OPENAI_API_KEY env var)
+  -k, --api-key KEY      API key (required for GPT-4 and Claude)
   -v, --verbose          Enable verbose logging
   -p, --prompt TEXT      Custom prompt for image description
 ```
 
 ### `describe-image` Command
 ```bash
-describe-image [-h] -i IMAGE [-m MODEL] [-k API_KEY] [-t MAX_TOKENS] [-v] [-p PROMPT]
+describe-image [-h] -i IMAGE [-u MODEL] [-k API_KEY] [-t MAX_TOKENS] [-v] [-p PROMPT]
 
 Required Arguments:
-  -i, --image IMAGE      Path to image file
+  -i, --image IMAGE      Path to the image file
 
 Optional Arguments:
   -h, --help            Show help message and exit
-  -m, --model MODEL     Vision model to use:
-                        - gpt4: GPT-4 Vision (default, recommended)
+  -u, --use-case MODEL  Model to use:
+                        - gpt4: GPT-4 Vision (default)
+                        - claude: Claude Vision
                         - llama: Local Llama model
-  -k, --api-key KEY     OpenAI API key (can also be set via OPENAI_API_KEY env var)
-  -t, --max-tokens NUM  Maximum tokens for response (default: 300)
-  -p, --prompt TEXT     Custom prompt for image description
+  -k, --api-key KEY     API key (required for GPT-4 and Claude)
+  -t, --max-tokens N    Maximum tokens in response (GPT-4 only)
   -v, --verbose         Enable verbose logging
+  -p, --prompt TEXT     Custom prompt for image description
 ```
 
 ## Examples

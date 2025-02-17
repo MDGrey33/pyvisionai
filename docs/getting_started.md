@@ -1,6 +1,6 @@
 # Getting Started with PyVisionAI
 
-This guide will help you get up and running with PyVisionAI quickly. We'll cover installation, basic setup, and common use cases.
+This guide will help you get started with PyVisionAI, a powerful tool for extracting and describing content from documents using Vision Language Models.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ Before using PyVisionAI, ensure you have:
 
 ## Installation
 
-1. Install PyVisionAI using pip:
+1. **Install via pip**
    ```bash
    pip install pyvisionai
    ```
@@ -32,166 +32,215 @@ Before using PyVisionAI, ensure you have:
    # For OpenAI Vision (recommended)
    export OPENAI_API_KEY='your-api-key'
 
-   # For local Llama (optional)
+## Configuration
+
+### API Keys
+
+1. **Cloud-based Models (Recommended)**
+
+   Choose one or both of the following:
+
+   ```bash
+   # For GPT-4 Vision
+   export OPENAI_API_KEY='your-openai-key'
+
+   # For Claude Vision
+   export ANTHROPIC_API_KEY='your-anthropic-key'
+   ```
+
+2. **Local Model (Optional)**
+   ```bash
    # First install and start Ollama
    brew install ollama    # macOS
+   # Or for Linux
+   curl -fsSL https://ollama.com/install.sh | sh
+   # Or for Windows, download from:
+   # https://ollama.com/download/windows
+
    ollama serve
    ollama pull llama3.2-vision
    ```
 
-## Quick Start
+## Basic Usage
 
-### 1. Extract Text and Images from a PDF
+### Command Line Interface
+
+1. **Extract Content from Documents**
+   ```bash
+   # Basic usage (uses GPT-4 Vision by default)
+   file-extract -t pdf -s document.pdf -o output_dir
+
+   # Using Claude Vision
+   file-extract -t pdf -s document.pdf -o output_dir -m claude
+
+   # Using local Llama model
+   file-extract -t pdf -s document.pdf -o output_dir -m llama
+   ```
+
+2. **Describe Images**
+   ```bash
+   # Using GPT-4 Vision (default)
+   describe-image -i image.jpg
+
+   # Using Claude Vision
+   describe-image -i image.jpg -u claude -k your-anthropic-key
+
+   # Using local Llama model
+   describe-image -i image.jpg -u llama
+
+   # With custom prompt
+   describe-image -i image.jpg -p "Describe the main colors and objects"
+   ```
+
+### Python Library
 
 ```python
-from pyvisionai import create_extractor
+from pyvisionai import (
+    create_extractor,
+    describe_image_openai,
+    describe_image_claude,
+    describe_image_ollama
+)
 
-# Create a PDF extractor
+# 1. Extract content from documents
+# Using GPT-4 Vision (default)
 extractor = create_extractor("pdf")
+output_path = extractor.extract("document.pdf", "output_dir")
 
-# Extract content (will use GPT-4 Vision by default)
-output_path = extractor.extract(
-    "path/to/document.pdf",
-    "output_directory"
-)
+# Using Claude Vision
+extractor = create_extractor("pdf", model="claude")
+output_path = extractor.extract("document.pdf", "output_dir")
 
-print(f"Extracted content saved to: {output_path}")
-```
+# Using local Llama model
+extractor = create_extractor("pdf", model="llama")
+output_path = extractor.extract("document.pdf", "output_dir")
 
-### 2. Process a Word Document
-
-```python
-# Create a DOCX extractor with text_and_images method
-extractor = create_extractor(
-    "docx",
-    extractor_type="text_and_images"
-)
-
-# Extract content
-output_path = extractor.extract(
-    "path/to/document.docx",
-    "output_directory"
-)
-```
-
-### 3. Capture and Process a Web Page
-
-```python
-# Create an HTML extractor
-extractor = create_extractor("html")
-
-# Extract content from a URL
-output_path = extractor.extract(
-    "https://example.com",
-    "output_directory"
-)
-```
-
-### 4. Describe Individual Images
-
-```python
-from pyvisionai import describe_image_openai
-
-# Using OpenAI's Vision model
+# 2. Describe images
+# Using GPT-4 Vision
 description = describe_image_openai(
-    "path/to/image.jpg",
-    prompt="Describe the main elements in this image"
+    "image.jpg",
+    api_key="your-openai-key",  # optional if set in environment
+    prompt="Describe the main objects"  # optional
 )
 
-print(description)
-```
-
-## Common Use Cases
-
-### 1. Batch Processing Documents
-
-```python
-import os
-from pyvisionai import create_extractor
-
-def process_directory(input_dir: str, output_dir: str):
-    # Create extractors for different file types
-    extractors = {
-        ".pdf": create_extractor("pdf"),
-        ".docx": create_extractor("docx"),
-        ".pptx": create_extractor("pptx")
-    }
-
-    for filename in os.listdir(input_dir):
-        ext = os.path.splitext(filename)[1].lower()
-        if ext in extractors:
-            input_path = os.path.join(input_dir, filename)
-            try:
-                output_path = extractors[ext].extract(
-                    input_path,
-                    output_dir
-                )
-                print(f"Processed: {filename}")
-            except Exception as e:
-                print(f"Error processing {filename}: {e}")
-
-# Use the function
-process_directory("documents", "extracted_content")
-```
-
-### 2. Custom Image Description
-
-```python
-from pyvisionai import create_extractor
-
-# Create extractor with custom prompt
-extractor = create_extractor(
-    "pdf",
-    prompt="List all text elements and describe any charts or diagrams"
+# Using Claude Vision
+description = describe_image_claude(
+    "image.jpg",
+    api_key="your-anthropic-key",  # optional if set in environment
+    prompt="List the colors present"  # optional
 )
 
-# Process document
-output_path = extractor.extract("report.pdf", "output")
-```
-
-### 3. Using Local Model for Privacy
-
-```python
-# Create extractor using local Llama model
-extractor = create_extractor(
-    "pdf",
-    model="llama",
-    prompt="Extract text and describe visual elements"
+# Using local Llama model
+description = describe_image_ollama(
+    "image.jpg",
+    prompt="Describe the scene"  # optional
 )
-
-output_path = extractor.extract("confidential.pdf", "output")
 ```
+
+## Supported File Types
+
+- PDF (`.pdf`)
+- Word Documents (`.docx`)
+- PowerPoint Presentations (`.pptx`)
+- HTML Pages (`.html`, `.htm`)
+
+## Vision Models
+
+1. **GPT-4 Vision (Default)**
+   - Cloud-based model by OpenAI
+   - Requires API key
+   - Best for general-purpose image description
+   - Supports detailed custom prompts
+
+2. **Claude Vision**
+   - Cloud-based model by Anthropic
+   - Requires API key
+   - Excellent for detailed analysis
+   - Strong at identifying text in images
+
+3. **Llama Vision**
+   - Local model via Ollama
+   - No API key required
+   - Good for basic image description
+   - Runs entirely on your machine
+
+## Extraction Methods
+
+1. **page_as_image (Default)**
+   - Converts each page to an image
+   - Sends to vision model for description
+   - Best for maintaining layout
+   - Works with all file types
+
+2. **text_and_images**
+   - Extracts text and images separately
+   - More efficient for text-heavy documents
+   - Better for searchable output
+   - Not available for HTML files
 
 ## Output Format
 
-PyVisionAI generates a markdown file containing:
-1. Extracted text
-2. Embedded images (if using text_and_images method)
-3. Image descriptions
-4. Source file metadata
+The extracted content is saved in markdown format:
 
-Example output structure:
 ```markdown
 # Document Title
 
 ## Page 1
-[Extracted text content...]
+[Description of page content]
+
+### Extracted Text
+[Text content if available]
 
 ### Images
-![Image 1](./images/page1_image1.png)
-Description: A bar chart showing sales data for Q1 2024...
+1. [Description of image 1]
+2. [Description of image 2]
 
 ## Page 2
-[Extracted text content...]
 ...
+```
+
+## Advanced Usage
+
+### Custom Prompts
+
+```bash
+# CLI
+describe-image -i image.jpg -p "List all visible text in the image"
+
+# Python
+description = describe_image_claude(
+    "image.jpg",
+    prompt="Identify and transcribe any visible text"
+)
+```
+
+### Batch Processing
+
+```bash
+# Process all PDFs in a directory
+file-extract -t pdf -s input_dir -o output_dir
+
+# Process with specific model
+file-extract -t pdf -s input_dir -o output_dir -m claude
+```
+
+### Error Handling
+
+```python
+try:
+    description = describe_image_claude("image.jpg")
+except ValueError as e:
+    print(f"Configuration error: {e}")
+except Exception as e:
+    print(f"Error processing image: {e}")
 ```
 
 ## Next Steps
 
-- Check out the [API Documentation](api.md) for detailed reference
-- Learn about [Performance Optimization](performance.md)
-- See [Examples](examples/) for more use cases
-- Read the [Troubleshooting Guide](troubleshooting.md)
+1. Read the [API Documentation](api.md) for detailed reference
+2. Check out the [Examples](../examples/) directory
+3. Learn about [Testing](testing.md) your implementations
+4. Review [Contributing Guidelines](../CONTRIBUTING.md)
 
 ## Common Issues
 

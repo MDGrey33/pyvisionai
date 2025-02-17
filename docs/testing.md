@@ -25,13 +25,10 @@ This document provides a comprehensive guide to running tests in the PyVisionAI 
     - [Test Structure](#test-structure)
     - [Best Practices](#best-practices)
     - [Fixtures and Mocking](#fixtures-and-mocking)
+    - [Test Fixtures](#test-fixtures)
+    - [Mocking External Services](#mocking-external-services)
   - [Performance Testing](#performance-testing)
     - [Benchmark Tests](#benchmark-tests)
-    - [Metrics Collection](#metrics-collection)
-    - [Performance Analysis](#performance-analysis)
-  - [Troubleshooting](#troubleshooting)
-    - [Common Issues](#common-issues)
-    - [Debug Strategies](#debug-strategies)
 
 ## Test Organization
 
@@ -62,6 +59,27 @@ tests/
 
 ### Test Categories
 
+1. **Unit Tests**
+   - Test individual components in isolation
+   - Mock external dependencies
+   - Fast execution
+
+2. **Integration Tests**
+   - Test component interactions
+   - May require external services
+   - Slower execution
+
+3. **End-to-End Tests**
+   - Test complete workflows
+   - Require all dependencies
+   - Slowest execution
+
+4. **Model-Specific Tests**
+   - Tests for each vision model (GPT-4, Claude, Llama)
+   - API integration tests
+   - Error handling and retry logic
+   - Rate limit handling
+
 Tests are organized into several categories using pytest markers:
 
 ```python
@@ -78,7 +96,7 @@ class TestCLI:
 # Model-specific Tests
 @pytest.mark.openai
 @pytest.mark.ollama
-@pytest.mark.claude
+@pytest.mark.claude  # New marker for Claude tests
 def test_model():
     pass
 ```
@@ -140,6 +158,21 @@ pytest -n auto --dist=loadgroup
 ## Test Requirements
 
 ### Environment Setup
+
+Before running tests, ensure you have the necessary environment variables set:
+
+```bash
+# For GPT-4 Vision tests
+export OPENAI_API_KEY='your-openai-key'
+
+# For Claude Vision tests
+export ANTHROPIC_API_KEY='your-anthropic-key'
+
+# For local Llama tests (optional)
+export OLLAMA_HOST='http://localhost:11434'
+```
+
+Note: Tests requiring API keys will be skipped if the corresponding environment variable is not set.
 
 1. Create and activate virtual environment:
 ```bash
@@ -240,20 +273,59 @@ def model_type(request):
 
 ### Test Structure
 
+Follow this structure for test files:
+
 ```python
-class TestFeature:
-    """Test suite for specific feature."""
+import pytest
+from unittest.mock import Mock, patch
+from pyvisionai import ClaudeVisionModel  # Add this import
+
+class TestVisionModel:
+    """Base class for vision model tests."""
 
     def setup_method(self):
-        """Setup for each test method."""
+        """Set up test fixtures."""
         pass
 
     def teardown_method(self):
-        """Cleanup after each test method."""
+        """Clean up after tests."""
         pass
 
-    def test_functionality(self):
-        """Test specific functionality."""
+class TestGPT4Vision(TestVisionModel):
+    """Tests for GPT-4 Vision model."""
+
+    @pytest.mark.skipif(
+        "OPENAI_API_KEY" not in os.environ,
+        reason="OpenAI API key not found"
+    )
+    def test_real_api_call(self):
+        """Test with real API call."""
+        pass
+
+class TestClaudeVision(TestVisionModel):
+    """Tests for Claude Vision model."""
+
+    @pytest.mark.skipif(
+        "ANTHROPIC_API_KEY" not in os.environ,
+        reason="Anthropic API key not found"
+    )
+    def test_real_api_call(self):
+        """Test with real API call."""
+        pass
+
+    def test_retry_logic(self):
+        """Test retry logic for rate limits."""
+        pass
+
+    def test_error_handling(self):
+        """Test error handling for various API responses."""
+        pass
+
+class TestLlamaVision(TestVisionModel):
+    """Tests for local Llama model."""
+
+    def test_local_model(self):
+        """Test with local model."""
         pass
 ```
 
@@ -304,71 +376,60 @@ def mock_openai():
         yield mock
 ```
 
+### Test Fixtures
+
+Use fixtures for common setup:
+
+```python
+@pytest.fixture
+def mock_claude_api():
+    """Mock Claude Vision API responses."""
+    with patch("anthropic.Anthropic") as mock:
+        yield mock
+
+@pytest.fixture
+def mock_openai_api():
+    """Mock OpenAI API responses."""
+    with patch("openai.Client") as mock:
+        yield mock
+
+@pytest.fixture
+def mock_ollama_api():
+    """Mock Ollama API responses."""
+    with patch("ollama.Client") as mock:
+        yield mock
+```
+
+### Mocking External Services
+
+Example of mocking API calls:
+
+```python
+def test_claude_vision_description(mock_claude_api):
+    """Test Claude Vision image description."""
+    mock_response = {
+        "content": [{"text": "A detailed description of the image"}]
+    }
+    mock_claude_api.return_value.messages.create.return_value = mock_response
+
+    model = ClaudeVisionModel(api_key="test_key")
+    result = model.describe_image("test.jpg")
+    assert "detailed description" in result
+
+def test_claude_rate_limit_retry(mock_claude_api):
+    """Test retry logic for rate limits."""
+    mock_claude_api.return_value.messages.create.side_effect = [
+        anthropic.RateLimitError("Rate limit exceeded"),
+        {"content": [{"text": "Success after retry"}]}
+    ]
+
+    model = ClaudeVisionModel(api_key="test_key")
+    result = model.describe_image("test.jpg")
+    assert "Success" in result
+```
+
 ## Performance Testing
 
 ### Benchmark Tests
 
-```python
-@pytest.mark.benchmark
-def test_performance(benchmark):
-    result = benchmark(function_to_test)
-    assert result.stats.mean < 0.1
 ```
-
-### Metrics Collection
-
-The benchmark logger collects:
-- Execution time
-- Memory usage
-- Output size
-- API latency
-
-### Performance Analysis
-
-```python
-def test_benchmark_analysis(benchmark_logger):
-    metrics = benchmark_logger.get_statistics()
-    assert metrics["latency"]["p95"] < threshold
-    assert metrics["memory"]["max"] < memory_limit
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. API Key Issues:
-   ```bash
-   # Check API key presence
-   pytest --collect-only -m openai
-   ```
-
-2. Resource Cleanup:
-   ```python
-   @pytest.fixture(autouse=True)
-   def cleanup_resources():
-       yield
-       # Cleanup code
-   ```
-
-3. Test Isolation:
-   ```bash
-   # Run tests in random order
-   pytest --random-order
-   ```
-
-### Debug Strategies
-
-1. Verbose Logging:
-   ```bash
-   pytest --log-cli-level=DEBUG -vv
-   ```
-
-2. Test Selection:
-   ```bash
-   pytest -vv -k "test_name" --pdb
-   ```
-
-3. Coverage Analysis:
-   ```bash
-   pytest --cov=pyvisionai --cov-report=html
-   ```

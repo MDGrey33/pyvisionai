@@ -26,8 +26,9 @@ Each extractor supports two methods:
 
 ### Image Description
 
-Two Vision LLM options are available:
+Three Vision LLM options are available:
 - OpenAI's GPT-4 Vision (cloud-based, recommended)
+- Anthropic's Claude Vision (cloud-based, high quality)
 - Llama Vision model (local, via Ollama)
 
 ## API Reference
@@ -50,8 +51,8 @@ def create_extractor(
     Args:
         file_type: Type of file to process ("pdf", "docx", "pptx", "html")
         extractor_type: Extraction method ("page_as_image" or "text_and_images")
-        model: Vision model to use ("gpt4" or "llama")
-        api_key: OpenAI API key (required for GPT-4 Vision)
+        model: Vision model to use ("gpt4", "claude", or "llama")
+        api_key: API key (required for GPT-4 Vision and Claude)
         prompt: Custom prompt for image description
 
     Returns:
@@ -88,7 +89,7 @@ class BaseExtractor:
 ### Image Description Functions
 
 ```python
-from pyvisionai import describe_image_openai, describe_image_ollama
+from pyvisionai import describe_image_openai, describe_image_ollama, describe_image_claude
 
 def describe_image_openai(
     image_path: str,
@@ -113,6 +114,28 @@ def describe_image_openai(
     Raises:
         FileNotFoundError: If image file doesn't exist
         APIError: If API call fails
+    """
+
+def describe_image_claude(
+    image_path: str,
+    api_key: Optional[str] = None,
+    prompt: Optional[str] = None
+) -> str:
+    """
+    Describe an image using Anthropic's Claude Vision model.
+
+    Args:
+        image_path: Path to the image file
+        api_key: Anthropic API key
+        prompt: Custom prompt for image description
+
+    Returns:
+        str: Description of the image
+
+    Raises:
+        FileNotFoundError: If image file doesn't exist
+        ConnectionError: If API connection fails
+        ValueError: If configuration is invalid
     """
 
 def describe_image_ollama(
@@ -148,8 +171,8 @@ from pyvisionai import create_extractor
 extractor = create_extractor("pdf")
 output_path = extractor.extract("document.pdf", "output/")
 
-# Extract from DOCX using text_and_images method
-extractor = create_extractor("docx", extractor_type="text_and_images")
+# Extract from DOCX using Claude Vision
+extractor = create_extractor("docx", model="claude")
 output_path = extractor.extract("document.docx", "output/")
 
 # Extract from HTML using local Llama model
@@ -160,13 +183,19 @@ output_path = extractor.extract("page.html", "output/")
 ### Custom Image Description
 
 ```python
-from pyvisionai import describe_image_openai
+from pyvisionai import describe_image_openai, describe_image_claude
 
-# Describe image with custom prompt
+# Describe image with GPT-4 Vision
 description = describe_image_openai(
     "image.jpg",
     prompt="List all the objects visible in this image",
     max_tokens=500
+)
+
+# Describe image with Claude Vision
+description = describe_image_claude(
+    "image.jpg",
+    prompt="List all the objects visible in this image"
 )
 
 # Use local Llama model
@@ -180,11 +209,23 @@ description = describe_image_ollama(
 ## Error Handling
 
 ```python
-from pyvisionai import create_extractor
+from pyvisionai import create_extractor, describe_image_claude
 from pyvisionai.exceptions import ExtractionError
 
 try:
-    extractor = create_extractor("pdf")
+    # Using Claude Vision
+    description = describe_image_claude("image.jpg")
+except FileNotFoundError:
+    print("Input file not found")
+except ConnectionError as e:
+    print(f"API connection failed: {e}")
+except ValueError as e:
+    print(f"Invalid configuration: {e}")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+
+try:
+    extractor = create_extractor("pdf", model="claude")
     output = extractor.extract("document.pdf", "output/")
 except FileNotFoundError:
     print("Input file not found")
@@ -199,6 +240,7 @@ except Exception as e:
 ### Environment Variables
 
 - `OPENAI_API_KEY`: Your OpenAI API key (required for GPT-4 Vision)
+- `ANTHROPIC_API_KEY`: Your Anthropic API key (required for Claude Vision)
 - `OLLAMA_HOST`: Ollama server host (default: "http://localhost:11434")
 
 ### Default Settings

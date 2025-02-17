@@ -10,7 +10,37 @@ Thank you for your interest in contributing to PyVisionAI! This document provide
    cd pyvisionai
    ```
 
-2. **Set up Python environment**
+2. **Set up environment variables and services**
+   ```bash
+   # For GPT-4 Vision development
+   export OPENAI_API_KEY='your-openai-key'
+
+   # For Claude Vision development
+   export ANTHROPIC_API_KEY='your-anthropic-key'
+
+   # For local Llama development
+   export OLLAMA_HOST='http://localhost:11434'  # Optional, this is the default
+
+   # Install and start Ollama (macOS)
+   brew install ollama
+   ollama serve &  # Run in background
+
+   # Or install Ollama (Linux)
+   curl -fsSL https://ollama.com/install.sh | sh
+   ollama serve &  # Run in background
+
+   # Pull required model for development
+   ollama pull llama3.2-vision
+
+   # Verify Ollama setup
+   ollama list  # Should show llama3.2-vision
+   curl http://localhost:11434/api/tags  # Should return JSON response
+   ```
+
+   Note: For Windows development, download Ollama from https://ollama.com/download/windows
+   and run it as a service.
+
+3. **Set up Python environment**
    ```bash
    # Create virtual environment
    python -m venv venv
@@ -23,7 +53,7 @@ Thank you for your interest in contributing to PyVisionAI! This document provide
    pip install -r requirements-dev.txt
    ```
 
-3. **Install system dependencies**
+4. **Install system dependencies**
    ```bash
    # macOS
    brew install --cask libreoffice
@@ -36,7 +66,7 @@ Thank you for your interest in contributing to PyVisionAI! This document provide
    # Install LibreOffice and Poppler manually
    ```
 
-4. **Install development tools**
+5. **Install development tools**
    ```bash
    # Install pre-commit hooks
    pre-commit install
@@ -73,17 +103,30 @@ We use several tools to maintain code quality:
 
 ## Testing
 
-1. **Running tests**
+1. **Environment Setup**
+   ```bash
+   # Required for full test coverage
+   export OPENAI_API_KEY='your-openai-key'
+   export ANTHROPIC_API_KEY='your-anthropic-key'
+   ```
+
+2. **Running Tests**
    ```bash
    # Run all tests
-   poetry run pytest
+   pytest
 
-   # Run with coverage
-   poetry run pytest --cov=pyvisionai
+   # Run specific test categories
+   pytest tests/test_extractors/  # Test extractors
+   pytest tests/test_describers/  # Test vision models
+   pytest tests/test_cli.py       # Test CLI interface
 
-   # Run specific test file
-   poetry run pytest tests/test_specific.py
+   # Run tests for specific models
+   pytest -k "test_gpt4"         # Test GPT-4 Vision
+   pytest -k "test_claude"       # Test Claude Vision
+   pytest -k "test_llama"        # Test Llama Vision
    ```
+
+   Note: Tests requiring API keys will be skipped if the corresponding environment variable is not set.
 
 2. **Writing tests**
    - Place tests in the `tests/` directory
@@ -192,3 +235,53 @@ When adding new features or making changes:
 ## Code of Conduct
 
 Please note that PyVisionAI has a [Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
+
+## Development Guidelines
+
+### Vision Model Integration
+
+When implementing or modifying vision model support:
+
+1. **Model Interface**
+   - Implement the `BaseVisionModel` interface
+   - Handle API key validation and configuration
+   - Implement proper retry logic for API calls
+   - Follow the established error handling patterns
+
+2. **Testing**
+   - Add comprehensive unit tests
+   - Include API error simulation tests
+   - Add integration tests with real API calls
+   - Ensure tests can run without API keys (using skip markers)
+
+3. **Documentation**
+   - Update API documentation
+   - Add usage examples
+   - Document environment variables
+   - Update CLI help messages
+
+4. **Error Handling**
+   - Use appropriate exception classes
+   - Add descriptive error messages
+   - Implement proper retry logic
+   - Handle rate limits gracefully
+
+### Model-Specific Guidelines
+
+1. **GPT-4 Vision**
+   - Follow OpenAI's best practices
+   - Handle token limits appropriately
+   - Implement proper error handling for API responses
+   - Use appropriate model versions
+
+2. **Claude Vision**
+   - Follow Anthropic's guidelines
+   - Handle API rate limits
+   - Implement proper retry logic
+   - Use appropriate model versions
+
+3. **Llama Vision**
+   - Handle local model availability
+   - Implement proper error handling
+   - Support custom model configurations
+   - Handle resource constraints
