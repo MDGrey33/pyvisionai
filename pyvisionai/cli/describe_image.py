@@ -5,6 +5,7 @@ import os
 from typing import Optional
 
 from pyvisionai.describers import (
+    describe_image_claude,
     describe_image_ollama,
     describe_image_openai,
 )
@@ -24,8 +25,8 @@ def describe_image_cli(
 
     Args:
         image_path: Path to the image file
-        model: Model to use (llama, gpt3, or gpt4)
-        api_key: OpenAI API key (required for gpt3/gpt4)
+        model: Model to use (llama, gpt3, gpt4, or claude)
+        api_key: API key (required for gpt3/gpt4/claude)
         verbose: Whether to print verbose output
         prompt: Custom prompt for image description (optional)
 
@@ -35,6 +36,7 @@ def describe_image_cli(
     Note:
         - llama: Uses Ollama's llama3.2-vision model (local)
         - gpt3/gpt4: Uses OpenAI's gpt-4o-mini model (cloud)
+        - claude: Uses Anthropic's Claude 3 Opus model (cloud)
     """
     try:
         # Validate image path
@@ -43,10 +45,6 @@ def describe_image_cli(
                 f"Image file not found: {image_path}"
             )
 
-        # Set OpenAI API key if provided
-        if api_key:
-            os.environ["OPENAI_API_KEY"] = api_key
-
         # Get description based on model
         if model == "llama":
             description = describe_image_ollama(
@@ -54,8 +52,20 @@ def describe_image_cli(
                 prompt=prompt,
             )
         elif model in ["gpt3", "gpt4"]:
+            # Set OpenAI API key if provided
+            if api_key:
+                os.environ["OPENAI_API_KEY"] = api_key
             # Both GPT-3 and GPT-4 use cases use the same vision model
             description = describe_image_openai(
+                image_path,
+                api_key=api_key,
+                prompt=prompt,
+            )
+        elif model == "claude":
+            # Set Anthropic API key if provided
+            if api_key:
+                os.environ["ANTHROPIC_API_KEY"] = api_key
+            description = describe_image_claude(
                 image_path,
                 api_key=api_key,
                 prompt=prompt,
@@ -85,14 +95,14 @@ def main():
     parser.add_argument(
         "-u",
         "--use-case",
-        choices=["llama", "gpt3", "gpt4"],
+        choices=["llama", "gpt3", "gpt4", "claude"],
         default=DEFAULT_IMAGE_MODEL,
         help="Model to use for description",
     )
     parser.add_argument(
         "-k",
         "--api-key",
-        help="OpenAI API key (required for GPT models)",
+        help="API key (required for GPT and Claude models)",
     )
     parser.add_argument(
         "-v",

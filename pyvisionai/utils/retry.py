@@ -58,9 +58,13 @@ def is_retryable_http_error(e: Exception) -> bool:
     Returns:
         bool: True if the error should trigger a retry
     """
+    # Handle Anthropic errors
+    if e.__class__.__name__ == "APIError":
+        error_msg = str(e).lower()
+        return "rate limit" in error_msg or "server error" in error_msg
+
     # Handle OpenAI errors
     if e.__class__.__name__ == "OpenAIError":
-        # Retry on rate limits and server errors
         error_msg = str(e).lower()
         return "rate limit" in error_msg or "server error" in error_msg
 
@@ -79,6 +83,16 @@ def is_retryable_http_error(e: Exception) -> bool:
             ),
         )
     return False
+
+
+def convert_error(e: Exception) -> Exception:
+    """Convert API errors to appropriate retry errors."""
+    error_msg = str(e).lower()
+    if "rate limit" in error_msg:
+        return ConnectionError("Rate limit exceeded")
+    elif "server error" in error_msg:
+        return ConnectionError("Internal server error")
+    return e
 
 
 class RetryManager:
@@ -136,14 +150,10 @@ class RetryManager:
                 return operation()
             except Exception as e:
                 # Convert HTTP errors to retryable errors
-                if is_retryable_http_error(e):
-                    if isinstance(e, requests.exceptions.HTTPError):
-                        if e.response.status_code == 429:
-                            error = RateLimitError(str(e))
-                        else:
-                            error = TemporaryError(str(e))
-                    else:
-                        error = ConnectionError(str(e))
+                if isinstance(e, requests.exceptions.ConnectionError):
+                    error = ConnectionError(str(e))
+                elif is_retryable_http_error(e):
+                    error = convert_error(e)
                 elif not isinstance(e, RetryableError):
                     raise
                 else:
@@ -157,7 +167,9 @@ class RetryManager:
                         f"Retrying in {delay:.1f}s"
                     )
                     time.sleep(delay)
+                continue
 
+        # Re-raise the last error
         raise last_error
 
     def _calculate_delay(self, attempt: int) -> float:

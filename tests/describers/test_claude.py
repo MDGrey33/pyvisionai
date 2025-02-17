@@ -1,25 +1,23 @@
 """Unit tests for Claude Vision model."""
 
 import logging
+import os
 from unittest.mock import MagicMock, patch
 
 import pytest
-from anthropic import APIError
+from anthropic import APIError, AuthenticationError
 
 from pyvisionai.describers.claude import ClaudeVisionModel
 from pyvisionai.utils.retry import ConnectionError
 
 logger = logging.getLogger(__name__)
 
-pytestmark = pytest.mark.skip(
-    reason="Claude Vision model not implemented yet"
-)
-
 
 @pytest.fixture
 def claude_model():
     """Create a ClaudeVisionModel instance."""
-    return ClaudeVisionModel(api_key="test_key")
+    api_key = os.getenv("ANTHROPIC_API_KEY", "test_key")
+    return ClaudeVisionModel(api_key=api_key)
 
 
 @pytest.fixture
@@ -27,7 +25,9 @@ def mock_anthropic_setup():
     """Set up common Anthropic mocking."""
     with (
         patch("builtins.open", create=True) as mock_open,
-        patch("anthropic.Anthropic") as mock_anthropic_class,
+        patch(
+            "pyvisionai.describers.claude.Anthropic"
+        ) as mock_anthropic_class,
     ):
         # Mock file reading
         mock_file = MagicMock()
@@ -47,12 +47,28 @@ def mock_anthropic_setup():
         }
 
 
+def create_api_error(message: str) -> APIError:
+    """Create a mock Anthropic APIError."""
+    mock_response = MagicMock()
+    mock_response.status_code = (
+        429 if "rate limit" in message.lower() else 500
+    )
+    mock_response.text = message
+    return APIError(
+        message=message,
+        request=MagicMock(),
+        body={"error": {"message": message}},
+    )
+
+
 class TestClaudeVisionModel:
     """Test suite for Claude Vision model."""
 
     def test_init(self, claude_model):
         """Test model initialization."""
-        assert claude_model.api_key == "test_key"
+        assert claude_model.api_key == os.getenv(
+            "ANTHROPIC_API_KEY", "test_key"
+        )
         assert claude_model.prompt is None
 
     def test_validate_config_with_key(self, claude_model):
@@ -79,8 +95,8 @@ class TestClaudeVisionModel:
 
         # Mock rate limit twice, then success
         mock_messages.create.side_effect = [
-            APIError("Rate limit exceeded"),
-            APIError("Rate limit exceeded"),
+            create_api_error("Rate limit exceeded"),
+            create_api_error("Rate limit exceeded"),
             mock_response,
         ]
 
@@ -100,8 +116,8 @@ class TestClaudeVisionModel:
 
         # Mock server error twice, then success
         mock_messages.create.side_effect = [
-            APIError("Internal server error"),
-            APIError("Internal server error"),
+            create_api_error("Internal server error"),
+            create_api_error("Internal server error"),
             mock_response,
         ]
 
@@ -116,7 +132,7 @@ class TestClaudeVisionModel:
         mock_messages = mock_anthropic_setup["mock_messages"]
 
         # Mock consistent failure
-        mock_messages.create.side_effect = APIError(
+        mock_messages.create.side_effect = create_api_error(
             "Rate limit exceeded"
         )
 
@@ -145,9 +161,14 @@ class TestClaudeVisionModel:
             claude_model.describe_image(test_image_path)
 
     @pytest.mark.integration
-    def test_real_api_call(self, claude_model, test_image_path):
+    def test_real_api_call(self, test_image_path):
         """Test actual API integration."""
-        description = claude_model.describe_image(test_image_path)
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        if not api_key:
+            pytest.skip("Skipping test - No Anthropic API key provided")
+
+        model = ClaudeVisionModel(api_key=api_key)
+        description = model.describe_image(test_image_path)
         assert len(description) > 100, "Description seems too short"
         assert any(
             term in description.lower() for term in ["forest", "tree"]

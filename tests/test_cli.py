@@ -1,6 +1,7 @@
 """CLI tests for image description functionality."""
 
 import logging
+import os
 import subprocess
 from typing import Tuple
 
@@ -15,10 +16,7 @@ test_models = [
     pytest.param(
         "claude",
         id="claude",
-        marks=[
-            pytest.mark.claude,
-            pytest.mark.skip(reason="Claude not implemented yet"),
-        ],
+        marks=pytest.mark.claude,
     ),
 ]
 
@@ -45,9 +43,22 @@ error_cases = [
 class TestDescribeImageCLI:
     """Test suite for describe-image CLI."""
 
+    def get_api_key(self, model: str) -> str:
+        """Get API key for the specified model."""
+        if model == "gpt4":
+            return os.getenv("OPENAI_API_KEY", "")
+        elif model == "claude":
+            return os.getenv("ANTHROPIC_API_KEY", "")
+        return ""
+
     @pytest.mark.parametrize("model", test_models)
     def test_model_specific(self, model: str, test_image_path: str):
         """Test CLI with different models."""
+        # Skip if required API key is missing
+        api_key = self.get_api_key(model)
+        if model in ["gpt4", "claude"] and not api_key:
+            pytest.skip(f"Skipping {model} test - No API key provided")
+
         cmd = [
             "describe-image",
             "-i",
@@ -56,6 +67,9 @@ class TestDescribeImageCLI:
             model,
             "-v",
         ]
+        if api_key:
+            cmd.extend(["-k", api_key])
+
         result = subprocess.run(cmd, capture_output=True, text=True)
         assert (
             result.returncode == 0
@@ -80,11 +94,18 @@ class TestDescribeImageCLI:
         self, prompt: str, model: str, test_image_path: str
     ):
         """Test CLI with different prompts and models."""
+        # Skip if required API key is missing
+        api_key = self.get_api_key(model)
+        if model in ["gpt4", "claude"] and not api_key:
+            pytest.skip(f"Skipping {model} test - No API key provided")
+
         cmd = ["describe-image", "-i", test_image_path, "-v"]
         if model:
             cmd.extend(["-u", model])
         if prompt:
             cmd.extend(["-p", prompt])
+        if api_key:
+            cmd.extend(["-k", api_key])
 
         result = subprocess.run(cmd, capture_output=True, text=True)
         assert (
@@ -148,6 +169,11 @@ class TestDescribeImageCLI:
     @pytest.mark.parametrize("model", test_models)
     def test_verbose_output(self, model: str, test_image_path: str):
         """Test verbose output for different models."""
+        # Skip if required API key is missing
+        api_key = self.get_api_key(model)
+        if model in ["gpt4", "claude"] and not api_key:
+            pytest.skip(f"Skipping {model} test - No API key provided")
+
         # Test with verbose flag
         cmd_verbose = [
             "describe-image",
@@ -157,6 +183,9 @@ class TestDescribeImageCLI:
             model,
             "-v",
         ]
+        if api_key:
+            cmd_verbose.extend(["-k", api_key])
+
         result_verbose = subprocess.run(
             cmd_verbose, capture_output=True, text=True
         )
@@ -169,6 +198,9 @@ class TestDescribeImageCLI:
             "-u",
             model,
         ]
+        if api_key:
+            cmd_normal.extend(["-k", api_key])
+
         result_normal = subprocess.run(
             cmd_normal, capture_output=True, text=True
         )

@@ -68,6 +68,12 @@ class LlamaVisionModel(VisionModel):
         try:
             # Execute with retry
             return self.retry_manager.execute(_make_request)
+        except requests.exceptions.ConnectionError as e:
+            error_msg = str(e)
+            logger.error(
+                f"Error describing image with Ollama: {error_msg}"
+            )
+            raise ConnectionError(error_msg)
         except Exception as e:
             logger.error(
                 f"Error describing image with Ollama: {str(e)}"

@@ -275,7 +275,6 @@ def test_custom_prompt_lib_gpt4(setup_test_env):
     ), "Default prompt should describe the scene"
 
 
-@pytest.mark.skip(reason="Claude Vision model not implemented yet")
 @pytest.mark.claude
 def test_image_description_lib_claude(setup_test_env):
     """Test image description using Claude through library API."""
@@ -287,11 +286,13 @@ def test_image_description_lib_claude(setup_test_env):
         logger.info("Skipping Claude test - No API key provided")
         pytest.skip("Skipping Claude test - No API key provided")
 
-    with pytest.raises(NotImplementedError):
-        describe_image_claude(image_path)
+    description = describe_image_claude(image_path, api_key=api_key)
+    assert len(description) > 100, "Description seems too short"
+    assert any(
+        term in description.lower() for term in ["forest", "tree"]
+    ), "Expected forest scene description not found"
 
 
-@pytest.mark.skip(reason="Claude Vision model not implemented yet")
 @pytest.mark.claude
 def test_image_description_cli_claude(setup_test_env):
     """Test image description using Claude through CLI."""
@@ -322,13 +323,15 @@ def test_image_description_cli_claude(setup_test_env):
         logger.error(f"CLI error output: {result.stderr}")
     logger.debug(f"CLI output: {result.stdout}")
 
-    # Verify output indicates Claude is not implemented
     assert (
-        "invalid choice: 'claude'" in result.stderr
-    ), "Expected Claude to be unavailable"
+        result.returncode == 0
+    ), f"CLI command failed with: {result.stderr}"
+    assert len(result.stdout) > 100, "Description seems too short"
+    assert any(
+        term in result.stdout.lower() for term in ["forest", "tree"]
+    ), "Expected forest scene description not found"
 
 
-@pytest.mark.skip(reason="Claude Vision model not implemented yet")
 @pytest.mark.claude
 def test_custom_prompt_lib_claude(setup_test_env):
     """Test custom prompt handling through library API with Claude."""
@@ -343,9 +346,12 @@ def test_custom_prompt_lib_claude(setup_test_env):
         )
         pytest.skip("Skipping Claude test - No API key provided")
 
-    with pytest.raises(NotImplementedError):
-        describe_image_claude(
-            image_path,
-            prompt=custom_prompt,
-            api_key=api_key,
-        )
+    description = describe_image_claude(
+        image_path,
+        prompt=custom_prompt,
+        api_key=api_key,
+    )
+    assert any(
+        term in description.lower()
+        for term in ["color", "green", "brown"]
+    ), "Custom prompt was not reflected in output"
