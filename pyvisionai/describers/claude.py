@@ -2,10 +2,10 @@
 
 from typing import Optional
 
-from pyvisionai.describers.base import BaseVisionModel
+from pyvisionai.describers.base import VisionModel
 
 
-class ClaudeVisionModel(BaseVisionModel):
+class ClaudeVisionModel(VisionModel):
     """Claude Vision model for image description.
 
     This is a placeholder class that will be implemented in the future.
@@ -17,9 +17,7 @@ class ClaudeVisionModel(BaseVisionModel):
         Args:
             api_key: Anthropic API key (optional)
         """
-        super().__init__()
-        self.api_key = api_key
-        self.prompt = None
+        super().__init__(api_key=api_key)
 
     def _validate_config(self) -> None:
         """Validate the model configuration."""
