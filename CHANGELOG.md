@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Claude Vision Integration
 - Added `ClaudeVisionModel` class for Anthropic's Claude Vision API integration
 - Implemented robust retry logic and error handling for Claude API calls
+  - Added handling for rate limits and server errors
+  - Added specific handling for API overload conditions (Error 529)
+  - Implemented exponential backoff for retries
 - Added support for custom prompts with Claude Vision
 - Added `describe_image_claude` function to main API
 

@@ -125,6 +125,27 @@ class TestClaudeVisionModel:
         assert result == "Success response"
         assert mock_messages.create.call_count == 3
 
+    def test_retry_overloaded(
+        self, claude_model, mock_anthropic_setup, test_image_path
+    ):
+        """Test retry on overloaded errors."""
+        mock_messages = mock_anthropic_setup["mock_messages"]
+
+        # Create mock response
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text="Success response")]
+
+        # Mock overloaded error twice, then success
+        mock_messages.create.side_effect = [
+            create_api_error("Error code: 529 - Overloaded"),
+            create_api_error("Error code: 529 - Overloaded"),
+            mock_response,
+        ]
+
+        result = claude_model.describe_image(test_image_path)
+        assert result == "Success response"
+        assert mock_messages.create.call_count == 3
+
     def test_max_retries_exceeded(
         self, claude_model, mock_anthropic_setup, test_image_path
     ):

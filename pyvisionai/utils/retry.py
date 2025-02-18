@@ -61,7 +61,12 @@ def is_retryable_http_error(e: Exception) -> bool:
     # Handle Anthropic errors
     if e.__class__.__name__ == "APIError":
         error_msg = str(e).lower()
-        return "rate limit" in error_msg or "server error" in error_msg
+        return (
+            "rate limit" in error_msg
+            or "server error" in error_msg
+            or "overloaded" in error_msg
+            or "529" in error_msg
+        )
 
     # Handle OpenAI errors
     if e.__class__.__name__ == "OpenAIError":
@@ -70,8 +75,8 @@ def is_retryable_http_error(e: Exception) -> bool:
 
     if isinstance(e, requests.exceptions.RequestException):
         if isinstance(e, requests.exceptions.HTTPError):
-            # Retry on rate limits (429) and server errors (5xx)
-            return e.response.status_code in [429] + list(
+            # Retry on rate limits (429), server errors (5xx), and overloaded (529)
+            return e.response.status_code in [429, 529] + list(
                 range(500, 600)
             )
         # Retry on connection errors, timeouts etc.
@@ -92,6 +97,8 @@ def convert_error(e: Exception) -> Exception:
         return ConnectionError("Rate limit exceeded")
     elif "server error" in error_msg:
         return ConnectionError("Internal server error")
+    elif "overloaded" in error_msg or "529" in error_msg:
+        return ConnectionError("Service overloaded")
     return e
 
 
