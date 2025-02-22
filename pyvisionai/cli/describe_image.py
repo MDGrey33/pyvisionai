@@ -89,9 +89,20 @@ def main():
     parser = argparse.ArgumentParser(
         description="Describe an image using various models."
     )
-    parser.add_argument(
-        "-i", "--image", required=True, help="Path to the image file"
+
+    # Source parameter group
+    source_group = parser.add_mutually_exclusive_group(required=True)
+    source_group.add_argument(
+        "-s",
+        "--source",
+        help="Path to the image file to describe",
     )
+    source_group.add_argument(
+        "-i",
+        "--image",
+        help="[Legacy] Path to the image file. For consistency with other commands, we recommend using -s/--source instead.",
+    )
+
     parser.add_argument(
         "-u",
         "--use-case",
@@ -125,7 +136,17 @@ def main():
     args = parser.parse_args()
 
     try:
-        # Use --use-case if provided (for backward compatibility), otherwise use --model
+        # Determine which parameter was used and set image_path
+        if args.image:
+            image_path = args.image
+            logger.warning(
+                "For better consistency across commands, we recommend using -s/--source instead of -i/--image. "
+                "Both parameters remain fully supported for backward compatibility."
+            )
+        else:
+            image_path = args.source
+
+        # Handle model parameter precedence
         model = (
             args.use_case if args.use_case is not None else args.model
         )
@@ -136,7 +157,7 @@ def main():
             )
 
         description = describe_image_cli(
-            args.image,
+            image_path,
             model,
             args.api_key,
             args.verbose,

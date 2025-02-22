@@ -9,24 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added new `-m/--model` parameter to `describe-image` command for model selection
+- Added new `-s/--source` parameter to `describe-image` command for specifying image path
 - Added comprehensive test coverage for CLI parameters:
   - Tests for both `-m/--model` and `-u/--use-case` parameters
+  - Tests for both `-s/--source` and `-i/--image` parameters
   - Tests for parameter precedence
   - Tests for default model behavior
   - Tests for deprecation warnings
 
 ### Changed
 - Updated CLI parameter handling to support both new and legacy model selection
+- Updated CLI parameter handling to support both new and legacy image path specification
 - Enhanced help messages with clearer model descriptions
 - Improved error messages and help text for CLI commands
 - Updated documentation to reflect new CLI parameters
 - Added friendly guidance message for `-u/--use-case` users to consider using `-m/--model`
+- Added friendly guidance message for `-i/--image` users to consider using `-s/--source`
 - Enhanced parameter handling with proper precedence rules
 
 ### Note
 - The `-u/--use-case` parameter continues to be fully supported for backward compatibility
-- We recommend using `-m/--model` for better consistency across commands
-- Both parameters will be maintained to ensure a stable user experience
+- The `-i/--image` parameter continues to be fully supported for backward compatibility
+- We recommend using `-m/--model` and `-s/--source` for better consistency across commands
+- Both parameter pairs will be maintained to ensure a stable user experience
 - Users can choose either option based on their preference and existing scripts
 
 ## [0.3.0] - 2024-03-25

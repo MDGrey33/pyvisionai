@@ -325,28 +325,24 @@ Optional Arguments:
 
 ### `describe-image` Command
 ```bash
-describe-image [-h] -i IMAGE [-m MODEL] [-u MODEL] [-k API_KEY] [-v] [-p PROMPT]
+describe-image [-h] -s SOURCE [-m MODEL] [-k API_KEY] [-v] [-p PROMPT]
 
 Required Arguments:
-  -i, --image IMAGE      Path to the image file
+  -s, --source SOURCE   Path to the image file to describe
 
 Optional Arguments:
   -h, --help            Show help message and exit
-  -m, --model MODEL     Model to use:
+  -m, --model MODEL     Model to use for description:
                         - gpt4: GPT-4 Vision (default)
-                        - claude: Claude Vision
-                        - llama: Local Llama model
-  -u, --use-case MODEL  [DEPRECATED] Legacy parameter for model selection
-                        Please use -m/--model instead
-                        - gpt4: GPT-4 Vision
                         - claude: Claude Vision
                         - llama: Local Llama model
   -k, --api-key KEY     API key (required for GPT-4 and Claude)
   -v, --verbose         Enable verbose logging
   -p, --prompt TEXT     Custom prompt for image description
-```
 
-## Examples
+Note: For backward compatibility, you can also use -i/--image instead of -s/--source.
+      The -u/--use-case parameter is deprecated. Please use -m/--model instead.
+```
 
 ### File Extraction Examples
 ```bash
@@ -373,25 +369,28 @@ file-extract -t pdf -s document.pdf -o output_dir -p "Focus on text content and 
 ### Image Description Examples
 ```bash
 # Basic usage with defaults (GPT-4 Vision)
-describe-image -i photo.jpg
+describe-image -s photo.jpg
+describe-image -i photo.jpg  # Legacy parameter, still supported
 
-# Use local Llama model
-describe-image -i photo.jpg -m llama
+# Using specific models
+describe-image -s photo.jpg -m claude -k your-anthropic-key
+describe-image -s photo.jpg -m llama
+describe-image -i photo.jpg -m gpt4  # Legacy parameter style
 
-# Use custom prompt
-describe-image -i photo.jpg -p "List the main colors and their proportions"
+# Using custom prompt
+describe-image -s photo.jpg -p "List the main colors and their proportions"
 
 # Customize token limit
-describe-image -i photo.jpg -t 500
+describe-image -s photo.jpg -t 500
 
 # Enable verbose logging
-describe-image -i photo.jpg -v
+describe-image -s photo.jpg -v
 
 # Use custom OpenAI API key
-describe-image -i photo.jpg -k "your-api-key"
+describe-image -s photo.jpg -k "your-api-key"
 
 # Combine options
-describe-image -i photo.jpg -m llama -p "Describe the lighting and shadows" -v
+describe-image -s photo.jpg -m llama -p "Describe the lighting and shadows" -v
 ```
 
 ## Custom Prompts

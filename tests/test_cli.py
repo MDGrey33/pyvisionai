@@ -343,3 +343,66 @@ class TestDescribeImageCLI:
             term in result.stdout.lower()
             for term in ["scene", "image", "shows"]
         ), "Default model (GPT-4) output should be detailed and descriptive"
+
+    @pytest.mark.parametrize("model", test_models)
+    def test_source_parameter(self, model: str, test_image_path: str):
+        """Test CLI with --source parameter."""
+        # Skip if required API key is missing
+        api_key = self.get_api_key(model)
+        if model in ["gpt4", "claude"] and not api_key:
+            pytest.skip(f"Skipping {model} test - No API key provided")
+
+        cmd = [
+            "describe-image",
+            "-s",  # Using new --source parameter
+            test_image_path,
+            "-m",
+            model,
+            "-v",
+        ]
+        if api_key:
+            cmd.extend(["-k", api_key])
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        assert (
+            result.returncode == 0
+        ), f"CLI command failed with: {result.stderr}"
+        assert len(result.stdout) > 100, "Description seems too short"
+
+    def test_source_image_precedence(self, test_image_path: str):
+        """Test that --image and --source cannot be used together."""
+        cmd = [
+            "describe-image",
+            "-i",
+            test_image_path,  # Using legacy --image parameter
+            "-s",
+            "nonexistent.jpg",  # This should cause an error
+            "-m",
+            "llama",  # Using local model to avoid API key requirement
+            "-v",
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        assert (
+            result.returncode != 0
+        ), "Command should fail with both parameters"
+        assert (
+            "not allowed with argument" in result.stderr.lower()
+        ), "Should show mutually exclusive error"
+
+    def test_no_source_or_image_parameter(self):
+        """Test that error is shown when neither --source nor --image is provided."""
+        cmd = [
+            "describe-image",
+            "-m",
+            "llama",  # Using local model to avoid API key requirement
+            "-v",
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        assert (
+            result.returncode != 0
+        ), "Command should fail without image path"
+        assert (
+            "required" in result.stderr.lower()
+        ), "Error about missing parameter should be shown"
