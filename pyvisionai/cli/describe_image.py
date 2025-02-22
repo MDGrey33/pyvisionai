@@ -96,8 +96,14 @@ def main():
         "-u",
         "--use-case",
         choices=["llama", "gpt3", "gpt4", "claude"],
+        help="Legacy parameter for model selection. We recommend using --model for consistency, though --use-case remains supported for backward compatibility.",
+    )
+    parser.add_argument(
+        "-m",
+        "--model",
+        choices=["llama", "gpt3", "gpt4", "claude"],
         default=DEFAULT_IMAGE_MODEL,
-        help="Model to use for description",
+        help="Model to use for description (gpt4: GPT-4 Vision, claude: Claude Vision, llama: Local Llama)",
     )
     parser.add_argument(
         "-k",
@@ -119,9 +125,19 @@ def main():
     args = parser.parse_args()
 
     try:
+        # Use --use-case if provided (for backward compatibility), otherwise use --model
+        model = (
+            args.use_case if args.use_case is not None else args.model
+        )
+        if args.use_case is not None:
+            logger.warning(
+                "For better consistency across commands, we recommend using -m/--model instead of -u/--use-case. "
+                "Both parameters remain fully supported for backward compatibility."
+            )
+
         description = describe_image_cli(
             args.image,
-            args.use_case,
+            model,
             args.api_key,
             args.verbose,
             args.prompt,

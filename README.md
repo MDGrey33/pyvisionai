@@ -182,18 +182,23 @@ Note: The local Llama model:
    # Using GPT-4 Vision (default)
    describe-image -i path/to/image.jpg
 
-   # Using Claude Vision
-   describe-image -i path/to/image.jpg -u claude -k your-anthropic-key
+   # Using Claude Vision (with --model parameter)
+   describe-image -i path/to/image.jpg -m claude -k your-anthropic-key
 
-   # Using local Llama model
-   describe-image -i path/to/image.jpg -u llama
+   # Using local Llama model (with --model parameter)
+   describe-image -i path/to/image.jpg -m llama
 
    # Using custom prompt
    describe-image -i image.jpg -p "List the main colors in this image"
 
+   # Using legacy --use-case parameter (deprecated, use --model instead)
+   describe-image -i path/to/image.jpg -u claude -k your-anthropic-key
+
    # Additional options
    describe-image -i image.jpg -v  # Verbose output
    ```
+
+   **Note:** The `-u/--use-case` parameter is deprecated but maintained for backward compatibility. Please use `-m/--model` instead.
 
 ### Library Usage
 
@@ -320,19 +325,23 @@ Optional Arguments:
 
 ### `describe-image` Command
 ```bash
-describe-image [-h] -i IMAGE [-u MODEL] [-k API_KEY] [-t MAX_TOKENS] [-v] [-p PROMPT]
+describe-image [-h] -i IMAGE [-m MODEL] [-u MODEL] [-k API_KEY] [-v] [-p PROMPT]
 
 Required Arguments:
   -i, --image IMAGE      Path to the image file
 
 Optional Arguments:
   -h, --help            Show help message and exit
-  -u, --use-case MODEL  Model to use:
+  -m, --model MODEL     Model to use:
                         - gpt4: GPT-4 Vision (default)
                         - claude: Claude Vision
                         - llama: Local Llama model
+  -u, --use-case MODEL  [DEPRECATED] Legacy parameter for model selection
+                        Please use -m/--model instead
+                        - gpt4: GPT-4 Vision
+                        - claude: Claude Vision
+                        - llama: Local Llama model
   -k, --api-key KEY     API key (required for GPT-4 and Claude)
-  -t, --max-tokens N    Maximum tokens in response (GPT-4 only)
   -v, --verbose         Enable verbose logging
   -p, --prompt TEXT     Custom prompt for image description
 ```

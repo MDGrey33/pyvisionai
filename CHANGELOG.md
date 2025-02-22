@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2024-03-25
+
+### Added
+- Added new `-m/--model` parameter to `describe-image` command for model selection
+- Added comprehensive test coverage for CLI parameters:
+  - Tests for both `-m/--model` and `-u/--use-case` parameters
+  - Tests for parameter precedence
+  - Tests for default model behavior
+  - Tests for deprecation warnings
+
+### Changed
+- Updated CLI parameter handling to support both new and legacy model selection
+- Enhanced help messages with clearer model descriptions
+- Improved error messages and help text for CLI commands
+- Updated documentation to reflect new CLI parameters
+- Added friendly guidance message for `-u/--use-case` users to consider using `-m/--model`
+- Enhanced parameter handling with proper precedence rules
+
+### Note
+- The `-u/--use-case` parameter continues to be fully supported for backward compatibility
+- We recommend using `-m/--model` for better consistency across commands
+- Both parameters will be maintained to ensure a stable user experience
+- Users can choose either option based on their preference and existing scripts
+
 ## [0.3.0] - 2024-03-25
 
 ### Added
@@ -37,11 +61,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `ANTHROPIC_API_KEY` environment variable support
 - Added Claude Vision model configuration in factory system
 - Added retry strategy configuration for API calls
-
-#### CLI Updates
-- Added Claude Vision support to `describe-image` CLI command
-- Added `-u claude` option for model selection
-- Added support for custom prompts with Claude Vision
 
 ### Enhanced
 - Improved error handling with specific error types for API issues

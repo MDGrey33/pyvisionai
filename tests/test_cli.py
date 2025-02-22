@@ -221,3 +221,125 @@ class TestDescribeImageCLI:
         assert (
             "Registering model type" in result_verbose.stderr
         ), "Verbose mode should show model registration"
+
+    @pytest.mark.parametrize("model", test_models)
+    def test_model_parameter(self, model: str, test_image_path: str):
+        """Test CLI with --model parameter."""
+        # Skip if required API key is missing
+        api_key = self.get_api_key(model)
+        if model in ["gpt4", "claude"] and not api_key:
+            pytest.skip(f"Skipping {model} test - No API key provided")
+
+        cmd = [
+            "describe-image",
+            "-i",
+            test_image_path,
+            "-m",  # Using new --model parameter
+            model,
+            "-v",
+        ]
+        if api_key:
+            cmd.extend(["-k", api_key])
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        assert (
+            result.returncode == 0
+        ), f"CLI command failed with: {result.stderr}"
+        assert len(result.stdout) > 100, "Description seems too short"
+
+        # Model-specific output validation
+        if model == "gpt4":
+            assert any(
+                term in result.stdout.lower()
+                for term in ["scene", "image", "shows"]
+            ), "GPT-4 output should be detailed and descriptive"
+        elif model == "llama":
+            assert any(
+                term in result.stdout.lower()
+                for term in ["forest", "tree", "nature"]
+            ), "Llama output should identify nature elements"
+
+    @pytest.mark.parametrize("model", test_models)
+    def test_use_case_parameter(self, model: str, test_image_path: str):
+        """Test CLI with legacy --use-case parameter."""
+        # Skip if required API key is missing
+        api_key = self.get_api_key(model)
+        if model in ["gpt4", "claude"] and not api_key:
+            pytest.skip(f"Skipping {model} test - No API key provided")
+
+        cmd = [
+            "describe-image",
+            "-i",
+            test_image_path,
+            "-u",  # Using legacy --use-case parameter
+            model,
+            "-v",
+        ]
+        if api_key:
+            cmd.extend(["-k", api_key])
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        assert (
+            result.returncode == 0
+        ), f"CLI command failed with: {result.stderr}"
+        assert len(result.stdout) > 100, "Description seems too short"
+        # Check for new user-friendly message
+        assert all(
+            term in result.stderr.lower()
+            for term in ["recommend", "consistency"]
+        ), "User-friendly guidance message should be shown"
+
+    def test_parameter_precedence(self, test_image_path: str):
+        """Test that --use-case takes precedence over --model when both are provided."""
+        cmd = [
+            "describe-image",
+            "-i",
+            test_image_path,
+            "-u",
+            "llama",  # Using local model to avoid API key requirement
+            "-m",
+            "gpt4",  # This should be ignored when -u is present
+            "-v",
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        assert (
+            result.returncode == 0
+        ), f"CLI command failed with: {result.stderr}"
+        # Check that llama-specific output is present (indicating -u took precedence)
+        assert any(
+            term in result.stdout.lower()
+            for term in ["forest", "tree", "nature"]
+        ), "Use case parameter should take precedence"
+        # Check for new user-friendly message
+        assert all(
+            term in result.stderr.lower()
+            for term in ["recommend", "consistency"]
+        ), "User-friendly guidance message should be shown"
+
+    def test_default_model(self, test_image_path: str):
+        """Test that default model is used when neither parameter is provided."""
+        # Skip if required API key is missing (assuming default is gpt4)
+        api_key = self.get_api_key("gpt4")
+        if not api_key:
+            pytest.skip("Skipping test - No OpenAI API key provided")
+
+        cmd = [
+            "describe-image",
+            "-i",
+            test_image_path,
+            "-k",
+            api_key,
+            "-v",
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        assert (
+            result.returncode == 0
+        ), f"CLI command failed with: {result.stderr}"
+        assert len(result.stdout) > 100, "Description seems too short"
+        # Verify GPT-4 specific output (as it's the default)
+        assert any(
+            term in result.stdout.lower()
+            for term in ["scene", "image", "shows"]
+        ), "Default model (GPT-4) output should be detailed and descriptive"
