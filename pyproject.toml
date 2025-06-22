@@ -31,6 +31,8 @@ pdfminer-six = "^20231228"
 pypdf = "^4.1.0"
 playwright = "^1.41.0"
 anthropic = "^0.45.2"
+fastapi-mcp = "^0.3.4"
+mcp-proxy = "^0.8.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.4"
@@ -41,6 +43,10 @@ flake8 = "^7.0.0"
 flake8-pyproject = "^1.2.3"
 pytest-cov = "^4.1.0"
 pytest-order = "^1.2.0"
+fastapi = "^0.115.13"
+uvicorn = "^0.34.3"
+python-multipart = "^0.0.20"
+pillow = "^11.2.1"
 
 [tool.poetry.scripts]
 file-extract = "pyvisionai.cli.extract:main"
