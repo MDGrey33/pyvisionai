@@ -23,6 +23,8 @@ def setup_test_logging():
     return logger
 
 
+@pytest.mark.e2e
+@pytest.mark.openai
 def test_image_description_lib_gpt4(setup_test_env):
     """Test image description using GPT-4 through library API."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
@@ -52,6 +54,8 @@ def test_image_description_lib_gpt4(setup_test_env):
     logger.info("GPT-4 library API test completed successfully")
 
 
+@pytest.mark.e2e
+@pytest.mark.openai
 def test_image_description_cli_gpt4(setup_test_env):
     """Test image description using GPT-4 through CLI."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
@@ -95,6 +99,8 @@ def test_image_description_cli_gpt4(setup_test_env):
     logger.info("GPT-4 CLI test completed successfully")
 
 
+@pytest.mark.e2e
+@pytest.mark.ollama
 def test_image_description_lib_llama(setup_test_env):
     """Test image description using Llama through library API."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
@@ -120,6 +126,8 @@ def test_image_description_lib_llama(setup_test_env):
     logger.info("Llama library API test completed successfully")
 
 
+@pytest.mark.e2e
+@pytest.mark.ollama
 def test_image_description_cli_llama(setup_test_env):
     """Test image description using Llama through CLI."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
@@ -146,6 +154,8 @@ def test_image_description_cli_llama(setup_test_env):
     ), "Expected forest scene description not found"
 
 
+@pytest.mark.e2e
+@pytest.mark.openai
 def test_custom_prompt_cli_gpt4(setup_test_env):
     """Test custom prompt handling through CLI with GPT-4."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
@@ -198,6 +208,8 @@ def test_custom_prompt_cli_gpt4(setup_test_env):
     ), "Default prompt output seems too short"
 
 
+@pytest.mark.e2e
+@pytest.mark.ollama
 def test_custom_prompt_cli_llama(setup_test_env):
     """Test custom prompt handling through CLI with Llama."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
@@ -241,6 +253,8 @@ def test_custom_prompt_cli_llama(setup_test_env):
     ), "Default prompt output seems too short"
 
 
+@pytest.mark.e2e
+@pytest.mark.openai
 def test_custom_prompt_lib_gpt4(setup_test_env):
     """Test custom prompt handling through library API with GPT-4."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
@@ -276,6 +290,7 @@ def test_custom_prompt_lib_gpt4(setup_test_env):
 
 
 @pytest.mark.claude
+@pytest.mark.e2e
 def test_image_description_lib_claude(setup_test_env):
     """Test image description using Claude through library API."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
@@ -294,6 +309,7 @@ def test_image_description_lib_claude(setup_test_env):
 
 
 @pytest.mark.claude
+@pytest.mark.e2e
 def test_image_description_cli_claude(setup_test_env):
     """Test image description using Claude through CLI."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")
@@ -333,6 +349,7 @@ def test_image_description_cli_claude(setup_test_env):
 
 
 @pytest.mark.claude
+@pytest.mark.e2e
 def test_custom_prompt_lib_claude(setup_test_env):
     """Test custom prompt handling through library API with Claude."""
     image_path = os.path.join("content", "test", "source", "test.jpeg")

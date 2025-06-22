@@ -84,7 +84,7 @@ class TestClaudeVisionModel:
             model.validate_config()
 
     def test_retry_rate_limit(
-        self, claude_model, mock_anthropic_setup, test_image_path
+        self, claude_model, mock_anthropic_setup, sample_image_path
     ):
         """Test retry on rate limit errors."""
         mock_messages = mock_anthropic_setup["mock_messages"]
@@ -100,12 +100,12 @@ class TestClaudeVisionModel:
             mock_response,
         ]
 
-        result = claude_model.describe_image(test_image_path)
+        result = claude_model.describe_image(sample_image_path)
         assert result == "Success response"
         assert mock_messages.create.call_count == 3
 
     def test_retry_server_error(
-        self, claude_model, mock_anthropic_setup, test_image_path
+        self, claude_model, mock_anthropic_setup, sample_image_path
     ):
         """Test retry on server errors."""
         mock_messages = mock_anthropic_setup["mock_messages"]
@@ -121,12 +121,12 @@ class TestClaudeVisionModel:
             mock_response,
         ]
 
-        result = claude_model.describe_image(test_image_path)
+        result = claude_model.describe_image(sample_image_path)
         assert result == "Success response"
         assert mock_messages.create.call_count == 3
 
     def test_retry_overloaded(
-        self, claude_model, mock_anthropic_setup, test_image_path
+        self, claude_model, mock_anthropic_setup, sample_image_path
     ):
         """Test retry on overloaded errors."""
         mock_messages = mock_anthropic_setup["mock_messages"]
@@ -142,12 +142,12 @@ class TestClaudeVisionModel:
             mock_response,
         ]
 
-        result = claude_model.describe_image(test_image_path)
+        result = claude_model.describe_image(sample_image_path)
         assert result == "Success response"
         assert mock_messages.create.call_count == 3
 
     def test_max_retries_exceeded(
-        self, claude_model, mock_anthropic_setup, test_image_path
+        self, claude_model, mock_anthropic_setup, sample_image_path
     ):
         """Test failure after max retries."""
         mock_messages = mock_anthropic_setup["mock_messages"]
@@ -160,13 +160,13 @@ class TestClaudeVisionModel:
         with pytest.raises(
             ConnectionError, match="Rate limit exceeded"
         ):
-            claude_model.describe_image(test_image_path)
+            claude_model.describe_image(sample_image_path)
         assert (
             mock_messages.create.call_count == 3
         )  # Initial attempt + 2 retries
 
     def test_empty_response(
-        self, claude_model, mock_anthropic_setup, test_image_path
+        self, claude_model, mock_anthropic_setup, sample_image_path
     ):
         """Test handling of empty response."""
         mock_messages = mock_anthropic_setup["mock_messages"]
@@ -179,17 +179,18 @@ class TestClaudeVisionModel:
         with pytest.raises(
             ValueError, match="No description generated"
         ):
-            claude_model.describe_image(test_image_path)
+            claude_model.describe_image(sample_image_path)
 
     @pytest.mark.integration
-    def test_real_api_call(self, test_image_path):
+    @pytest.mark.e2e
+    def test_real_api_call(self, sample_image_path):
         """Test actual API integration."""
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
             pytest.skip("Skipping test - No Anthropic API key provided")
 
         model = ClaudeVisionModel(api_key=api_key)
-        description = model.describe_image(test_image_path)
+        description = model.describe_image(sample_image_path)
         assert len(description) > 100, "Description seems too short"
         assert any(
             term in description.lower() for term in ["forest", "tree"]
