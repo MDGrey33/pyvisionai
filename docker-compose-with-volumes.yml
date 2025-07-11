@@ -1,0 +1,11 @@
+services:
+  pyvisionai:
+    image: pyvisionai-app
+    container_name: pyvisionai-container
+    ports:
+      - "8001:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./content:/app/content  # Mount local content directory into container
+    restart: unless-stopped

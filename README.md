@@ -479,3 +479,81 @@ Please read our [Contributing Guidelines](CONTRIBUTING.md) for detailed informat
 6. Submit a pull request
 
 For more detailed instructions, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Docker Support
+
+PyVisionAI includes Docker support for easy deployment of the FastAPI server.
+
+### Building the Docker Image
+
+```bash
+# Build the Docker image
+docker build -t pyvisionai-app .
+```
+
+### Running with Docker Compose (Recommended)
+
+The easiest way to run PyVisionAI in Docker is using Docker Compose:
+
+```bash
+# Start the container
+docker compose up -d
+
+# The API will be available at http://localhost:8001
+# (mapped from container port 8000 to host port 8001)
+
+# Stop the container
+docker compose down
+```
+
+The `docker-compose.yml` file automatically:
+- Maps port 8001 on your host to port 8000 in the container
+- Passes your `OPENAI_API_KEY` environment variable to the container
+- Names the container `pyvisionai-container`
+- Configures automatic restart unless stopped
+
+### Running with Docker (Manual)
+
+If you prefer to use Docker directly:
+
+```bash
+# Run the container
+docker run -d \
+  -p 8001:8000 \
+  -e OPENAI_API_KEY="${OPENAI_API_KEY}" \
+  --name pyvisionai-container \
+  pyvisionai-app
+
+# Stop and remove the container
+docker stop pyvisionai-container
+docker rm pyvisionai-container
+```
+
+### Testing the Docker Container
+
+Once running, test the API with:
+
+```bash
+# Test image description endpoint
+curl -X POST "http://127.0.0.1:8001/api/v1/describe/openai" \
+  -F "file=@content/test/source/test.jpeg" \
+  -F "model=gpt-4o" \
+  -F "prompt=Describe this image in detail"
+
+# View API documentation
+open http://localhost:8001/docs
+```
+
+### Environment Variables
+
+The Docker container supports the following environment variables:
+- `OPENAI_API_KEY`: Required for OpenAI GPT-4 Vision
+- `ANTHROPIC_API_KEY`: Required for Claude Vision
+- `OLLAMA_HOST`: Optional, for connecting to Ollama server
+
+### Notes
+
+- The container runs on port 8000 internally, mapped to 8001 on your host
+- Ensure your API keys are set in your environment before running
+- The image includes all necessary dependencies for processing PDFs, DOCX, PPTX, and HTML files
+- For production use, consider adding health checks and resource limits
