@@ -1,0 +1,12 @@
+services:
+  pyvisionai-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: pyvisionai-mcp-server
+    ports:
+      - "8002:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    restart: unless-stopped

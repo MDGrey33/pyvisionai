@@ -557,3 +557,111 @@ The Docker container supports the following environment variables:
 - Ensure your API keys are set in your environment before running
 - The image includes all necessary dependencies for processing PDFs, DOCX, PPTX, and HTML files
 - For production use, consider adding health checks and resource limits
+
+## MCP (Model Context Protocol) Support
+
+PyVisionAI can also run as an MCP server, exposing its image description capabilities as tools for AI assistants like Cursor.
+
+### What is MCP?
+
+MCP (Model Context Protocol) is a standard for exposing tools and resources to AI assistants. When running PyVisionAI as an MCP server, AI assistants can directly use the image description capabilities.
+
+### Running as MCP Server
+
+#### Quick Start with Docker
+
+```bash
+# Build and start the MCP server
+docker compose -f docker-compose.mcp.yml up -d
+
+# The MCP server will be available at http://localhost:8002/sse
+```
+
+#### Configuring in Cursor
+
+Add this to your `~/.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "pyvisionai": {
+      "url": "http://localhost:8002/sse"
+    }
+  }
+}
+```
+
+Then restart Cursor to load the new MCP server.
+
+### Available MCP Tools
+
+The MCP server exposes three tools:
+
+1. **describe_image_with_openai**
+   - Uses OpenAI GPT-4 Vision models
+   - Requires `OPENAI_API_KEY` environment variable
+   - Supports custom prompts and model selection
+
+2. **describe_image_with_ollama**
+   - Uses local Ollama vision models
+   - Requires Ollama running locally
+   - Good for privacy-sensitive applications
+
+3. **describe_image_with_claude**
+   - Uses Anthropic's Claude Vision
+   - Requires `ANTHROPIC_API_KEY` environment variable
+   - Excellent for detailed analysis
+
+### MCP Server Management
+
+```bash
+# View logs
+docker compose -f docker-compose.mcp.yml logs
+
+# Stop the server
+docker compose -f docker-compose.mcp.yml down
+
+# Restart the server
+docker compose -f docker-compose.mcp.yml restart
+```
+
+### Using MCP Tools
+
+Once configured, you can ask your AI assistant to describe images:
+- "Use PyVisionAI to describe the image at /path/to/image.jpg"
+- "Analyze this screenshot using OpenAI vision"
+- "Describe this image using the local Ollama model"
+
+The tools accept both file paths and base64-encoded images.
+
+## Contributing
+
+We welcome contributions to PyVisionAI! Whether you're fixing bugs, improving documentation, or proposing new features, your help is appreciated.
+
+Please read our [Contributing Guidelines](CONTRIBUTING.md) for detailed information on:
+- Setting up your development environment
+- Code style and standards
+- Testing requirements
+- Pull request process
+- Documentation guidelines
+
+### Quick Start for Contributors
+
+1. Fork and clone the repository
+2. Install development dependencies:
+   ```bash
+   pip install poetry
+   poetry install
+   ```
+3. Install pre-commit hooks:
+   ```bash
+   poetry run pre-commit install
+   ```
+4. Make your changes
+5. Run tests:
+   ```bash
+   poetry run pytest
+   ```
+6. Submit a pull request
+
+For more detailed instructions, see [CONTRIBUTING.md](CONTRIBUTING.md).

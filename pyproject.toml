@@ -32,6 +32,7 @@ pypdf = "^4.1.0"
 playwright = "^1.41.0"
 anthropic = "^0.45.2"
 fastapi-mcp = "^0.3.4"
+fastmcp = "^2.10.4"
 mcp-proxy = "^0.8.0"
 
 [tool.poetry.group.dev.dependencies]
