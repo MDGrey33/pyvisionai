@@ -14,7 +14,7 @@ DEFAULT_PDF_EXTRACTOR = "page_as_image"  # or "text_and_images"
 
 # Model names
 OLLAMA_MODEL_NAME = "llama3.2-vision"  # Default Ollama model
-OPENAI_MODEL_NAME = "gpt-4o-mini"  # Default OpenAI model
+OPENAI_MODEL_NAME = "gpt-4o"  # Default OpenAI model
 
 # Default prompts for image description
 DEFAULT_PROMPT = (

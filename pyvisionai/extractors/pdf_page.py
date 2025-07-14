@@ -3,6 +3,7 @@
 import concurrent.futures
 import logging
 import os
+import shutil
 from typing import Tuple
 
 from pdf2image import convert_from_path
@@ -121,7 +122,12 @@ class PDFPageImageExtractor(BaseExtractor):
                 md_file.write(md_content)
 
             # Clean up pages directory after all pages are processed
-            os.rmdir(pages_dir)
+            try:
+                shutil.rmtree(pages_dir, ignore_errors=True)
+            except Exception as e:
+                logger.warning(
+                    f"Failed to cleanup pages directory: {e}"
+                )
 
             logger.info("PDF processing completed successfully")
             return md_file_path

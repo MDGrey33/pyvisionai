@@ -1,22 +1,28 @@
-feat(api): Add retry mechanism for API calls
+feat: Add MCP server with PDF extraction and enhance hybrid method
 
-Add robust retry mechanism to handle transient API failures:
-- Add RetryManager with configurable retry strategies (exponential, linear, constant)
-- Add custom error hierarchy (RetryableError, APIError, RateLimitError, etc.)
-- Integrate retry with Ollama and OpenAI API calls
-- Add comprehensive test suite with mocked API responses
-- Add logging for retry attempts and failures
+Major enhancements:
+- Add MCP (Model Context Protocol) server on port 8002 with 4 tools:
+  - describe_image_with_openai: OpenAI GPT-4 Vision image analysis
+  - describe_image_with_ollama: Local Ollama vision model analysis
+  - describe_image_with_claude: Anthropic Claude vision analysis
+  - extract_pdf_content: PDF content extraction with hybrid method support
 
-The retry mechanism handles:
-- Connection errors (network issues)
-- Rate limiting (429 responses)
-- Server errors (5xx responses)
-- API-specific errors (OpenAI/Ollama)
+- Implement hybrid PDF extraction method combining text_and_images + page_as_image:
+  - Preserves exact text while adding visual descriptions
+  - Optimized prompts to prevent LLM paraphrasing
+  - Parallel processing for better performance
+  - Separate output directories to prevent file collisions
 
-Tests:
-- Add test_api_retry.py with mocked API responses
-- Add test coverage for all retry scenarios
-- Mock time.sleep for faster test execution
+- Infrastructure improvements:
+  - Add unified server management script (run_servers.sh)
+  - Update Docker configurations with poppler-utils for PDF processing
+  - Set OpenAI default model to gpt-4o across all endpoints
+  - Add comprehensive MCP setup documentation and examples
 
-This change improves reliability of API calls without breaking existing functionality.
-No migration needed for existing code.
+- Bug fixes:
+  - Fix filename collision in PDF extractors
+  - Resolve temporary directory cleanup issues
+  - Fix API key environment variable fallback
+
+The hybrid PDF extraction method is now the recommended default, providing
+the best balance of text accuracy and visual analysis.

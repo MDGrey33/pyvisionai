@@ -7,6 +7,7 @@ from pyvisionai.extractors.docx import DocxTextImageExtractor
 from pyvisionai.extractors.docx_page import DocxPageImageExtractor
 from pyvisionai.extractors.html_page import HtmlPageImageExtractor
 from pyvisionai.extractors.pdf import PDFTextImageExtractor
+from pyvisionai.extractors.pdf_hybrid import PDFHybridExtractor
 from pyvisionai.extractors.pdf_page import PDFPageImageExtractor
 from pyvisionai.extractors.pptx import PptxTextImageExtractor
 from pyvisionai.extractors.pptx_page import PptxPageImageExtractor
@@ -17,6 +18,7 @@ EXTRACTORS: Dict[str, Dict[str, Type[BaseExtractor]]] = {
     "pdf": {
         "text_and_images": PDFTextImageExtractor,
         "page_as_image": PDFPageImageExtractor,  # Recommended for better results
+        "hybrid": PDFHybridExtractor,  # Best quality: combines both methods with LLM merge
     },
     "docx": {
         "text_and_images": DocxTextImageExtractor,

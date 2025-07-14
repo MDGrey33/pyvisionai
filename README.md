@@ -313,6 +313,7 @@ Optional Arguments:
   -e, --extractor TYPE   Extraction method:
                          - page_as_image: Convert pages to images (default)
                          - text_and_images: Extract text and images separately
+                         - hybrid: ⚠️ EXPERIMENTAL - NOT RECOMMENDED (see HYBRID_METHOD_DECISION.md)
                          Note: HTML only supports page_as_image
   -m, --model MODEL      Vision model for image description:
                          - gpt4: GPT-4 Vision (default)
@@ -352,6 +353,9 @@ file-extract -t html -s webpage.html -o output_dir  # HTML always uses page_as_i
 
 # Specify extraction method (not applicable for HTML)
 file-extract -t docx -s document.docx -o output_dir -e text_and_images
+
+# Use hybrid extraction (EXPERIMENTAL - NOT RECOMMENDED due to performance/accuracy issues)
+# file-extract -t pdf -s document.pdf -o output_dir -e hybrid
 
 # Use local Llama model for image description
 file-extract -t pptx -s slides.pptx -o output_dir -m llama
@@ -557,6 +561,73 @@ The Docker container supports the following environment variables:
 - Ensure your API keys are set in your environment before running
 - The image includes all necessary dependencies for processing PDFs, DOCX, PPTX, and HTML files
 - For production use, consider adding health checks and resource limits
+
+## Unified Server Management
+
+PyVisionAI provides a unified command to manage both the API server and MCP server:
+
+### Quick Start
+
+```bash
+# Start both servers (API on port 8001, MCP on port 8002)
+./run_servers.sh
+
+# Or using Python directly
+python scripts/run_pyvisionai.py
+```
+
+### Server Management Commands
+
+```bash
+# Start both servers (default)
+./run_servers.sh
+
+# Start only the API server
+./run_servers.sh --api
+
+# Start only the MCP server
+./run_servers.sh --mcp
+
+# Check server status
+./run_servers.sh --status
+
+# Stop all servers
+./run_servers.sh --stop
+
+# Build images and start servers
+./run_servers.sh --build
+
+# Use custom ports
+./run_servers.sh --api-port 8080 --mcp-port 8090
+```
+
+### What Each Server Provides
+
+1. **API Server (Port 8001)**
+   - REST API endpoints at `/api/v1/`
+   - Swagger UI at http://localhost:8001/docs
+   - Direct HTTP calls for image description and PDF extraction
+   - Suitable for programmatic access and web applications
+
+2. **MCP Server (Port 8002)**
+   - SSE endpoint at http://localhost:8002/sse
+   - Integration with Claude Desktop and Cursor
+   - Simplified tool interface for AI assistants
+   - Tools: `describe_image_with_openai`, `describe_image_with_ollama`, `describe_image_with_claude`, `extract_pdf_content`
+
+### MCP Configuration
+
+After starting the servers, add this to your Claude Desktop or Cursor configuration:
+
+```json
+{
+  "mcpServers": {
+    "pyvisionai": {
+      "url": "http://localhost:8002/sse"
+    }
+  }
+}
+```
 
 ## MCP (Model Context Protocol) Support
 

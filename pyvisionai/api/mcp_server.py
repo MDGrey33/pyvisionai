@@ -203,6 +203,80 @@ def describe_image_with_claude(
         return f"Error describing image with Claude: {str(e)}"
 
 
+@mcp.tool()
+def extract_pdf_content(
+    pdf_path: str,
+    method: str = "hybrid",
+    use_openai: bool = True,
+) -> str:
+    """
+    Extract content from a PDF document using advanced vision models.
+
+    The hybrid method is strongly recommended as it provides the best results by
+    combining accurate text extraction with comprehensive visual analysis.
+
+    Args:
+        pdf_path: Path to the PDF file
+        method: Extraction method - 'hybrid' (default, RECOMMENDED), 'page_as_image', or 'text_and_images'
+        use_openai: Use OpenAI GPT-4 (True) or local Ollama (False)
+
+    Returns:
+        Extracted content in markdown format with both text and visual descriptions
+    """
+    try:
+        from pyvisionai import create_extractor
+
+        # Log the extraction method being used
+        print(
+            f"Extracting PDF using '{method}' method (hybrid is recommended for best results)"
+        )
+
+        # Determine model and API key
+        if use_openai:
+            model = "gpt4"
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                return "Error: OpenAI API key not found in environment variables"
+        else:
+            model = "llama"
+            api_key = None
+
+        # Create output directory
+        output_dir = tempfile.mkdtemp(prefix="mcp_pdf_")
+
+        try:
+            # Create extractor
+            extractor = create_extractor(
+                file_type="pdf",
+                extractor_type=method,
+                model=model,
+                api_key=api_key,
+            )
+
+            # Extract content
+            output_path = extractor.extract(pdf_path, output_dir)
+
+            # Read the extracted content
+            with open(output_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Add a note about the extraction method used
+            if method != "hybrid":
+                content = f"*Note: Extracted using '{method}' method. For best results, use 'hybrid' method.*\n\n{content}"
+
+            return content
+
+        finally:
+            # Clean up
+            import shutil
+
+            if os.path.exists(output_dir):
+                shutil.rmtree(output_dir, ignore_errors=True)
+
+    except Exception as e:
+        return f"Error extracting PDF: {str(e)}\n\nTip: Make sure poppler-utils is installed for PDF processing."
+
+
 if __name__ == "__main__":
     # Run the MCP server
     mcp.run(transport="sse", host="0.0.0.0", port=8000)

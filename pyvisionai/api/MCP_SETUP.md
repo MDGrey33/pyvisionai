@@ -83,6 +83,13 @@ Once connected, Claude will have access to these image description tools:
 3. **describe_image_with_claude** - Analyze images with Anthropic's Claude Vision
 4. **describe_image_auto** - Let the system choose the best available model
 
+### Document Extraction Tools
+
+5. **extract_pdf_content** - Extract and analyze content from PDF documents
+   - Supports multiple extraction methods: page_as_image, text_and_images, or hybrid
+   - Automatically uses OpenAI GPT-4 Vision or local Ollama
+   - Returns markdown-formatted content with both text and visual descriptions
+
 ## Using PyVisionAI Tools in Claude
 
 You can now ask Claude to analyze images using natural language:

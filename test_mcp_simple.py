@@ -52,6 +52,7 @@ def test_mcp_server():
     print("     • describe_image_with_openai")
     print("     • describe_image_with_ollama")
     print("     • describe_image_with_claude")
+    print("     • extract_pdf_content")
 
     print("\n3. Configuration for Cursor:")
     cursor_config = {
@@ -73,6 +74,22 @@ def test_mcp_server():
     print('   - "Analyze this screenshot using OpenAI vision"')
     print('   - "Describe this image using the local Ollama model"')
     print('   - "Use Claude to analyze this diagram"')
+    print(
+        '   - "Extract content from the PDF at /path/to/document.pdf"'
+    )
+    print(
+        '   - "Extract text and images from this PDF" (uses hybrid method by default)'
+    )
+    print(
+        '   - "Analyze this PDF with page_as_image method" (specify method if needed)'
+    )
+
+    print(
+        "\n   Note: The hybrid method is strongly recommended for PDFs as it provides"
+    )
+    print(
+        "         the most comprehensive results by combining text accuracy with visual analysis."
+    )
 
     print("\n5. Docker Management:")
     print(

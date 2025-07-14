@@ -3,8 +3,10 @@
 import base64
 import io
 import os
+import shutil
 import tempfile
 import time
+from datetime import datetime
 from enum import Enum
 from typing import Optional
 
@@ -14,6 +16,7 @@ from fastapi_mcp import FastApiMCP
 from pydantic import BaseModel, Field
 
 from pyvisionai import (
+    create_extractor,
     describe_image,
     describe_image_claude,
     describe_image_ollama,
@@ -144,6 +147,48 @@ class ErrorResponse(BaseModel):
     status_code: int
 
 
+class PDFExtractionResponse(BaseModel):
+    """Response model for PDF extraction."""
+
+    content: str = Field(
+        ...,
+        description="Extracted content from the PDF in markdown format",
+        example="# Document Title\n\n## Page 1\n\nThis is the extracted content...",
+    )
+    model_used: str = Field(
+        ...,
+        description="The model that was used for extraction",
+        example="gpt-4o",
+    )
+    extraction_method: str = Field(
+        ...,
+        description="The extraction method used",
+        example="hybrid",
+    )
+    processing_time: float = Field(
+        ...,
+        description="Time taken to process the request in seconds",
+        example=15.67,
+    )
+    page_count: int = Field(
+        ...,
+        description="Number of pages processed",
+        example=5,
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "content": "# Annual Report 2023\n\n## Page 1\n\nIntroduction text...",
+                "model_used": "gpt-4o",
+                "extraction_method": "hybrid",
+                "processing_time": 15.67,
+                "page_count": 5,
+            }
+        }
+    }
+
+
 def save_uploaded_file(
     file_content: bytes, suffix: str = ".jpg"
 ) -> str:
@@ -204,9 +249,9 @@ async def describe_image_openai_endpoint(
         description="OpenAI API key (uses OPENAI_API_KEY env var if not provided)",
     ),
     model: Optional[str] = Form(
-        "gpt-4o-mini",
-        description="OpenAI model to use (defaults to gpt-4o-mini)",
-        example="gpt-4o-mini",
+        "gpt-4o",
+        description="OpenAI model to use (defaults to gpt-4o)",
+        example="gpt-4o",
     ),
     prompt: Optional[str] = Form(
         "Describe this image in detail",
@@ -464,6 +509,331 @@ async def describe_image_auto_endpoint(
         if 'image_path' in locals():
             try:
                 os.unlink(image_path)
+            except Exception:
+                pass
+
+
+@app.post(
+    "/api/v1/extract/pdf",
+    response_model=PDFExtractionResponse,
+    operation_id="extract_pdf_hybrid",
+    summary="Extract PDF content using hybrid method - Combines text and visual extraction for comprehensive results",
+    description="Extract content from PDF using hybrid method (combines text_and_images + page_as_image). Supports OpenAI and Ollama models. Note: This is experimental and slower than individual methods.",
+    tags=["Document Extraction"],
+    responses={
+        200: {
+            "description": "Successfully extracted PDF content",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "content": "# Document Title\n\n## Page 1\n\nExtracted content with both text and visual descriptions...",
+                        "model_used": "gpt-4o",
+                        "extraction_method": "hybrid",
+                        "processing_time": 15.67,
+                        "page_count": 5,
+                    }
+                }
+            },
+        },
+        400: {
+            "description": "Invalid file type - only PDF files are supported"
+        },
+        422: {
+            "description": "Validation error - missing file or invalid parameters"
+        },
+        500: {
+            "description": "Internal server error or extraction failure"
+        },
+    },
+)
+async def extract_pdf_hybrid_endpoint(
+    file: UploadFile = File(
+        ...,
+        description="PDF file to extract content from",
+    ),
+    model_type: str = Form(
+        "openai",
+        description="Model type to use: 'openai' or 'ollama'",
+        regex="^(openai|ollama)$",
+    ),
+    model: Optional[str] = Form(
+        None,
+        description="Specific model to use. For OpenAI: gpt-4o, gpt-4o-mini, etc. For Ollama: llama3.2-vision:latest, etc.",
+    ),
+    api_key: Optional[str] = Form(
+        None,
+        description="API key for OpenAI (uses OPENAI_API_KEY env var if not provided). Not needed for Ollama.",
+    ),
+    prompt: Optional[str] = Form(
+        None,
+        description="Custom prompt for extraction (optional)",
+    ),
+):
+    """
+    Extract content from PDF using hybrid method.
+
+    This endpoint uses the experimental hybrid extraction method that combines:
+    - text_and_images: Accurate text extraction
+    - page_as_image: Visual layout understanding
+
+    The results are merged using an LLM to provide comprehensive extraction.
+
+    Note: This method is 2-3x slower than individual extraction methods.
+    """
+    start_time = time.time()
+
+    # Validate file type
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF files are supported for hybrid extraction",
+        )
+
+    # Save uploaded file with datetime tag
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    file_content = await file.read()
+    pdf_filename = f"upload_{timestamp}.pdf"
+    pdf_path = save_uploaded_file(file_content, suffix=".pdf")
+
+    # Create a unique output directory with timestamp
+    output_base_dir = tempfile.gettempdir()
+    output_dir = os.path.join(
+        output_base_dir, f"pdf_extract_{timestamp}"
+    )
+    os.makedirs(output_dir, exist_ok=True)
+
+    try:
+        # Determine model to use
+        if model_type == "openai":
+            actual_model = model or "gpt-4o"
+            if not api_key:
+                api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise HTTPException(
+                    status_code=422,
+                    detail="OpenAI API key is required (provide in request or set OPENAI_API_KEY env var)",
+                )
+        else:  # ollama
+            actual_model = model or "llama3.2-vision:latest"
+            api_key = None  # Ollama doesn't need API key
+
+        # Create hybrid extractor
+        # For create_extractor, we need to use "gpt4" not the specific model name
+        extractor_model = "gpt4" if model_type == "openai" else "llama"
+        extractor = create_extractor(
+            file_type="pdf",
+            extractor_type="hybrid",
+            model=extractor_model,
+            api_key=api_key,
+            prompt=prompt,
+        )
+
+        # Set the specific OpenAI model if provided
+        if model_type == "openai" and model:
+            # The extractor will use this specific model for OpenAI calls
+            extractor.text_image_extractor.model = actual_model
+            extractor.page_image_extractor.model = actual_model
+
+        # Extract content
+        output_path = extractor.extract(pdf_path, output_dir)
+
+        # Read extracted content
+        with open(output_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Count pages (simple approach - count "## Page" occurrences)
+        page_count = content.count("## Page")
+
+        processing_time = time.time() - start_time
+
+        return PDFExtractionResponse(
+            content=content,
+            model_used=actual_model,
+            extraction_method="hybrid",
+            processing_time=processing_time,
+            page_count=page_count,
+        )
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Failed to extract PDF content",
+                "detail": str(e),
+                "extraction_method": "hybrid",
+            },
+        )
+    finally:
+        # Cleanup uploaded file
+        if os.path.exists(pdf_path):
+            try:
+                os.unlink(pdf_path)
+            except Exception as e:
+                # Log but don't fail if cleanup fails
+                print(
+                    f"Warning: Failed to cleanup uploaded file {pdf_path}: {e}"
+                )
+
+        # Cleanup output directory with retry
+        if os.path.exists(output_dir):
+            try:
+                shutil.rmtree(output_dir, ignore_errors=True)
+            except Exception as e:
+                # Log but don't fail if cleanup fails
+                print(
+                    f"Warning: Failed to cleanup output directory {output_dir}: {e}"
+                )
+
+
+@app.post(
+    "/api/v1/extract/pdf/simple",
+    response_model=PDFExtractionResponse,
+    operation_id="extract_pdf_content",
+    summary="Extract PDF content - Use this tool to extract and analyze content from PDF documents",
+    description="Extract content from PDF using the best available method. Automatically selects between text extraction and visual analysis based on the PDF structure.",
+    tags=["Document Extraction", "MCP Tools"],
+    responses={
+        200: {
+            "description": "Successfully extracted PDF content",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "content": "# Document Title\n\n## Page 1\n\nExtracted content...",
+                        "model_used": "gpt-4o",
+                        "extraction_method": "page_as_image",
+                        "processing_time": 8.5,
+                        "page_count": 3,
+                    }
+                }
+            },
+        },
+        400: {
+            "description": "Invalid file type - only PDF files are supported"
+        },
+        422: {
+            "description": "Validation error - missing file or invalid parameters"
+        },
+        500: {
+            "description": "Internal server error or extraction failure"
+        },
+    },
+)
+async def extract_pdf_simple_endpoint(
+    file: UploadFile = File(
+        ...,
+        description="PDF file to extract content from",
+    ),
+    method: Optional[str] = Form(
+        "hybrid",
+        description="Extraction method: 'hybrid' (default, RECOMMENDED for best results), 'page_as_image', or 'text_and_images'",
+        regex="^(page_as_image|text_and_images|hybrid)$",
+    ),
+    use_openai: bool = Form(
+        True,
+        description="Use OpenAI GPT-4 Vision (True) or local Ollama (False)",
+    ),
+    api_key: Optional[str] = Form(
+        None,
+        description="API key for OpenAI (uses OPENAI_API_KEY env var if not provided)",
+    ),
+):
+    """
+    Extract content from PDF documents for MCP tools.
+
+    This endpoint is optimized for MCP usage with simpler parameters:
+    - Automatic model selection (OpenAI by default)
+    - Simplified method selection
+    - Better error handling for MCP contexts
+    """
+    start_time = time.time()
+
+    # Validate file type
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(
+            status_code=400, detail="Only PDF files are supported"
+        )
+
+    # Save uploaded file
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    file_content = await file.read()
+    pdf_path = save_uploaded_file(file_content, suffix=".pdf")
+
+    # Create output directory
+    output_base_dir = tempfile.gettempdir()
+    output_dir = os.path.join(
+        output_base_dir, f"pdf_extract_{timestamp}"
+    )
+    os.makedirs(output_dir, exist_ok=True)
+
+    try:
+        # Determine model configuration
+        if use_openai:
+            model = "gpt4"
+            actual_model_name = "gpt-4o"
+            if not api_key:
+                api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise HTTPException(
+                    status_code=422,
+                    detail="OpenAI API key is required (provide in request or set OPENAI_API_KEY env var)",
+                )
+        else:
+            model = "llama"
+            actual_model_name = "llama3.2-vision:latest"
+            api_key = None
+
+        # Create extractor
+        extractor = create_extractor(
+            file_type="pdf",
+            extractor_type=method,
+            model=model,
+            api_key=api_key,
+        )
+
+        # Extract content
+        output_path = extractor.extract(pdf_path, output_dir)
+
+        # Read extracted content
+        with open(output_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Count pages
+        page_count = content.count("## Page")
+        if page_count == 0:  # Fallback for different formatting
+            page_count = content.count("# Page")
+
+        processing_time = time.time() - start_time
+
+        return PDFExtractionResponse(
+            content=content,
+            model_used=actual_model_name,
+            extraction_method=method,
+            processing_time=processing_time,
+            page_count=page_count,
+        )
+
+    except Exception as e:
+        # Return a more MCP-friendly error response
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Failed to extract PDF content",
+                "detail": str(e),
+                "extraction_method": method,
+                "suggestion": "Try using 'text_and_images' method if 'page_as_image' fails",
+            },
+        )
+    finally:
+        # Cleanup
+        if os.path.exists(pdf_path):
+            try:
+                os.unlink(pdf_path)
+            except Exception:
+                pass
+
+        if os.path.exists(output_dir):
+            try:
+                shutil.rmtree(output_dir, ignore_errors=True)
             except Exception:
                 pass
 

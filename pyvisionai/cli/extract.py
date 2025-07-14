@@ -127,9 +127,9 @@ def main():
     parser.add_argument(
         "-e",
         "--extractor",
-        choices=["text_and_images", "page_as_image"],
+        choices=["text_and_images", "page_as_image", "hybrid"],
         default=DEFAULT_PDF_EXTRACTOR,
-        help="Type of extractor to use",
+        help="Type of extractor to use (hybrid combines both methods for best quality)",
     )
     parser.add_argument(
         "-m",
